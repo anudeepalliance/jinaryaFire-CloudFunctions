@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
 admin.initializeApp()
 
-
+//Just checking once
 // auth trigger (new user signup)
 exports.newUserSignUp = functions.auth.user().onCreate(user => {
     return admin.firestore().collection('userFunction').doc(user.uid).set( {
@@ -37,4 +37,3 @@ exports.sendFeedback = functions.https.onCall((data, context) => {
       uid: context.auth.uid
     })
   })
-
