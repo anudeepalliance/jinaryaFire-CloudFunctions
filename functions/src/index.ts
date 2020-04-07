@@ -18,6 +18,7 @@ exports.userDeleted = functions.auth.user().onDelete( user => {
 })
 
 // http callable function (adding a request)
+//Check if this was added
 exports.sendFeedback = functions.https.onCall((data, context) => {
     if (!context.auth) {
       throw new functions.https.HttpsError(
