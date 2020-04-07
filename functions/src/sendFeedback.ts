@@ -3,7 +3,7 @@ const admin = require('firebase-admin')
 admin.initializeApp()
 
 // http callable function (adding a request)
-export const sendFeedback = functions.https.onCall((data, context) => {
+export const sendFeedback = functions.region('asia-east2').https.onCall((data, context) => {
     if (!context.auth) {
       throw new functions.https.HttpsError(
         'unauthenticated', 
