@@ -9,7 +9,7 @@ export { newUserSignUp } from './userCreated'
 export { userDeleted } from './userDeleted'
 
 
-//-----------------------------------------------------------------------------------------------------------------------------------
+//(1)-----------------------------------------------------------------------------------------------------------------------------------
 //Send Feedback Function: This  takes in user feedback and adds to a Firestore database as an admin
 exports.sendFeedback = functions.region('asia-east2').https.onCall((data, context) => {
     
@@ -34,7 +34,15 @@ exports.sendFeedback = functions.region('asia-east2').https.onCall((data, contex
     
   })
 //-----------------------------------------------------------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+//(2)-----------------------------------------------------------------------------------------------------------------------------------
 //A test http callable function (adding a request)
 exports.addRequest = functions.https.onCall((data, context) => {
 
