@@ -18,9 +18,9 @@ exports.newFollowerGained1 = functions.region('asia-east2').firestore
     
     //get the follower details
     const followerPersonUid = context.params.userId
-    const followerPersonName = ""
-    const followerPersonProfilePhotoChosen = ""
-    const followerPersonUserName = ""
+    const followerPersonName = context.params.name
+    const followerPersonProfilePhotoChosen = context.params.profilePhotoChosen
+    const followerPersonUserName = context.params.userName
   
 
     return admin.firestore()
