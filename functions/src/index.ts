@@ -27,10 +27,10 @@ exports.newFollowerGained1 = functions.region('asia-east2').firestore
     .collection('Users').doc(`${followeePersonUid}`)
     .collection('Followers').doc(`${followerPersonUid}`)
     .set( {
-      name: followerPersonName,
-      userName: followerPersonUserName,
-      profilePhotoChosen: followerPersonProfilePhotoChosen,
-      uid: followerPersonUid
+      name: "followerPersonName",
+      userName: "followerPersonUserName",
+      profilePhotoChosen: "followerPersonProfilePhotoChosen",
+      uid: "followerPersonUid"
     })
 
       // const followerName = snap.data().age
