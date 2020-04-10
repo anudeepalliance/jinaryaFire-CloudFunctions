@@ -18,7 +18,7 @@ exports.newFollowerGained1 = functions.region('asia-east2').firestore
     
     //get the follower details
     const followerPersonUid = context.params.userId
-    // const followerPersonName = context.params.name
+    const followerPersonName = context.params.name
     // const followerPersonProfilePhotoChosen = context.params.profilePhotoChosen
     // const followerPersonUserName = context.params.userName
   
@@ -27,7 +27,7 @@ exports.newFollowerGained1 = functions.region('asia-east2').firestore
     .collection('Users').doc(`${followeePersonUid}`)
     .collection('Followers').doc(`${followerPersonUid}`)
     .set( {
-      name: "followerPersonName",
+      name: followerPersonName,
       userName: "followerPersonUserName",
       profilePhotoChosen: "followerPersonProfilePhotoChosen",
       uid: followerPersonUid
