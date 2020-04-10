@@ -18,9 +18,9 @@ exports.newFollowerGained1 = functions.region('asia-east2').firestore
     
     //get the follower details
     const followerPersonUid = context.params.userId
-    const followerPersonName = context.params.name
-    const followerPersonProfilePhotoChosen = context.params.profilePhotoChosen
-    const followerPersonUserName = context.params.userName
+    // const followerPersonName = context.params.name
+    // const followerPersonProfilePhotoChosen = context.params.profilePhotoChosen
+    // const followerPersonUserName = context.params.userName
   
 
     return admin.firestore()
@@ -30,7 +30,7 @@ exports.newFollowerGained1 = functions.region('asia-east2').firestore
       name: "followerPersonName",
       userName: "followerPersonUserName",
       profilePhotoChosen: "followerPersonProfilePhotoChosen",
-      uid: "followerPersonUid"
+      uid: followerPersonUid
     })
 
       // const followerName = snap.data().age
