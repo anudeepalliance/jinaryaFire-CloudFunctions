@@ -16,3 +16,8 @@ exports.sendUserFeedback = sendUserFeedback.sendFeedback
 //to the followee's followers sub collection
 import addNewFollower = require('./addNewFollower')
 exports.addNewFollower = addNewFollower.newFollowerGained
+
+//When client un-follows a user, it  calls a callable function to remove follower(himself)
+//from the unfollowee's followers sub collection
+import removeFollower = require('./removeFollower')
+exports.removeFollower = removeFollower.removeTheFollower

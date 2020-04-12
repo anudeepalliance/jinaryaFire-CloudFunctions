@@ -14,8 +14,10 @@ export const removeTheFollower = functions.region('asia-east2').https.onCall((un
       const unFollowerPersonUid = unFollowData.unFollowerPersonUid
       const unFolloweePersonUid = unFollowData.unFolloweePersonUid
   
-      return admin.firestore()
+      const followeeFollowerDoc = admin.firestore()
       .collection('Users').doc(unFolloweePersonUid)
-      .collection('Followers').doc(unFollowerPersonUid).delete()
+      .collection('Followers').doc(unFollowerPersonUid)
+
+      return followeeFollowerDoc.delete()
     
   })
