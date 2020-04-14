@@ -11,13 +11,13 @@ export const removeTheFollower = functions.region('asia-east2').https.onCall((un
         );
       }
   
-      const unFollowerPersonUid = unFollowData.unFollowerPersonUid
-      const unFolloweePersonUid = unFollowData.unFolloweePersonUid
+      const unFollowerUid = context.auth.uid
+      const unFolloweeUid = unFollowData.unFolloweeUid
   
-      const followeeFollowerDoc = admin.firestore()
-      .collection('Users').doc(unFolloweePersonUid)
-      .collection('Followers').doc(unFollowerPersonUid)
-
-      return followeeFollowerDoc.delete()
+      return admin.firestore()
+      .collection('Users').doc(unFolloweeUid)
+      .update({
+        followers: admin.firestore.FieldValue.arrayRemove(unFollowerUid)
+      })
     
   })
