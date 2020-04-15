@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
 
 
-export const stopFollowingTheBlocker = functions.region('asia-east2').https.onCall((blockedData, context) => {
+export const stopFollowingTheBlocked = functions.region('asia-east2').https.onCall((blockedData, context) => {
     
     if (!context.auth) {
         throw new functions.https.HttpsError(

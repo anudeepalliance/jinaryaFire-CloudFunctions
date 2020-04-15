@@ -26,6 +26,6 @@ exports.removeFollower = removeFollower.removeTheFollower
 
 //When client blocks a person, it  calls a callable function to remove blocker(himself)
 //from the blocked person's following array field
-import stopFollowingBlocker = require('./FollowFunctions/stopFollowingBlocker')
-exports.stopFollowingBlocker = stopFollowingBlocker.stopFollowingTheBlocker
+import stopFollowingBlocked = require('./FollowFunctions/stopFollowingBlocked')
+exports.stopFollowingBlocked = stopFollowingBlocked.stopFollowingTheBlocked
 
