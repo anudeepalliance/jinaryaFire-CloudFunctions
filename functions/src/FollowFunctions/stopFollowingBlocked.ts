@@ -1,7 +1,8 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
 
-
+//When client blocks a person, it  calls a callable function to remove blocker(himself)
+//from the blocked person's following array field
 export const stopFollowingTheBlocked = functions.region('asia-east2').https.onCall((blockedData, context) => {
     
     if (!context.auth) {
