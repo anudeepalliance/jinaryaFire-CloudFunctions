@@ -16,8 +16,8 @@ const admin = require('firebase-admin')
     return admin.firestore().collection('UserReports').add({
         reporteeUid : userReportData.reporteeUid,
         reportCategory: userReportData.reportCategory,
-        reporterUid: userReportData.reporterUid,
-        date: userReportData.date,
+        reporterUid: context.auth.uid,
+        date: userReportData.date
      })
     
     
