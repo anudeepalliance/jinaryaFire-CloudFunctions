@@ -10,8 +10,12 @@ export { newUserSignUp } from './for Development/userCreated'
 export { userDeleted } from './for Development/userDeleted'
 
 //https callable function triggered when client sends feedback
-import sendUserFeedback = require('./UserFeedback/sendUserFeedback')
+import sendUserFeedback = require('./ReportAndFeedback/sendUserFeedback')
 exports.sendUserFeedback = sendUserFeedback.sendFeedback
+
+//https callable function triggered when client reports a Person
+import reportPerson = require('./ReportAndFeedback/reportPerson')
+exports.reportPerson = reportPerson.reportThePerson
 
 //When client followes a user, it  calls a callable function to add follower(himself)
 //to the followee's follwers arrayField in the UserDoc

@@ -15,7 +15,7 @@ const admin = require('firebase-admin')
       )
      } 
 
-     //A random id for the feedback document is added here everytime a feedback 
+     //A random id for the feedback document is generated here everytime a feedback 
      //is given instead of using a uid of the user so that if a user submits multiple feedbacks
      //then the previous feedback document should not be distrubed
     return admin.firestore().collection('Feedback').add({
