@@ -24,8 +24,8 @@ exports.addNewFollower = addNewFollower.newFollowerGained
 
 //When client un-follows a user, it  calls a callable function to remove follower(himself)
 //from the unfollowee's followers array field
-import removeFollower = require('./FollowFunctions/removeFollower')
-exports.removeFollower = removeFollower.removeTheFollower
+import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
+exports.removeUserAsFollower = removeUserAsFollower.removeTheUserAsFollower
 
 
 //When client blocks a person, it  calls a callable function to remove blocker(himself)
