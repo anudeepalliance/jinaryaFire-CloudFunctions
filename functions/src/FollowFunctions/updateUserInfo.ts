@@ -20,9 +20,9 @@ const followerColl = admin.firestore().collection('Users').doc(updatersUserId).c
 //I find the other documents at firestore that needs updation with this 
 //updated information of the user
 
-return followerColl.get().then((querySnapshot: { documents: DocumentSnapshot[] }) => {
-    const promises = querySnapshot.documents.map((document) => {
-        const followerUid = document.id
+return followerColl.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
+    const promises = querySnapshot.docs.map((doc) => {
+        const followerUid = doc.id
         return admin.firestore().collection('Users').doc(followerUid).collection('followers')
         .doc(updatersUserId).set({
             name: newName, 
