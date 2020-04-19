@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 
 
@@ -12,14 +13,14 @@ const profilePhotoChosen = upDatedUserData?.profilePhotoChosen
 const updatersUserId = upDatedUserData?.uid
 const newUserName = upDatedUserData?.userName
 
-const userDoc = change.after.ref.parent
+// const userDoc = change.after.ref.parent
 const followerColl = admin.firestore().collection('Users').doc(updatersUserId).collection('followers')
 
 //This is where I am stuck, I have the updated document info but how do
 //I find the other documents at firestore that needs updation with this 
 //updated information of the user
 
-return followerColl.get().then((querySnapshot: { documents: any[] }) => {
+return followerColl.get().then((querySnapshot: { documents: DocumentSnapshot[] }) => {
     const promises = querySnapshot.documents.map((doc) => {
         const followerUid = doc.id
         return admin.firestore().collection('Users').doc(followerUid).collection('followers')
