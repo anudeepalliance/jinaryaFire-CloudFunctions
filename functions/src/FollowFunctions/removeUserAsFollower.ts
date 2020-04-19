@@ -16,9 +16,7 @@ export const removeTheUserAsFollower = functions.region('asia-east2').https.onCa
       const unFolloweeUid = unFollowData.unFolloweeUid
   
       return admin.firestore()
-      .collection('Users').doc(unFolloweeUid)
-      .update({
-        followers: admin.firestore.FieldValue.arrayRemove(unFollowerUid)
-      })
+      .collection('Users').doc(unFolloweeUid).collection('followers').doc(unFollowerUid)
+      .delete()
     
   })
