@@ -35,5 +35,5 @@ exports.stopFollowingBlockerAddToBlockedBy = stopFollowingBlockerAddToBlockedBy.
 
 //When client unBlocks a person, it  calls a callable function to remove unblockee(himself)
 //from the blockedBy Sub Col of the blocked
-import removeUnBlockeeFomBlockedBy = require('./FollowFunctions/removeUnBlockeeFromBlockedBy')
-exports.removeUnBlockeeFomBlockedBy = removeUnBlockeeFomBlockedBy.removeTheUnBlockeeFomBlockedBy
+import removeUnBlockeeFromBlockedBy = require('./FollowFunctions/removeUnBlockeeFromBlockedBy')
+exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeTheUnBlockeeFomBlockedBy
