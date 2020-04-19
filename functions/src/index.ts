@@ -19,8 +19,8 @@ exports.reportPerson = reportPerson.reportThePerson
 
 //When client followes a user, it  calls a callable function to add follower(himself)
 //to the followee's follwers arrayField in the UserDoc
-// import addNewFollower = require('./FollowFunctions/addNewFollower')
-// exports.addNewFollower = addNewFollower.newFollowerGained
+import addNewFollower = require('./FollowFunctions/addNewFollower')
+exports.addNewFollower = addNewFollower.newFollowerGained
 
 //When client un-follows a user, it  calls a callable function to remove follower(himself)
 //from the unfollowee's followers array field

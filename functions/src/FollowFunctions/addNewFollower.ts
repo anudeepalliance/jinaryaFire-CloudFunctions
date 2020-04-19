@@ -14,7 +14,7 @@ export const newFollowerGained = functions.region('asia-east2').https.onCall((fo
   
       const followerName = followerData.name
       const followerUserName  = followerData.userName
-      const followerProfilePhotoChosen = followerData.ProfilePhotoChosen
+      // const followerProfilePhotoChosen = followerData.profilePhotoChosen
       const followerUid = context.auth.uid
       const followeeUid = followerData.followeeUid
 
@@ -25,8 +25,8 @@ export const newFollowerGained = functions.region('asia-east2').https.onCall((fo
         name: followerName,
         userName: followerUserName,
         uid: followerUid,
-        profilePhotoChosen: followerProfilePhotoChosen
-        }) 
+        // profilePhotoChosen: followerProfilePhotoChosen
+        })
 
   })
   
