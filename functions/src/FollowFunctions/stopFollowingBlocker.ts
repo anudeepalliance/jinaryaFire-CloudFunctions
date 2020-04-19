@@ -14,6 +14,12 @@ export const stopFollowingTheBlocker = functions.region('asia-east2').https.onCa
   
       const blockerUid = context.auth.uid
       const blockedUid = blockedData.blockedUid
+
+      admin.firestore()
+      .collection('Users').doc(blockedUid).collection('blockedBy').doc(blockerUid)
+      .set({
+        uid: blockerUid
+      })
   
       return admin.firestore()
       .collection('Users').doc(blockedUid)
