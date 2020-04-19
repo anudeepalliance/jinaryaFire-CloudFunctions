@@ -37,3 +37,9 @@ exports.stopFollowingBlockerAddToBlockedBy = stopFollowingBlockerAddToBlockedBy.
 //from the blockedBy Sub Col of the blocked
 import removeUnBlockeeFromBlockedBy = require('./FollowFunctions/removeUnBlockeeFromBlockedBy')
 exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeTheUnBlockeeFomBlockedBy
+
+//When a user updates his userDoc like name or UserName then this updated info needs to be
+//reflected in the follower Doc and following Doc of all the other users that this user is following or is
+// a follower
+import updateUserInfo = require('./FollowFunctions/updateUserInfo')
+exports.updateUserInfo = updateUserInfo.onUserDocUpdate
