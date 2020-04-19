@@ -21,8 +21,8 @@ const followerColl = admin.firestore().collection('Users').doc(updatersUserId).c
 //updated information of the user
 
 return followerColl.get().then((querySnapshot: { documents: DocumentSnapshot[] }) => {
-    const promises = querySnapshot.documents.map((doc) => {
-        const followerUid = doc.id
+    const promises = querySnapshot.documents.map((document) => {
+        const followerUid = document.id
         return admin.firestore().collection('Users').doc(followerUid).collection('followers')
         .doc(updatersUserId).set({
             name: newName, 
