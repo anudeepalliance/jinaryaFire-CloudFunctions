@@ -39,7 +39,11 @@ import removeUnBlockeeFromBlockedBy = require('./FollowFunctions/removeUnBlockee
 exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeTheUnBlockeeFomBlockedBy
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
-//reflected in the follower Doc and following Doc of all the other users that this user is following or is
-// a follower
-import updateUserInfo = require('./FollowFunctions/updateUserInfo')
-exports.updateUserInfo = updateUserInfo.onUserDocUpdate
+//reflected in the followees' followers sub coll of all the other users that the this user to following
+import updateUserInfoToFollowees = require('./FollowFunctions/updateUserInfoToFollowees')
+exports.updateUserInfoToFollowees = updateUserInfoToFollowees.updateUserInfoToTheFollowees
+
+//When a user updates his userDoc like name or UserName then this updated info needs to be
+//reflected in the followers' following doc of all the other users that is a follower of this user 
+import updateUserInfoToFollowers = require('./FollowFunctions/updateUserInfoToFollowers')
+exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToTheFollowers

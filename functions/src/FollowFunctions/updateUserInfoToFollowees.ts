@@ -3,7 +3,7 @@ import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 
 
-export const onUserDocUpdate = functions.region('asia-east2').firestore.document
+export const updateUserInfoToTheFollowees = functions.region('asia-east2').firestore.document
 ('Users/{userId}').onUpdate((change, context) => {
 
 const upDatedUserData = change.after.data()
