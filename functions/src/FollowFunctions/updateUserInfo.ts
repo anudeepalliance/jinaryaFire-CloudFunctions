@@ -14,7 +14,7 @@ const updatersUserId = upDatedUserData?.uid
 const newUserName = upDatedUserData?.userName
 
 // const userDoc = change.after.ref.parent
-const followerColl = admin.firestore().collection('Users').doc(updatersUserId).collection('followers')
+const followerColl = admin.firestore().collection('Users').doc(updatersUserId).collection('following')
 
 //This is where I am stuck, I have the updated document info but how do
 //I find the other documents at firestore that needs updation with this 
