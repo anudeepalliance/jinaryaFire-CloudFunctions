@@ -31,7 +31,7 @@ return followerColl.get().then(((querySnapshot: { documents: any[] }) => {
         })
     })
     return Promise.all(promises)
-    })   
+    }))
 })
 
 
