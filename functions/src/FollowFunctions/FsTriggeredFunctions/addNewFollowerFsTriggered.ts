@@ -12,11 +12,10 @@ let followerName : string = ""
 let followerUserName : string = ""
 
 //Follower user details that needs to be duplicated to the Followee's following Sub Coll
-admin.firestore().collection('Users').doc(followerUid).get().then((doc: { exists: any; data: () => { (): any; new(): any; name: string; userName: string } }) => {
-    if ( doc.exists ) {
-            followerName = doc.data().name
-            followerUserName = doc.data().userName
-    }
+admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
+
+        followerName = doc.data().name
+        followerUserName = doc.data().userName
 })
 
 let followerData = {
