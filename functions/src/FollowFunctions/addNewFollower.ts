@@ -23,11 +23,12 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
 
     let followeeToken =  notificationTokenDoc.data().notificationToken
 
+
           // Notification details.
           const payload = {
             notification: {
               title: 'You have a new follower!',
-              body: `${name} is now following you.`,
+              body: `${followerData.name} is now following you.`,
               icon: ''
             }
           };
@@ -45,5 +46,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     return followeeFollowersFollowerUidDoc.set(followerData)
         
   })
+
+})
 
 })
