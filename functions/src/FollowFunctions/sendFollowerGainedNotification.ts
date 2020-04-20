@@ -3,7 +3,7 @@ const admin = require('firebase-admin')
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the user's followees' followers sub coll of all the other users that he is following
-export const addTheNewFollower = functions.region('asia-east2').firestore.document
+export const sendTheFollowerGainedNotification = functions.region('asia-east2').firestore.document
   ('Users/{followerUserId}/following/{followeeUserId}').onCreate((data, context) => {
 
   const followeeUid = context.params.followeeUserId
