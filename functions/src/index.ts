@@ -19,34 +19,24 @@ exports.reportPerson = reportPerson.reportThePerson
 
 //When client followes a user, a firestore .onCreate() background function is triggered to add follower
 //to the followee's followers sub collection
-import addNewFollowerFsTrigger = require('./FollowFunctions/FsTriggeredFunctions/addNewFollowerFsTriggered')
-exports.addNewFollowerFsTrigger = addNewFollowerFsTrigger.addTheNewFollowerFsTriggered
+import addNewFollower = require('./FollowFunctions/addNewFollower')
+exports.addNewFollower = addNewFollower.addTheNewFollower
 
 //When client un-follows a user, it calls a background FS triggered function to remove follower(the client)
 //from the unfollowee's followers sub collection
-import removeUserAsFollowerFsTriggered = require('./FollowFunctions/FsTriggeredFunctions/removeUserAsFollowerFsTriggered')
-exports.removeUserAsFollowerFsTriggered = removeUserAsFollowerFsTriggered.removeUserAsTheFollowerFsTriggered
+import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
+exports.removeUserAsFollower = removeUserAsFollower.removeUserAsTheFollower
 
 
 //When client blocks a person, it  calls a callable function to remove blocker(himself)
 //from the blocked person's following sub collection
-// import stopFollowingBlockerAddToBlockedBy = require('./FollowFunctions/stopFollowingBlockerAndAddToBlockedBy')
-// exports.stopFollowingBlockerAddToBlockedBy = stopFollowingBlockerAddToBlockedBy.stopFollowingTheBlockerAndToBlockedBy
+import stopFollowingBlockerAddToBlockedBy = require('./FollowFunctions/stopFollowingBlockerAndAddToBlockedBy')
+exports.stopFollowingBlockerAddToBlockedBy = stopFollowingBlockerAddToBlockedBy.stopFollowingTheBlockerAndToBlockedBy
 
 //When client unBlocks a person, it  calls a callable function to remove unblockee(himself)
 //from the blockedBy Sub Col of the blocked
-// import removeUnBlockeeFromBlockedBy = require('./FollowFunctions/removeUnBlockeeFromBlockedBy')
-// exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeTheUnBlockeeFromBlockedBy
-
-//When client blocks a person, it  calls a callable function to remove blocker(himself)
-//from the blocked person's following sub collection
-import stopFollowingBlockerAddToBlockedByFsTriggered = require('./FollowFunctions/FsTriggeredFunctions/stopFollowingBlockerAndAddToBlockedByFsTriggered')
-exports.stopFollowingBlockerAddToBlockedByFsTriggered = stopFollowingBlockerAddToBlockedByFsTriggered.stopFollowingTheBlockerAndToBlockedByFsTriggered
-
-//When client unBlocks a person, it  calls a callable function to remove unblockee(himself)
-//from the blockedBy Sub Col of the blocked
-import removeUnBlockeeFromBlockedByFsTriggered = require('./FollowFunctions/FsTriggeredFunctions/removeUnBlockeeFromBlockedByFsTriggered')
-exports.removeUnBlockeeFromBlockedByFsTriggered = removeUnBlockeeFromBlockedByFsTriggered.removeTheUnBlockeeFromBlockedByFsTriggered
+import removeUnBlockeeFromBlockedBy = require('./FollowFunctions/removeUnBlockeeFromBlockedBy')
+exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeTheUnBlockeeFromBlockedBy
 
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
