@@ -3,7 +3,7 @@ const admin = require('firebase-admin')
 
 //When client blocks a person, it  calls a callable function to remove blocker(himself)
 //from the blocked person's following array field
-export const removeTheUnBlockeeFomBlockedBy = 
+export const removeTheUnBlockeeFromBlockedByFsTriggered = 
   functions.region('asia-east2').https.onCall((unBlockedData, context) => {
     
     if (!context.auth) {

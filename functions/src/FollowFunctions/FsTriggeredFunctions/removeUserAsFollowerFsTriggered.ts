@@ -14,6 +14,4 @@ export const removeUserAsTheFollowerFsTriggered = functions.region('asia-east2')
   .collection('Users').doc(unFolloweeUserId).collection('followers').doc(unFollowerUserId)
   .delete()
         
-  })
-
 })
