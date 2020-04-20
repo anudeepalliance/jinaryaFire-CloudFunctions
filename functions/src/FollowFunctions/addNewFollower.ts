@@ -18,35 +18,11 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       userName: doc.data().userName
     }
 
-    admin.firestore().collection('Users').doc(followeeUid).collection('notificationToken')
-      .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
-
-    let followeeToken =  notificationTokenDoc.data().notificationToken
-
-
-          // Notification details.
-          const payload = {
-            notification: {
-              title: 'You have a new follower!',
-              body: `${followerData.name} is now following you.`,
-              icon: ''
-            }
-          };
-
-          admin.messaging().sendToDevice(followeeToken, payload)
-						.then(function(response: any) {
-							console.log("Successfully sent message:", response);
-						  })
-						  .catch(function(error: any) {
-							console.log("Error sending message:", error);
-						  });
         
     const followeeFollowersFollowerUidDoc = 
     admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid)
     return followeeFollowersFollowerUidDoc.set(followerData)
         
   })
-
-})
 
 })
