@@ -25,12 +25,17 @@ exports.reportPerson = reportPerson.reportThePerson
 //When client followes a user, a firestore .onCreate() background function is triggered to add follower
 //to the followee's followers sub collection
 import addNewFollowerFsTrigger = require('./FollowFunctions/FsTriggeredFunctions/addNewFollowerFsTriggered')
-exports.addNewFollowerFsTrigger = addNewFollowerFsTrigger.addTheNewFolloweFsTriggered
+exports.addNewFollowerFsTrigger = addNewFollowerFsTrigger.addTheNewFollowerFsTriggered
 
 //When client un-follows a user, it  calls a callable function to remove follower(himself)
 //from the unfollowee's followers sub collection
-import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
-exports.removeUserAsFollower = removeUserAsFollower.removeTheUserAsFollower
+// import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
+// exports.removeUserAsFollower = removeUserAsFollower.removeTheUserAsFollower
+
+//When client un-follows a user, it calls a background FS triggered function to remove follower(the client)
+//from the unfollowee's followers sub collection
+import removeUserAsFollowerFsTriggered = require('./FollowFunctions/FsTriggeredFunctions/removeUserAsFollowerFsTriggered')
+exports.removeUserAsFollowerFsTriggered = removeUserAsFollowerFsTriggered.removeUserAsTheFollowerFsTriggered
 
 
 //When client blocks a person, it  calls a callable function to remove blocker(himself)
