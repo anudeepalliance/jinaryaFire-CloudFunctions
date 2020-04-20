@@ -18,18 +18,23 @@ import reportPerson = require('./ReportAndFeedback/reportPerson')
 exports.reportPerson = reportPerson.reportThePerson
 
 //When client followes a user, it  calls a callable function to add follower(himself)
-//to the followee's follwers arrayField in the UserDoc
-import addNewFollower = require('./FollowFunctions/addNewFollower')
-exports.addNewFollower = addNewFollower.newFollowerGained
+//to the followee's followers sub collection
+// import addNewFollower = require('./FollowFunctions/addNewFollower')
+// exports.addNewFollower = addNewFollower.newFollowerGained
+
+//When client followes a user, a firestore .onCreate() background function is triggered to add follower
+//to the followee's followers sub collection
+import addNewFollowerFsTrigger = require('./FollowFunctions/FsTriggeredFunctions/addNewFollowerFsTriggered')
+exports.addNewFollowerFsTrigger = addNewFollowerFsTrigger.addTheNewFolloweFsTriggered
 
 //When client un-follows a user, it  calls a callable function to remove follower(himself)
-//from the unfollowee's followers array field
+//from the unfollowee's followers sub collection
 import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
 exports.removeUserAsFollower = removeUserAsFollower.removeTheUserAsFollower
 
 
 //When client blocks a person, it  calls a callable function to remove blocker(himself)
-//from the blocked person's following array field
+//from the blocked person's following sub collection
 import stopFollowingBlockerAddToBlockedBy = require('./FollowFunctions/stopFollowingBlockerAndAddToBlockedBy')
 exports.stopFollowingBlockerAddToBlockedBy = stopFollowingBlockerAddToBlockedBy.stopFollowingTheBlockerAndToBlockedBy
 

@@ -2,7 +2,8 @@ import * as functions from 'firebase-functions'
 import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 
-
+//When a user updates his userDoc like name or UserName then this updated info needs to be
+//reflected in the user's followers' following doc of all the other users that are a follower of this user 
 export const updateUserInfoToTheFollowers = functions.region('asia-east2').firestore.document
 ('Users/{userId}').onUpdate((change, context) => {
 
