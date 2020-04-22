@@ -30,7 +30,9 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
             },
             data: {
               ACTIVITY_NAME: "PersonProfileActivity",
-              PERSON_UID_INTENT_EXTRA: followerUid
+              PERSON_UID_INTENT_EXTRA: followerUid,
+              //This channel Id name should exist and be created at the client
+              CHANNEL_NAME:">Follow Updates"
             }
           }
 
