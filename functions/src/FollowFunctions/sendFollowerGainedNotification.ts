@@ -25,7 +25,7 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
             notification: {
               title: 'You have a new follower!',
               body: `${followerUserName}`,
-              click_action: ".People.PersonProfileActivity"
+              clickAction: ".ForDevelopment.NavigateToActivitiesDeveloperModeActivity"
             },
             data: {
               PERSON_UID_INTENT_EXTRA: followerUid
