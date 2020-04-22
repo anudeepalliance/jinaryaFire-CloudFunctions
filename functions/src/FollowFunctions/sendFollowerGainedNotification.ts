@@ -7,7 +7,7 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
   ('Users/{followerUserId}/following/{followeeUserId}').onCreate((data, context) => {
 
   const followeeUid = context.params.followeeUserId
-  const followerUid = context.params.followerUserId
+  const followerUid : String = context.params.followerUserId
 
   //Follower user details that needs to be duplicated to the Followee's following Sub Coll
   admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
@@ -24,7 +24,7 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
           const payload = {
             notification: {
               title: 'You have a new follower!',
-              body: `${followerUid}`,
+              body: `${followerUserName}`,
               clickAction: ".People.PersonProfileActivity"
             },
             data: {
@@ -32,15 +32,13 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
             }
           }
 
-          return admin.messaging().sendToDevice(followeeToken, payload)
-						.then(function(response: any) {
+return admin.messaging().sendToDevice(followeeToken, payload).then(function(response: any) {
 							console.log("Successfully sent message:", response);
 						  })
 						  .catch(function(error: any) {
 							console.log("Error sending message:", error);
-                          })
-                          
-                        })
-                    })
+      })                    
+    })
+  })
                 
-                })
+})
