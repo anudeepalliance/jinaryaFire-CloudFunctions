@@ -28,6 +28,7 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
               clickAction: ".People.PersonProfileActivity"
             },
             data: {
+              ACTIVITY_NAME: "PersonProfileActivity",
               PERSON_UID_INTENT_EXTRA: followerUid
             }
           }
