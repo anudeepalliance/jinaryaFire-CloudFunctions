@@ -25,7 +25,8 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
             notification: {
               title: 'You have a new follower!',
               body: `${followerUserName}`,
-              clickAction: ".People.PersonProfileActivity"
+              clickAction: ".People.PersonProfileActivity",
+              image: "https://firebasestorage.googleapis.com/v0/b/jinaryafire.appspot.com/o/profilePhotos%2FUEjyYBcycUfI4Hg94jztFnIhK5c2%2FprofilePhoto?alt=media&token=1c93e2d2-3ac2-4102-b859-a18e4aa087e9"
             },
             data: {
               ACTIVITY_NAME: "PersonProfileActivity",
@@ -41,5 +42,7 @@ return admin.messaging().sendToDevice(followeeToken, payload).then(function(resp
       })                    
     })
   })
+
+  return
                 
 })
