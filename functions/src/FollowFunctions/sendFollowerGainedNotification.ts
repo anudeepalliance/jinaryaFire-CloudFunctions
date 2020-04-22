@@ -7,7 +7,7 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
   ('Users/{followerUserId}/following/{followeeUserId}').onCreate((data, context) => {
 
   const followeeUid = context.params.followeeUserId
-  const followerUid : String = context.params.followerUserId
+  const followerUid = context.params.followerUserId
 
   //Follower user details that needs to be duplicated to the Followee's following Sub Coll
   admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
@@ -17,7 +17,9 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
     admin.firestore().collection('Users').doc(followeeUid).collection('notificationToken')
       .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
 
-    let followeeToken =  notificationTokenDoc.data().notificationToken
+    let followeeToken = notificationTokenDoc.data().notificationToken
+    let imageUrl = notificationTokenDoc.data().DOWNLOAD_URL
+
     console.log(`followeeToken ${followeeToken}`)
 
           // Notification details.
@@ -26,13 +28,14 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
               title: 'You have a new follower!',
               body: `${followerUserName}`,
               clickAction: ".People.PersonProfileActivity",
-              image: "https://firebasestorage.googleapis.com/v0/b/jinaryafire.appspot.com/o/profilePhotos%2FUEjyYBcycUfI4Hg94jztFnIhK5c2%2FprofilePhoto?alt=media&token=1c93e2d2-3ac2-4102-b859-a18e4aa087e9"
+              image: `${imageUrl}`
             },
             data: {
               ACTIVITY_NAME: "PersonProfileActivity",
               PERSON_UID_INTENT_EXTRA: followerUid,
-              //This channel Id name should exist and be created at the client
-              CHANNEL_NAME:">Follow Updates"
+              //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
+              //be created at the client else, this will fail
+              CHANNEL_ID: "Follow Update ID"
             }
           }
 
