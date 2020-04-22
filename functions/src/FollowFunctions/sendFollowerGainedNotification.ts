@@ -13,12 +13,12 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
   admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
 
     let followerUserName = doc.data().userName
+    let imageUrl = doc.data().DOWNLOAD_URL
 
     admin.firestore().collection('Users').doc(followeeUid).collection('notificationToken')
       .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
 
     let followeeToken = notificationTokenDoc.data().notificationToken
-    let imageUrl = notificationTokenDoc.data().DOWNLOAD_URL
 
     console.log(`followeeToken ${followeeToken}`)
 
