@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
-admin.initializeApp()
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the user's followees' followers sub coll of all the other users that he is following
@@ -26,7 +25,7 @@ export const sendTheFollowerGainedNotification = functions.region('asia-east2').
             notification: {
               title: 'You have a new follower!',
               body: `${followerUserName}`,
-              clickAction: "NavigateToActivitiesDeveloperModeActivity"
+              click_action: ".People.PersonProfileActivity"
             },
             data: {
               PERSON_UID_INTENT_EXTRA: followerUid
