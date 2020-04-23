@@ -48,9 +48,26 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       CHANNEL_ID: "Follow Update ID"
     }
   }
+
+
+  const notificationObject = {
+    message:`${followerData.userName} started following you`,
+    receivedTime: Date.now(),
+    senderName: followerData.name,
+    senderUid: followerData.uid,
+    //this type has be same as in the client
+    notificationType: "new_follower",
+    //this type has be same as in the client
+    notificationChannelId: "Follow Updates",
+    intentToActivity: "PersonProfileActivity",
+    intentExtras: followerData.uid
+  }
         
     //Add the follower to the followee sub-collection
     admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData)
+
+    //Add the notification doc to the user's notification sub collection
+    admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').add(notificationObject)
 
     //Send the notification to the user
     return admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload).then(function(response: any) {
