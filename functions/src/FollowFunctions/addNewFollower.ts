@@ -15,18 +15,22 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
   //And also added to the notification Payload data
   admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
 
-    let followerData = {
+    //Extracting this separately as this need not be copied to the Followers sub-collection
+    const followerImageUrl = doc.data().DOWNLOAD_URL
+
+    //This data will be copied to the followers sub collection
+    const followerData = {
       name:  doc.data().name,
       uid: followerUid,
       userName: doc.data().userName,
-      imageUrl: doc.data().DOWNLOAD_URL
     }
+    
 
   //get the notification token of the followee to identify & send notification to his device
   admin.firestore().collection('Users').doc(followeeUid).collection('notificationToken')
     .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
 
-  let followeeNotificationToken = notificationTokenDoc.data().notificationToken
+      const followeeNotificationToken = notificationTokenDoc.data().notificationToken
 
   //Create the Notification Payload content
   const notificationPayload = {
@@ -34,7 +38,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       title: 'You have a new follower!',
       body: `${followerData.userName}`,
       clickAction: ".People.PersonProfileActivity",
-      image: `${followerData.imageUrl}`
+      image: `${followerImageUrl}`
     },
     data: {
       ACTIVITY_NAME: "PersonProfileActivity",
