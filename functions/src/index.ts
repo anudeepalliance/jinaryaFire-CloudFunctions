@@ -50,5 +50,5 @@ import updateUserInfoToFollowers = require('./FollowFunctions/updateUserInfoToFo
 exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToTheFollowers
 
 //When a user gains a new follower, send them firestore triggered notification to the user
-import sendFollowerGainedNotification = require('./FollowFunctions/sendFollowerGainedNotification')
-exports.sendFollowerGainedNotification = sendFollowerGainedNotification.sendTheFollowerGainedNotification
+// import sendFollowerGainedNotification = require('./FollowFunctions/sendFollowerGainedNotification')
+// exports.sendFollowerGainedNotification = sendFollowerGainedNotification.sendTheFollowerGainedNotification
