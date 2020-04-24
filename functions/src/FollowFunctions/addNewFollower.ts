@@ -49,7 +49,6 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     }
   }
 
-
   const notificationObject = {
     message:`${followerData.userName} started following you`,
     receivedTime: Date.now(),
