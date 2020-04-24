@@ -42,6 +42,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     },
     data: {
       ACTIVITY_NAME: "PersonProfileActivity",
+      //The below field name to be same as the one used in the client
       PERSON_UID_INTENT_EXTRA: followerUid,
       //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
       //be created at the client else, this will fail
@@ -49,11 +50,17 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     }
   }
 
+  //random 11 digital Notification Doc Id
+  const randomNotificationDocId = (Math.random() * 100000000000).toString()
+
   const notificationObject = {
     message:`${followerData.userName} started following you`,
     receivedTime: Date.now(),
+    notificationDocId: randomNotificationDocId,
     senderName: followerData.name,
     senderUid: followerData.uid,
+    //this will be false by default, will turn true at client when clicked
+    wasClicked: false,
     //this type has be same as in the client
     notificationType: "new_follower",
     //this type has be same as in the client
@@ -66,7 +73,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData)
 
     //Add the notification doc to the user's notification sub collection
-    admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').add(notificationObject)
+    admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
 
     //Send the notification to the user
     return admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload).then(function(response: any) {
