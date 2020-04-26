@@ -66,32 +66,32 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     senderUid: followerData.uid,
     //this will be false by default, will turn true at client when clicked
     wasClicked: false,
-    //this type has be same as in the client
+    //this type has to be same as in the client
     notificationChannelId: "Follow Updates",
     intentToActivity: "PersonProfileActivity",
     intentExtrasUid: followerData.uid,
     intentExtrasName: followerData.name,
     intentExtrasUserName: followerData.userName,
   }
-        
+
+  return Promise.all([
     //Add the follower to the followee sub-collection
-    admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData)
+    admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData),
 
     //Add the notification doc to the user's notification sub collection
-    admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
+    admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject),
 
     //Send the notification to the user
-    return admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload).then(function(response: any) {
+    admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload).then(function(response: any) {
       console.log("Successfully sent message:", response);
       })
       .catch(function(error: any) {
       console.log("Error sending message:", error);
-
-        
+      
       })
+  ])
 
     })
 
   })
-
 })
