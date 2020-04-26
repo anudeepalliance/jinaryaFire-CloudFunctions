@@ -74,24 +74,23 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     intentExtrasUserName: followerData.userName,
   }
 
-  return Promise.all([
+
     //Add the follower to the followee sub-collection
-    admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData),
+    const p1 =  admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData)
+  
+      //Add the notification doc to the user's notification sub collection
+      const p2 =  admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
+              //Send the notification to the user
+              const p3 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload).then(function(response: any) {
+                console.log("Successfully sent message:", response)
+              })
 
-    //Add the notification doc to the user's notification sub collection
-    admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject),
-
-    //Send the notification to the user
-    admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload).then(function(response: any) {
-      console.log("Successfully sent message:", response);
-      })
-      .catch(function(error: any) {
-      console.log("Error sending message:", error);
+              const allFunctions = [p1,p2,p3]
+              const finalPromise = Promise.all(allFunctions)
+              finalPromise.then(result => {
+                console.log(`successful`)
+              })
       
+        })
       })
-  ])
-
-    })
-
   })
-})
