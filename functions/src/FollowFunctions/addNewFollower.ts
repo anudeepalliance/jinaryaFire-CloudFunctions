@@ -1,8 +1,10 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
 
-//When a user updates his userDoc like name or UserName then this updated info needs to be
-//reflected in the user's followees' followers sub coll of all the other users that he is following
+//When client followes a user, a firestore .onCreate() background function is triggered to
+//1.add follower to the followee's followers sub collection
+//2.an FCM notification to sent to the users
+//3.A Notification doc is added to Notification Sub Collection
 export const addTheNewFollower = functions.region('asia-east2').firestore.document
   ('Users/{followerUserId}/following/{followeeUserId}').onCreate((data, context) => {
 
@@ -44,6 +46,8 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       ACTIVITY_NAME: "PersonProfileActivity",
       //The below field name to be same as the one used in the client
       PERSON_UID_INTENT_EXTRA: followerUid,
+      PERSON_NAME_INTENT_EXTRA: followerData.name,
+      PERSON_USERNAME_INTENT_EXTRA: followerData.userName,
       //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
       //be created at the client else, this will fail
       CHANNEL_ID: "Follow Update ID"
@@ -56,17 +60,18 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
   const notificationObject = {
     message:`${followerData.userName} started following you`,
     receivedTime: Date.now(),
+    //This is needed for client to access this doc and update the wasClicked field
     notificationDocId: randomNotificationDocId,
     senderName: followerData.name,
     senderUid: followerData.uid,
     //this will be false by default, will turn true at client when clicked
     wasClicked: false,
     //this type has be same as in the client
-    notificationType: "new_follower",
-    //this type has be same as in the client
     notificationChannelId: "Follow Updates",
     intentToActivity: "PersonProfileActivity",
-    intentExtras: followerData.uid
+    intentExtrasUid: followerData.uid,
+    intentExtrasName: followerData.name,
+    intentExtrasUserName: followerData.userName,
   }
         
     //Add the follower to the followee sub-collection

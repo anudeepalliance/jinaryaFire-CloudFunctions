@@ -17,8 +17,10 @@ exports.sendUserFeedback = sendUserFeedback.sendFeedback
 import reportPerson = require('./ReportAndFeedback/reportPerson')
 exports.reportPerson = reportPerson.reportThePerson
 
-//When client followes a user, a firestore .onCreate() background function is triggered to add follower
-//to the followee's followers sub collection
+//When client followes a user, a firestore .onCreate() background function is triggered to
+//1.add follower to the followee's followers sub collection
+//2.an FCM notification to sent to the users
+//3.A Notification doc is added to Notification Sub Collection
 import addNewFollower = require('./FollowFunctions/addNewFollower')
 exports.addNewFollower = addNewFollower.addTheNewFollower
 
