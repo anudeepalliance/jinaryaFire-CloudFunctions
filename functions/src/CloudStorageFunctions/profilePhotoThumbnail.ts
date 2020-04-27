@@ -51,7 +51,7 @@ export const profilePhotoMakeThumbnail = functions.region('asia-east2').storage.
   await bucket.file(filePath).download({destination: tempFilePath});
   console.log('Image downloaded locally to', tempFilePath);
   // Generate a thumbnail using ImageMagick.
-  await spawn('convert', [tempFilePath, '-thumbnail', '10x10>', tempFilePath]);
+  await spawn('convert', [tempFilePath, '-thumbnail', '100x100>', tempFilePath]);
   console.log('Thumbnail created at', tempFilePath);
   // We add a 'thumb_' prefix to thumbnails file name. That's where we'll upload the thumbnail.
   const thumbFileName = `thumb_${fileName}`;
