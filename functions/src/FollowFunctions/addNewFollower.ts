@@ -8,6 +8,7 @@ const admin = require('firebase-admin')
 export const addTheNewFollower = functions.region('asia-east2').firestore.document
   ('Users/{followerUserId}/following/{followeeUserId}').onCreate((data, context) => {
 
+
   //get follower and followee Uids for identification
   const followeeUid = context.params.followeeUserId
   //for identification and notification payload data (Intent Extras for client)
@@ -29,7 +30,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     
 
   //get the notification token of the followee to identify & send notification to his device
-  admin.firestore().collection('Users').doc(followeeUid).collection('notificationToken')
+  return admin.firestore().collection('Users').doc(followeeUid).collection('notificationToken')
     .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
 
       const followeeNotificationToken = notificationTokenDoc.data().notificationToken
@@ -66,31 +67,30 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     senderUid: followerData.uid,
     //this will be false by default, will turn true at client when clicked
     wasClicked: false,
-    //this type has to be same as in the client
+    //this type has be same as in the client
     notificationChannelId: "Follow Updates",
     intentToActivity: "PersonProfileActivity",
     intentExtrasUid: followerData.uid,
     intentExtrasName: followerData.name,
     intentExtrasUserName: followerData.userName,
   }
-
-
-    //Add the follower to the followee sub-collection
-    const p1 =  admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData)
-  
-      //Add the notification doc to the user's notification sub collection
-      const p2 =  admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
-              //Send the notification to the user
-              const p3 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload).then(function(response: any) {
-                console.log("Successfully sent message:", response)
-              })
-
-              const allFunctions = [p1,p2,p3]
-              const finalPromise = Promise.all(allFunctions)
-              finalPromise.then(result => {
-                console.log(`successful`)
-              })
       
-        })
+
+    const promises = []
+      //Add the follower to the followee sub-collection
+      const p =  admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData)
+      promises.push(p)
+      //Add the notification doc to the user's notification sub collection
+      const p1 = admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
+      promises.push(p1)
+      //Send the notification to the user
+      const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
+      promises.push(p2)
+
+    return Promise.all(promises).
+
       })
+
+    })
+
   })
