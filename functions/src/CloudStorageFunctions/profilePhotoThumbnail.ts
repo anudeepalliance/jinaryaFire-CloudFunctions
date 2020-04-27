@@ -16,9 +16,9 @@ export const generateTheThumbnail = functions.storage.object().onFinalize( async
     const bucket = gcs.bucket(object.bucket)
     //The file path of the image uploaded
     const filePath = object.name
-    //The filName of the object, the pop method removes the last elements from
-    //an Array and returns it as String 
-    const fileName = filePath!!.split('/').pop
+    //The filName of the object, the pop() method removes the last elements from
+    //an Array and returns it as String
+    const fileName = filePath?.split('/').pop()
     //The directory of the bucket
     const bucketDir = dirname(filePath!!)
 
@@ -29,7 +29,7 @@ export const generateTheThumbnail = functions.storage.object().onFinalize( async
 
     //Make a sanity check ensuring this isnt an image uploaded to cloud storage via this cloud
     //function itself which can end in an infinite loop of functions
-    if ( fileName.toString().includes('thumbnail') || !object.contentType?.includes('image') )  {
+    if ( fileName?.toString().includes('thumbnail') || !object.contentType?.includes('image') )  {
             console.log('exiting function as it is a thumbnail image or may not be an image at all')
             return false
     }
@@ -43,10 +43,10 @@ export const generateTheThumbnail = functions.storage.object().onFinalize( async
     })
 
     //select the size for the resize
-    const size = [64]
+    const thumbnailSize = [64]
 
     //Define an upload promise
-    const promise = size.map( async size => {
+    const promise = thumbnailSize.map( async size => {
         
         //set the name for the thumbnail image
         const thumbName = `thumbnail${size}_${fileName}`
