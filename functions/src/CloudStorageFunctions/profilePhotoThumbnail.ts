@@ -3,7 +3,6 @@
 // [START import]
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-admin.initializeApp()
 const spawn = require('child-process-promise').spawn;
 const path = require('path');
 const os = require('os');
@@ -16,7 +15,8 @@ const fs = require('fs');
  * ImageMagick.
  */
 // [START generateThumbnailTrigger]
-export const profilePhotoMakeThumbnail = functions.storage.object().onFinalize(async (object) => {
+export const profilePhotoMakeThumbnail = functions.region('asia-east2').storage.object()
+.onFinalize(async (object: { bucket: any; name: any; contentType: any; }) => {
 // [END generateThumbnailTrigger]
   // [START eventAttributes]
   const fileBucket = object.bucket; // The Storage bucket that contains the file.
@@ -28,14 +28,16 @@ export const profilePhotoMakeThumbnail = functions.storage.object().onFinalize(a
   // [START stopConditions]
   // Exit if this is triggered on a file that is not an image.
   if (!contentType.startsWith('image/')) {
-    return console.log('This is not an image.');
+    console.log('This is not an image.');
+    return false
   }
 
   // Get the file name.
   const fileName = path.basename(filePath);
   // Exit if the image is already a thumbnail.
   if (fileName.startsWith('thumb_')) {
-    return console.log('Already a Thumbnail.');
+    console.log('Already a Thumbnail.');
+    return false
   }
   // [END stopConditions]
 
@@ -49,7 +51,7 @@ export const profilePhotoMakeThumbnail = functions.storage.object().onFinalize(a
   await bucket.file(filePath).download({destination: tempFilePath});
   console.log('Image downloaded locally to', tempFilePath);
   // Generate a thumbnail using ImageMagick.
-  await spawn('convert', [tempFilePath, '-thumbnail', '200x200>', tempFilePath]);
+  await spawn('convert', [tempFilePath, '-thumbnail', '10x10>', tempFilePath]);
   console.log('Thumbnail created at', tempFilePath);
   // We add a 'thumb_' prefix to thumbnails file name. That's where we'll upload the thumbnail.
   const thumbFileName = `thumb_${fileName}`;
