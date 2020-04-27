@@ -50,3 +50,9 @@ exports.updateUserInfoToFollowees = updateUserInfoToFollowees.updateUserInfoToTh
 //reflected in the followers' following doc of all the other users that is a follower of this user 
 import updateUserInfoToFollowers = require('./FollowFunctions/updateUserInfoToFollowers')
 exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToTheFollowers
+
+
+//When an Image is upload to Cloud Storage which can only be the profilePhotos of users,
+//generate thumbnail and save it back to the same folder in Cloud Storage
+import generateThumbnail = require('./CloudStorageFunctions/profilePhotoThumbnail')
+exports.generateThumbnail = generateThumbnail.generateTheThumbnail
