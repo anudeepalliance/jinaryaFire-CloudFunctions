@@ -1,73 +1,64 @@
-import * as functions from 'firebase-functions'
+'use strict';
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 
-const {Storage} = require('@google-cloud/storage');
-const gcs = new Storage()
+// const {Storage} = require('@google-cloud/storage');
+// const gcs = new Storage()
+// import { join, dirname } from 'path'
 
-import { tmpdir } from 'os'
-import { join, dirname } from 'path'
-
-import * as sharp from 'sharp'
-import * as fs from 'fs-extra'
+// import * as sharp from 'sharp'
+const fs = require('fs');
+const spawn = require('child-process-promise').spawn;
+const path = require('path');
+const os = require('os');
 
 //When an Image is upload to Cloud Storage which can only be the profilePhotos of users,
 //generate thumbnail and save it back to the same folder in Cloud Storage
-export const profilePhotoMakeThumbnail = functions.storage.object().onFinalize( async object => {
-    //The storage bucket
-    const bucket = gcs.bucket(object.bucket)
-    //The file path of the image uploaded
-    const filePath = object.name
-    //The filName of the object, the pop() method removes the last elements from
-    //an Array and returns it as String
-    const fileName = filePath?.split('/').pop()
-    //The directory of the bucket
-    const bucketDir = dirname(filePath!!.toString())
-
-    //Create a working directory in the temporary directory called 'thumbs'
-    const workingDir = join(tmpdir(), 'thumbs')
-    //Get the temporary filePath to the image that we will download and name it 'source.png'
-    const timeSourceFilePath = join(workingDir, 'source.png')
-
-    //Make a sanity check ensuring this isnt an image uploaded to cloud storage via this cloud
-    //function itself which can end in an infinite loop of functions
-    if ( fileName?.toString().includes('thumbnail') || !object.contentType?.includes('image') )  {
-            console.log('exiting function as it is a thumbnail image or may not be an image at all')
-            return false
+export const profilePhotoMakeThumbnail = functions.region('asia-east2').storage.object().onFinalize( async object => {
+    // The Storage bucket that contains the file.
+    const fileBucket = object.bucket; 
+    // File path in the bucket.
+    const filePath = object.name; 
+    // File content type.
+    const contentType = object.contentType; 
+    // Number of times metadata has been generated. New objects have a value of 1.
+    // const metageneration = object.metageneration; 
+  
+    // [START stopConditions]
+    // Exit if this is triggered on a file that is not an image.
+    if (!contentType?.startsWith('image/')) {
+      return console.log('This is not an image.');
     }
-
-    //check if Thumbnail working directory exists in the function
-    await fs.ensureDir(workingDir)
-
-    //Download the source file from Cloud Storage
-    await bucket.file(filePath).download({
-        destination: timeSourceFilePath
-    })
-
-    //select the size for the resize
-    const thumbnailSize = [64]
-
-    //Define an upload promise
-    const promise = thumbnailSize.map( async size => {
-        
-        //set the name for the thumbnail image
-        const thumbName = `thumbnail${size}_${fileName}`
-        //set the place to where the thumbnail should be saved which is the working Directory
-        const thumbPath = join(workingDir, thumbName)
-
-        //Now that name and save directory is defined, do the resizing
-        await sharp(timeSourceFilePath).resize(size, size).toFile(thumbPath)
-
-        //upload the thumbnail image from the working directory thumbpath to the 
-        //Cloud storage directory bucketDir
-        return bucket.upload(thumbPath, {
-            destination: join(bucketDir, thumbName)
-        })
-
-
-    })
-
-    //run the upload operations
-    await Promise.all(promise)
-
-    //Clean up remove the tmp/thumbs from the filesystem
-    return fs.remove(workingDir)
+  
+    // Get the file name.
+    const fileName = path.basename(filePath);
+    // Exit if the image is already a thumbnail.
+    if (fileName.startsWith('thumb_')) {
+      return console.log('Already a Thumbnail.');
+    }
+    // [END stopConditions]
+  
+    // [START thumbnailGeneration]
+    // Download file from bucket.
+    const bucket = admin.storage().bucket(fileBucket);
+    const tempFilePath = path.join(os.tmpdir(), fileName);
+    const metadata = {
+      contentType: contentType,
+    };
+    await bucket.file(filePath).download({destination: tempFilePath});
+    console.log('Image downloaded locally to', tempFilePath);
+    // Generate a thumbnail using ImageMagick.
+    await spawn('convert', [tempFilePath, '-thumbnail', '200x200>', tempFilePath]);
+    console.log('Thumbnail created at', tempFilePath);
+    // We add a 'thumb_' prefix to thumbnails file name. That's where we'll upload the thumbnail.
+    const thumbFileName = `thumb_${fileName}`;
+    const thumbFilePath = path.join(path.dirname(filePath), thumbFileName);
+    // Uploading the thumbnail.
+    await bucket.upload(tempFilePath, {
+      destination: thumbFilePath,
+      metadata: metadata,
+    });
+    // Once the thumbnail has been uploaded delete the local file to free up disk space.
+    return fs.unlinkSync(tempFilePath);
+    // [END thumbnailGeneration]
 })
