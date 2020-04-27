@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions'
 
 const {Storage} = require('@google-cloud/storage');
-const gcs = Storage()
+const gcs = new Storage()
 
 import { tmpdir } from 'os'
 import { join, dirname } from 'path'
@@ -11,7 +11,7 @@ import * as fs from 'fs-extra'
 
 //When an Image is upload to Cloud Storage which can only be the profilePhotos of users,
 //generate thumbnail and save it back to the same folder in Cloud Storage
-export const generateTheThumbnail = functions.storage.object().onFinalize( async object => {
+export const profilePhotoMakeThumbnail = functions.storage.object().onFinalize( async object => {
     //The storage bucket
     const bucket = gcs.bucket(object.bucket)
     //The file path of the image uploaded
@@ -20,7 +20,7 @@ export const generateTheThumbnail = functions.storage.object().onFinalize( async
     //an Array and returns it as String
     const fileName = filePath?.split('/').pop()
     //The directory of the bucket
-    const bucketDir = dirname(filePath!!)
+    const bucketDir = dirname(filePath!!.toString())
 
     //Create a working directory in the temporary directory called 'thumbs'
     const workingDir = join(tmpdir(), 'thumbs')

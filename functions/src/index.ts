@@ -54,5 +54,5 @@ exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToTh
 
 //When an Image is upload to Cloud Storage which can only be the profilePhotos of users,
 //generate thumbnail and save it back to the same folder in Cloud Storage
-import generateThumbnail = require('./CloudStorageFunctions/profilePhotoThumbnail')
-exports.generateThumbnail = generateThumbnail.generateTheThumbnail
+import profilePhotoThumbnail = require('./CloudStorageFunctions/profilePhotoThumbnail')
+exports.profilePhotoThumbnail = profilePhotoThumbnail.profilePhotoMakeThumbnail
