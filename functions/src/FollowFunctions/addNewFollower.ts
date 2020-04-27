@@ -16,7 +16,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
 
   //Get Follower user details that needs to be duplicated to the Followee's following Sub Coll
   //And also added to the notification Payload data
-  admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
+  return admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
 
     //Extracting this separately as this need not be copied to the Followers sub-collection
     const followerImageUrl = doc.data().DOWNLOAD_URL
@@ -87,10 +87,9 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
       promises.push(p2)
 
-    return Promise.all(promises).
+      return Promise.all(promises)
+  })
 
-      })
-
-    })
+  })
 
   })
