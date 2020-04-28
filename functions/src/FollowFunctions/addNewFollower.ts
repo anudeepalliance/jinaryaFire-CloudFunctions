@@ -76,20 +76,20 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
   }
       
 
-    const promises = []
-      //Add the follower to the followee sub-collection
-      const p =  admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData)
-      promises.push(p)
-      //Add the notification doc to the user's notification sub collection
-      const p1 = admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
-      promises.push(p1)
-      //Send the notification to the user
-      const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
-      promises.push(p2)
+        const promises = []
+          //Add the follower to the followee sub-collection
+          const p =  admin.firestore().collection('Users').doc(followeeUid).collection('followers').doc(followerUid).set(followerData)
+          promises.push(p)
+          //Add the notification doc to the user's notification sub collection
+          const p1 = admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
+          promises.push(p1)
+          //Send the notification to the user
+          const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
+          promises.push(p2)
 
-      return Promise.all(promises)
-  })
+          return Promise.all(promises)
+      })
 
-  })
+     })
 
   })

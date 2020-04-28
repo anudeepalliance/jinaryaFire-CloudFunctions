@@ -1,67 +1,80 @@
-'use strict';
-
-// [START import]
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+'use strict'
+const functions = require('firebase-functions')
+const admin = require('firebase-admin')
 const spawn = require('child-process-promise').spawn;
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
-// [END import]
+const path = require('path')
+const os = require('os')
+const fs = require('fs')
 
-// [START generateThumbnail]
-/**
- * When an image is uploaded in the Storage bucket We generate a thumbnail automatically using
- * ImageMagick.
- */
-// [START generateThumbnailTrigger]
+
 export const profilePhotoMakeThumbnail = functions.region('asia-east2').storage.object()
 .onFinalize(async (object: { bucket: any; name: any; contentType: any; }) => {
-// [END generateThumbnailTrigger]
-  // [START eventAttributes]
-  const fileBucket = object.bucket; // The Storage bucket that contains the file.
-  const filePath = object.name; // File path in the bucket.
-  const contentType = object.contentType; // File content type.
-  // const metageneration = object.metageneration; // Number of times metadata has been generated. New objects have a value of 1.
-  // [END eventAttributes]
+  
+  //The Storage bucket in Cloud Storage that contains the file
+  const cloudStorageFileBucket = object.bucket
+  //File path in the Storage bucket
+  const cloudStorageRawImageFilePath = object.name
+  //Get the File content type (it has to be an image which we will check later)
+  const rawImageContentType = object.contentType
+   // Number of times metadata has been generated. New Images/Objects will have a value of 1
+  // const metageneration = object.metageneration
+  
 
-  // [START stopConditions]
-  // Exit if this is triggered on a file that is not an image.
-  if (!contentType.startsWith('image/')) {
-    console.log('This is not an image.');
+  //Exit if this is triggered on a file that is not an image
+  if (!rawImageContentType.startsWith('image/')) {
+    console.log('This is not an image.')
     return false
   }
 
-  // Get the file name.
-  const fileName = path.basename(filePath);
-  // Exit if the image is already a thumbnail.
-  if (fileName.startsWith('thumb_')) {
-    console.log('Already a Thumbnail.');
+  //Get the file name
+  const fileName = path.basename(cloudStorageRawImageFilePath)
+  //Exit if the image is already a thumbnail
+  if (fileName.startsWith('thumb')) {
+    console.log('Already a Thumbnail.')
     return false
   }
-  // [END stopConditions]
+  
 
-  // [START thumbnailGeneration]
-  // Download file from bucket.
-  const bucket = admin.storage().bucket(fileBucket);
-  const tempFilePath = path.join(os.tmpdir(), fileName);
+  
+  //Initiate an admin access to the storage bucket
+  const bucket = admin.storage().bucket(cloudStorageFileBucket)
+  //Create a temporary filePath with the temporary directory and a filName
+  //same as the source Image fileName
+  //os.tmpdir() probably creates the temporary directory and path.join
+  //must be joining the temp dir with the fileName
+  const tempFilePath = path.join(os.tmpdir(), fileName)
+  //create a metada JSON object which is just a contentType field that has
+  //been extracted previously
   const metadata = {
-    contentType: contentType,
-  };
-  await bucket.file(filePath).download({destination: tempFilePath});
-  console.log('Image downloaded locally to', tempFilePath);
-  // Generate a thumbnail using ImageMagick.
-  await spawn('convert', [tempFilePath, '-thumbnail', '100x100>', tempFilePath]);
-  console.log('Thumbnail created at', tempFilePath);
-  // We add a 'thumb_' prefix to thumbnails file name. That's where we'll upload the thumbnail.
-  const thumbFileName = `thumb_${fileName}`;
-  const thumbFilePath = path.join(path.dirname(filePath), thumbFileName);
-  // Uploading the thumbnail.
+    contentType: rawImageContentType
+  }
+
+  // Download the Image file from the storage bucket to the temporary filePath
+  //which is in the temporary directoy
+  await bucket.file(cloudStorageRawImageFilePath).download({destination: tempFilePath})
+  console.log('Image downloaded locally to', tempFilePath)
+
+  //Generate a thumbnail using ImageMagick with its path as the temporary filePath
+  await spawn('convert', [tempFilePath, '-thumbnail', '100x100>', tempFilePath])
+  console.log('Thumbnail created at', tempFilePath)
+  //Add a prefix called 'thumb_' to thumbnail file name, the final name has to be the same as the 
+  //one in the client as the client looks for the file with the Filename
+  const thumbFileName = `thumb_100x100_${fileName}`
+  
+  //Get a reference to a FilePath that this thumbnail file needs to be uploaded to,
+  const thumbFilePath = path.join(
+    //It needs to be uploaded to the Cloud Storage directory which is the same as the Raw Image
+    //So get that directory
+    path.dirname(cloudStorageRawImageFilePath), 
+    //Append the fileName to the directory so it becomes a filePath
+    thumbFileName)
+  
+  // Upload the thumbnail to the thumbFilePath created above
   await bucket.upload(tempFilePath, {
-    destination: thumbFilePath,
-    metadata: metadata,
-  });
-  // Once the thumbnail has been uploaded delete the local file to free up disk space.
-  return fs.unlinkSync(tempFilePath);
-  // [END thumbnailGeneration]
-});
+    destination: thumbFilePath, metadata: metadata,
+  })
+
+  // Once the thumbnail has been uploaded delete the local file to free up disk space
+  return fs.unlinkSync(tempFilePath)
+
+})
