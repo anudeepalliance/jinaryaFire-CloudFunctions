@@ -26,6 +26,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       name:  doc.data().name,
       uid: followerUid,
       userName: doc.data().userName,
+      profilePhotoChosen: doc.data().profilePhotoChosen
     }
     
 
