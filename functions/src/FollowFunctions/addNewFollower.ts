@@ -84,10 +84,12 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
           //Add the notification doc to the user's notification sub collection
           const p1 = admin.firestore().collection('Users').doc(followeeUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
           promises.push(p1)
-          //Send the notification to the user
-          const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
-          promises.push(p2)
-
+          //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
+          if ( followeeNotificationToken != null ) {
+            //Send the notification to the user
+            const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
+            promises.push(p2)
+          }
           return Promise.all(promises)
       })
 
