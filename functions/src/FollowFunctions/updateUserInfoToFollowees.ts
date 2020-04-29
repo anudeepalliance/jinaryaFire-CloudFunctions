@@ -12,6 +12,7 @@ const upDatedUserData = change.after.data()
 const newName = upDatedUserData?.name
 const updatersUserId = upDatedUserData?.uid
 const newUserName = upDatedUserData?.userName
+const newprofilePhotoChosenBoolean = upDatedUserData?.profilePhotoChosen
 
 const userFollowingColl = admin.firestore().collection('Users').doc(updatersUserId).collection('following')
 
@@ -22,7 +23,8 @@ return userFollowingColl.get().then((querySnapshot: { docs: DocumentSnapshot[] }
         .doc(updatersUserId).set({
             name: newName, 
             userName: newUserName,
-            uid: updatersUserId
+            uid: updatersUserId,
+            profilePhotoChosen : newprofilePhotoChosenBoolean
         })
     })
     return Promise.all(promises)
