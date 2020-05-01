@@ -14,13 +14,13 @@ const admin = require('firebase-admin')
   const randomComplimentId = (Math.random() * 100000000000).toString()
 
     const complimentReceivedObject = {
-        senderUserName:  complimentData.data().name,
-        senderUid: complimentData.data().senderUid,
-        content: complimentData.data().senderUid,
-        receiverUid: complimentData.data().receiverUid,
-        receiverUserName: complimentData.data().receiverUserName,
-        receiverName: complimentData.data().receiverName,
-        receivedTime: complimentData.data().receivedTime,
+        senderUserName:  complimentData.senderUserName,
+        senderUid: complimentData.senderUid,
+        content: complimentData.content,
+        receiverUid: complimentData.receiverUid,
+        receiverUserName: complimentData.receiverUserName,
+        receiverName: complimentData.receiverName,
+        receivedTime: Date.now(),
         noOfLikes: 0,
         noOfViews: 0,
         complimentId: randomComplimentId,
