@@ -56,3 +56,9 @@ exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToTh
 //generate thumbnail in 100 * 100px  and save it back to the same folder in Cloud Storage
 import profilePhotoThumbnail = require('./CloudStorageFunctions/profilePhotoThumbnail')
 exports.profilePhotoThumbnail = profilePhotoThumbnail.profilePhotoMakeThumbnail
+
+
+//When a compliment is sent by the user then it is added to the compliments received sub collection of the
+//receiver via callable Cf as the sender does not have permission to write that sub collection
+import addNewCompliment = require('./Compliment/addNewCompliment')
+exports.addNewCompliment = addNewCompliment.addTheNewCompliment
