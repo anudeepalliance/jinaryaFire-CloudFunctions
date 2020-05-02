@@ -54,8 +54,8 @@ service cloud.firestore {
       }
 
       //get complimentReceivedDocData
-    function getComplimentReceivedDocData(randomComplimentId) {
-      return get(/databases/$(database)/documents/Users/$(request.data.receiverUid)/complimentsReceived/$(randomComplimentId)).data
+    function getComplimentReceivedDocData() {
+      return get(/databases/$(database)/documents/Users/$(request.data.receiverUid)/complimentsReceived/{randomComplimentId}).data
     }
 
         //The rules for complimentsReceivedLikes sub coll
