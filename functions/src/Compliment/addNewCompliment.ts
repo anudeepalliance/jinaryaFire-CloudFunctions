@@ -15,6 +15,7 @@ const admin = require('firebase-admin')
 
     const complimentReceivedObject = {
         senderUserName:  complimentData.senderUserName,
+        senderName:  complimentData.senderName,
         senderUid: complimentData.senderUid,
         content: complimentData.content,
         receiverUid: complimentData.receiverUid,
