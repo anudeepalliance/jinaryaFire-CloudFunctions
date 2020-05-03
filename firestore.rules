@@ -53,8 +53,8 @@ service cloud.firestore {
       allow read, update: if request.auth.uid == uid;
       }
 
-          //custom function to check if client is trying to update anything other 
-    //than likes or views field of the compliment doc
+    //custom function to check if client is trying to update anything other 
+    //than likes or views field of the complimentSent doc
     function isUpdatingOnlyLikesOrViewsCounter() {
     return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) || 
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews'])
@@ -69,13 +69,12 @@ service cloud.firestore {
       || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
       //allow update only if trying to update the likes or viewCounter fields
       allow update: if isUpdatingOnlyLikesOrViewsCounter();
-      //allow delete to only the likers so users can unlike their own likes and cannot unlike for other users
-      allow delete: if request.auth.uid == likerUid;
+      //allow delete compliment to only the receiver
+      allow delete: if request.auth.uid == resource.data.receiverUid;
     }
 
 
-
-      //get complimentReceivedDocData
+    //get complimentReceivedDocData
     function getComplimentReceivedDocData() {
       return get(/databases/$(database)/documents/Users/$(request.data.receiverUid)/complimentsReceived/{randomComplimentId}).data
     }
@@ -92,6 +91,7 @@ service cloud.firestore {
         }
 
     }
+
 
       //The rules for complimentsReceivedSubCollection
       //Using a collectionGroup query for retreving compliments sent
