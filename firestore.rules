@@ -53,6 +53,28 @@ service cloud.firestore {
       allow read, update: if request.auth.uid == uid;
       }
 
+          //custom function to check if client is trying to update anything other 
+    //than likes or views field of the compliment doc
+    function isUpdatingOnlyLikesOrViewsCounter() {
+    return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) || 
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews'])
+    }
+
+    //The rules for complimentsReceivedLike Docs
+    match /complimentsReceived/{randomComplimentId} {
+      //allow read, create for compliment receivers, the followers and compliment senders
+      //sender is already a follower but separate rule is added just in case the sender unfollows a person later
+      allow read, create: if request.auth.uid == uid
+      || exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid)) 
+      || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
+      //allow update only if trying to update the likes or viewCounter fields
+      allow update: if isUpdatingOnlyLikesOrViewsCounter();
+      //allow delete to only the likers so users can unlike their own likes and cannot unlike for other users
+      allow delete: if request.auth.uid == likerUid;
+    }
+
+
+
       //get complimentReceivedDocData
     function getComplimentReceivedDocData() {
       return get(/databases/$(database)/documents/Users/$(request.data.receiverUid)/complimentsReceived/{randomComplimentId}).data
@@ -69,7 +91,6 @@ service cloud.firestore {
         allow delete: if request.auth.uid == likerUid;
         }
 
-      
     }
 
       //The rules for complimentsReceivedSubCollection
@@ -83,10 +104,6 @@ service cloud.firestore {
         allow read: if request.auth.uid == resource.data.receiverUid 
         || exists(/databases/$(database)/documents/Users/$(resource.data.receiverUid)/followers/$(request.auth.uid)) 
           || resource.data.senderUid == request.auth.uid;
-        //allow delete for the compliment receiver only
-        allow delete: if request.auth.uid == resource.data.receiverUid;
-
-        // allow read: if request.auth.uid != null
       }
 
     //Experiment Collection users-t

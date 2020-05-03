@@ -17,7 +17,7 @@ const admin = require('firebase-admin')
         senderUserName:  complimentData.senderUserName,
         senderName:  complimentData.senderName,
         senderUid: complimentData.senderUid,
-        content: complimentData.content,
+        complimentReceivedContent: complimentData.complimentReceivedContent,
         receiverUid: complimentData.receiverUid,
         receiverUserName: complimentData.receiverUserName,
         receiverName: complimentData.receiverName,
