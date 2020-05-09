@@ -62,13 +62,18 @@ service cloud.firestore {
 
     //The rules for complimentsReceivedLike Docs
     match /complimentsReceived/{randomComplimentId} {
-      //allow read, create for compliment receivers, the followers and compliment senders
+      //allow read for compliment receivers, the followers and compliment senders
       //sender is already a follower but separate rule is added just in case the sender unfollows a person later
-      allow read, create: if request.auth.uid == uid
+      allow read: if request.auth.uid == uid
       || exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid)) 
       || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
+
+      //allow create for the followers
+      allow create: if exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid))
+
       //allow update only if trying to update the likes or viewCounter fields
       allow update: if isUpdatingOnlyLikesOrViewsCounter();
+
       //allow delete compliment to only the receiver
       allow delete: if request.auth.uid == resource.data.receiverUid;
     }
@@ -83,15 +88,17 @@ service cloud.firestore {
         match /complimentsReceived/{randomComplimentId}/complimentLikes/{likerUid} {
         //allow read, create for compliment receivers, the followers and compliment senders
         //sender is already a follower but separate rule is added just in case the sender unfollows a person later
-        allow read, create: if request.auth.uid == uid
+        allow read, create: if request.auth.uid != null
          || exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid)) 
           || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
+
         //allow delete to only the likers so users can unlike their own likes and cannot unlike for other users
         allow delete: if request.auth.uid == likerUid;
         }
 
+    
+    //End of Users/{uid} parent
     }
-
 
       //The rules for complimentsReceivedSubCollection
       //Using a collectionGroup query for retreving compliments sent
@@ -109,8 +116,7 @@ service cloud.firestore {
     //Experiment Collection users-t
     match /users-t/{userdIds} {
     	//Users can read data about all other users
-    	allow read : if request.auth.uid in resource.data.followers || 
-      resource.data.following
+    	allow read : if request.auth.uid in resource.data.followers || resource.data.following
     }
     
   }

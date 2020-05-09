@@ -4,26 +4,26 @@ const admin = require('firebase-admin')
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the user's followees' followers sub coll of all the other users that he is following
-export const updateUserInfoToTheFollowees = functions.region('asia-east2').firestore.document
+export const updateUserInfoAtTheComplimentLikes = functions.region('asia-east2').firestore.document
 ('Users/{userId}').onUpdate((change, context) => {
 
 const upDatedUserData = change.after.data()
 
 const newName = upDatedUserData?.name
+const newNameLowerCase = upDatedUserData?.nameLowerCase
 const updatersUserId = upDatedUserData?.uid
 const newUserName = upDatedUserData?.userName
 const newprofilePhotoChosenBoolean = upDatedUserData?.profilePhotoChosen
 
-const userFollowingColl = admin.firestore().collection('Users').doc(updatersUserId).collection('following')
+const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimentLikes').where('uid', '==',`${updatersUserId}`)
 
-return userFollowingColl.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
+return userComplimentLikedUserDocs.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
     const promises = querySnapshot.docs.map((doc) => {
-        //get the followee uid
-        const followeeUid = doc.id
-        //go to the follower Doc in the followee's followers sub collection
-        return admin.firestore().collection('Users').doc(followeeUid).collection('followers')
-        .doc(updatersUserId).set({
-            name: newName, 
+        //get a string representation of the documentPath and use that to update the doc
+        const complimentLikerDocPath = doc.ref.path
+        return admin.firestore().doc(complimentLikerDocPath).set({
+            name: newName,
+            nameLowerCase: newNameLowerCase,
             userName: newUserName,
             uid: updatersUserId,
             profilePhotoChosen : newprofilePhotoChosenBoolean

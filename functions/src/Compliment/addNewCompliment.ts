@@ -10,7 +10,7 @@ const admin = require('firebase-admin')
       )
     } 
     
-  //random 11 digital Notification Doc Id
+  //random 11 digital Notification Doc Id converted to String
   const randomComplimentId = (Math.random() * 100000000000).toString()
 
     const complimentReceivedObject = {
