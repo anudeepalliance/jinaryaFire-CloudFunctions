@@ -31,4 +31,5 @@ return userComplimentLikedUserDocs.get().then((querySnapshot: { docs: DocumentSn
     })
     return Promise.all(promises)
     })
+    
 })

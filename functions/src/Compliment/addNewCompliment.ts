@@ -21,6 +21,7 @@ const admin = require('firebase-admin')
         receiverUid: complimentData.receiverUid,
         receiverUserName: complimentData.receiverUserName,
         receiverName: complimentData.receiverName,
+        complimentRead: false,
         receivedTime: Date.now(),
         noOfLikes: 0,
         noOfViews: 0,

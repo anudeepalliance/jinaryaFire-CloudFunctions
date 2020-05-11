@@ -17,6 +17,10 @@ exports.sendUserFeedback = sendUserFeedback.sendFeedback
 import reportPerson = require('./ReportAndFeedback/reportPerson')
 exports.reportPerson = reportPerson.reportThePerson
 
+//https callable function triggered when client reports Content either a compliment or insight
+import reportContent = require('./ReportAndFeedback/reportContent')
+exports.reportContent = reportContent.reportTheContent
+
 //When client followes a user, a firestore .onCreate() background function is triggered to
 //1.add follower to the followee's followers sub collection
 //2.an FCM notification to sent to the users
