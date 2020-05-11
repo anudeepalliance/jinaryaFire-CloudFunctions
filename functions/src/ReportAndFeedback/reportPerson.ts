@@ -10,15 +10,17 @@ const admin = require('firebase-admin')
       )
     } 
 
-     //A random id for the report document is generated here everytime a report is filed
-     //instead of using a uid of the reporter or reportee so that if a user reports
-     //multiple times then the previous report  document should not be distrubed
+    //A random id for the report document is generated here everytime a report is filed
+   //instead of using a uid of the reporter or reportee so that if a user reports
+  //multiple times then the previous report  document should not be distrubed=
     return admin.firestore().collection('UserReports').add({
-        reporteeUid : userReportData.reporteeUid,
-        reportCategory: userReportData.reportCategory,
-        reporterUid: context.auth.uid,
-        date: userReportData.date
-     })
-    
-    
+      reporteeUid : userReportData.reporteeUid,
+      reportCategory: userReportData.reportCategory,
+      reporterUid: context.auth.uid,
+      date: userReportData.date
+    })
+    .then(() => {
+      return { reporteeUid : userReportData.reporteeUid}
   })
+
+})

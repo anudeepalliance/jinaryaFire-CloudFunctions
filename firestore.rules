@@ -56,8 +56,15 @@ service cloud.firestore {
     //custom function to check if client is trying to update anything other 
     //than likes or views field of the complimentSent doc
     function isUpdatingOnlyLikesOrViewsCounter() {
-    return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) || 
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) || 
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews'])
+    }
+
+    //function to track if the complimentReceiver to trying to update the wasRead 
+    //Boolean in the ComplimentReceived Doc when it is populated in his screen
+    function isComplimentReceiverUpdatingWasReadBoolean() {
+      return request.resource.data.receiverUid == uid && 
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentRead'])
     }
 
     //The rules for complimentsReceivedLike Docs
@@ -72,7 +79,8 @@ service cloud.firestore {
       allow create: if exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid))
 
       //allow update only if trying to update the likes or viewCounter fields
-      allow update: if isUpdatingOnlyLikesOrViewsCounter();
+      allow update: if isUpdatingOnlyLikesOrViewsCounter() ||
+        isComplimentReceiverUpdatingWasReadBoolean();
 
       //allow delete compliment to only the receiver
       allow delete: if request.auth.uid == resource.data.receiverUid;

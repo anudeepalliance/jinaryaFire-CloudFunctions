@@ -25,7 +25,9 @@ const admin = require('firebase-admin')
         contentId : userReportContentData.contentId,
         reportedTime : userReportContentData.reportedTime,
         reportCategory : userReportContentData.reportCategory
-     })
+     }).then(() => {
+      return { ownerUid : userReportContentData.ownerUid}
+    })
     
     
   })
