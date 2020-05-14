@@ -3,7 +3,7 @@ import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
-//reflected in the user's followees' followers sub coll of all the other users that he is following
+//reflected in the complimentlikes coll of all the compliments that he has liked
 export const updateUserInfoAtTheComplimentLikes = functions.region('asia-east2').firestore.document
 ('Users/{userId}').onUpdate((change, context) => {
 
