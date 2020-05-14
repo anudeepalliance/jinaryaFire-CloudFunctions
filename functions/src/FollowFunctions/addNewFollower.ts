@@ -41,6 +41,8 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     notification: {
       title: 'You have a new follower!',
       body: `${followerData.userName}`,
+      //Add an additional intent filter in manifest file for android for the activity with the name 
+      //same as the clickAction here 
       clickAction: ".People.PersonProfileActivity",
       image: `${followerImageUrl}`
     },

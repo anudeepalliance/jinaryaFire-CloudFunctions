@@ -60,12 +60,18 @@ service cloud.firestore {
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews'])
     }
 
-    //function to track if the complimentReceiver to trying to update the wasRead 
-    //Boolean in the ComplimentReceived Doc when it is populated in his screen
-    function isComplimentReceiverUpdatingWasReadOrComplimentBLockedField() {
+    //function to track if the complimentReceiver to trying to update the wasRead, senderBlocked or 
+    //followingStatus Booleans in the ComplimentReceived Doc
+    function isComplimentReceiverUpdatingWasReadOrComplimentBlockedFieldOrFollowingStatus() {
       return request.resource.data.receiverUid == uid && 
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentRead']) ||
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderBlocked'])
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderBlocked']) ||
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followingStatus']);
+    }
+
+    function isSenderBlockingComplimentToReceiver() {
+      return get(/databases/$(database)/documents/Users/$(request.data.receiverUid)/complimentsReceived/{randomComplimentId}).data.senderUid == request.auth.uid &&
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverBlocked']);
     }
 
     //The rules for complimentsReceivedLike Docs
@@ -81,7 +87,8 @@ service cloud.firestore {
 
       //allow update only if trying to update the likes or viewCounter fields
       allow update: if isUpdatingOnlyLikesOrViewsCounter() ||
-        isComplimentReceiverUpdatingWasReadOrComplimentBLockedField();
+        isComplimentReceiverUpdatingWasReadOrComplimentBlockedFieldOrFollowingStatus() ||
+        isSenderBlockingComplimentToReceiver();
 
       //allow delete compliment to only the receiver
       allow delete: if request.auth.uid == resource.data.receiverUid;

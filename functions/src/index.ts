@@ -62,12 +62,14 @@ import profilePhotoThumbnail = require('./CloudStorageFunctions/profilePhotoThum
 exports.profilePhotoThumbnail = profilePhotoThumbnail.profilePhotoMakeThumbnail
 
 
-//When a compliment is sent by the user then it is added to the compliments received sub collection of the
-//receiver via callable Cf as the sender does not have permission to write that sub collection
+//When a compliment is sent by the user then the following are done
+//1.it is added to the compliments received sub collection of the receiver via callable Cf as the sender does not have permission to write that sub collection
+//2.A Notification payload is created and sent via FCM to the client
+//3. A Notification Object is created and added to the Notifications Sub Collection of the Client
 import addNewCompliment = require('./Compliment/addNewCompliment')
 exports.addNewCompliment = addNewCompliment.addTheNewCompliment
 
-//When a compliment is sent by the user then it is added to the compliments received sub collection of the
-//receiver via callable Cf as the sender does not have permission to write that sub collection
+//When a user updates his userDoc like name or UserName then this updated info needs to be
+//reflected in the complimentlikes coll of all the compliments that he has liked
 import updateUserInfoAtComplimentLikes = require('./Compliment/updateUserInfoAtComplimentLikes')
 exports.updateUserInfoAtComplimentLikes = updateUserInfoAtComplimentLikes.updateUserInfoAtTheComplimentLikes

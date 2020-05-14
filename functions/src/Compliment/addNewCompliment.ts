@@ -1,7 +1,10 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
 
-// export function reportUser() 
+//When a compliment is sent by the user then the following are done
+//1.it is added to the compliments received sub collection of the receiver via callable Cf as the sender does not have permission to write that sub collection
+//2.A Notification payload is created and sent via FCM to the client
+//3. A Notification Object is created and added to the Notifications Sub Collection of the Client
   export const addTheNewCompliment = functions.region('asia-east2').https.onCall((complimentData, context) => {
     if (!context.auth) {
       throw new functions.https.HttpsError(
@@ -26,7 +29,9 @@ const admin = require('firebase-admin')
         noOfLikes: 0,
         noOfViews: 0,
         complimentId: randomComplimentId,
-        senderBlocked: false
+        followingStatus: complimentData.followingStatus,
+        senderBlocked: false,
+        receiverBlocked: false
     }
 
 
@@ -41,17 +46,19 @@ const admin = require('firebase-admin')
       notification: {
         title: 'You received a new Compliment!',
         body: `${complimentData.senderName}`,
+        //Add an additional intent filter in manifest file for android for the activity with the name 
+        //same as the clickAction here
         clickAction: ".source.SourceActivity",
         image: `${complimentData.senderProfileImageDownloadUrl}`
       },
       data: {
-        ACTIVITY_NAME: "source.SourceActivity",
+        ACTIVITY_NAME: "SOURCE_COMPLIMENTS_RECEIVED_ACTIVITY_NAME",
         //The below field name to be same as the one used in the client
         SOURCE_ACTIVITY_INTENT_EXTRA: "COMPLIMENTS_RECEIVED_FRAGMENT_INTENT_EXTRA",
         COMPLIMENT_SENDER_UID_INTENT_EXTRA: complimentData.senderUid,
         //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
         //be created at the client else, this will fail
-        CHANNEL_ID: "New Compliment Received ID"
+        CHANNEL_ID: "Follow Update ID"
       }
     }
 
@@ -69,7 +76,7 @@ const admin = require('firebase-admin')
     wasClicked: false,
     //this type has be same as in the client
     notificationChannelId: "New Compliment Received",
-    intentToActivity: "SourceActivity",
+    intentToActivity: "SOURCE_COMPLIMENTS_RECEIVED_ACTIVITY_NAME",
     intentExtrasUid: complimentData.senderUid,
     intentExtrasName: complimentData.senderName,
     intentExtrasUserName: complimentData.senderUserName,
