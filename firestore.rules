@@ -69,10 +69,14 @@ service cloud.firestore {
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followingStatus']);
     }
 
-    function isSenderBlockingComplimentToReceiver() {
-      return get(/databases/$(database)/documents/Users/$(request.data.receiverUid)/complimentsReceived/{randomComplimentId}).data.senderUid == request.auth.uid &&
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverBlocked']);
+    function isComplimentSenderUpdatingReceiverBlockedStatusOrHisNameOrUserName() {
+      return resource.data.senderUid == request.auth.uid && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverBlocked']) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderName']) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderUserName']);
     }
+
+
 
     //The rules for complimentsReceivedLike Docs
     match /complimentsReceived/{randomComplimentId} {
@@ -88,7 +92,7 @@ service cloud.firestore {
       //allow update only if trying to update the likes or viewCounter fields
       allow update: if isUpdatingOnlyLikesOrViewsCounter() ||
         isComplimentReceiverUpdatingWasReadOrComplimentBlockedFieldOrFollowingStatus() ||
-        isSenderBlockingComplimentToReceiver();
+        isComplimentSenderUpdatingReceiverBlockedStatusOrHisNameOrUserName();
 
       //allow delete compliment to only the receiver
       allow delete: if request.auth.uid == resource.data.receiverUid;
@@ -124,9 +128,10 @@ service cloud.firestore {
         //Allow read permission to compliment receivers, followers of the receiver
         //and the sender of the compliment 
         //sender is already a follower but separate rule is added just in case the sender unfollows a person later
-        allow read: if request.auth.uid == resource.data.receiverUid 
-        || exists(/databases/$(database)/documents/Users/$(resource.data.receiverUid)/followers/$(request.auth.uid)) 
-          || resource.data.senderUid == request.auth.uid;
+        allow read: if request.auth.uid == resource.data.receiverUid || 
+          exists(/databases/$(database)/documents/Users/$(resource.data.receiverUid)/followers/$(request.auth.uid)) || 
+          resource.data.senderUid == request.auth.uid;
+
       }
 
     //Experiment Collection users-t
