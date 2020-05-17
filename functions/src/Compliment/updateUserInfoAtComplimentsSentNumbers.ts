@@ -17,18 +17,20 @@ const newprofilePhotoChosenBoolean = upDatedUserData?.profilePhotoChosen
 
 const userComplimentsSentNumbersDocs = admin.firestore().collectionGroup('complimentsSentNumbers').where('uid', '==',`${updatersUserId}`)
 
-return userComplimentsSentNumbersDocs.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
-    const updateAtComplimentsSentPromises = querySnapshot.docs.map((doc) => {
-        //get a string representation of the documentPath and use that to update the doc
-        const complimentsSentNumbersDocPath = doc.ref.path
-        return admin.firestore().doc(complimentsSentNumbersDocPath).update({
-            name: newName,
-            nameLowerCase: newNameLowerCase,
-            userName: newUserName,
-            profilePhotoChosen : newprofilePhotoChosenBoolean
+    return userComplimentsSentNumbersDocs.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
+        const updateAtComplimentsSentPromises = querySnapshot.docs.map((doc) => {
+            //get a string representation of the documentPath and use that to update the doc
+            const complimentsSentNumbersDocPath = doc.ref.path
+            return admin.firestore().doc(complimentsSentNumbersDocPath).update({
+                name: newName,
+                nameLowerCase: newNameLowerCase,
+                userName: newUserName,
+                profilePhotoChosen : newprofilePhotoChosenBoolean
+            })
         })
+        
+        return Promise.all(updateAtComplimentsSentPromises)
+        
     })
-    
-    return Promise.all(updateAtComplimentsSentPromises)
-    
+
 })

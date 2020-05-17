@@ -17,7 +17,7 @@ const newprofilePhotoChosenBoolean = upDatedUserData?.profilePhotoChosen
 
 const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimentLikes').where('uid', '==',`${updatersUserId}`)
 
-return userComplimentLikedUserDocs.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
+    return userComplimentLikedUserDocs.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
     const updateAtComplimentLikesPromises = querySnapshot.docs.map((doc) => {
         //get a string representation of the documentPath and use that to update the doc
         const complimentLikerDocPath = doc.ref.path
@@ -32,4 +32,6 @@ return userComplimentLikedUserDocs.get().then((querySnapshot: { docs: DocumentSn
     
     return Promise.all(updateAtComplimentLikesPromises)
     
+    })
+
 })
