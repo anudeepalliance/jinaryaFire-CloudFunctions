@@ -21,12 +21,21 @@ service cloud.firestore {
       //Only the user is authorised to read, delete 
       //and add to his following sub-collection
       allow read, create, delete: if request.auth.uid == uid;
+      //allow update if user is trying to update just the number of compliments sent field
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']);
       }
       
       match /followers/{followerPersonUid} {
       //Only the user is authorised to read, delete 
       //and add to his followers sub-collection
       allow read,create, delete: if request.auth.uid == uid;
+      }
+      
+      match /complimentsSentNumbers/{followingPersonUid} {
+      //Only the owner can create and read
+      //can update if updating the noOfComplimentsSent
+      allow read,create : if request.auth.uid == uid;
+      allow update : if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']);
       }
       
       match /blocked/{blockedPersonUid} {
@@ -44,7 +53,8 @@ service cloud.firestore {
       match /notificationToken/{tokenId} {
       //Only the user is authorised to read and write
       //to his followers sub-collection
-      allow read, write: if request.auth.uid == uid;
+      allow read, create, update: if request.auth.uid == uid;
+      allow delete : if false;
       }
       
       match /Notifications/{randomId} {
@@ -95,7 +105,7 @@ service cloud.firestore {
         isComplimentSenderUpdatingReceiverBlockedStatusOrHisNameOrUserName();
 
       //allow delete compliment to only the receiver
-      allow delete: if request.auth.uid == resource.data.receiverUid;
+      allow delete: if request.auth.uid == uid;
     }
 
 

@@ -73,3 +73,8 @@ exports.addNewCompliment = addNewCompliment.addTheNewCompliment
 //reflected in the complimentlikes coll of all the compliments that he has liked
 import updateUserInfoAtComplimentLikes = require('./Compliment/updateUserInfoAtComplimentLikes')
 exports.updateUserInfoAtComplimentLikes = updateUserInfoAtComplimentLikes.updateUserInfoAtTheComplimentLikes
+
+//When a user updates his userDoc like name or UserName then this updated info needs to be
+//reflected in the complimentSentNumbers coll of all users who have sent this person a compliment
+import updateUserInfoAtComplimentsSentNumbers = require('./Compliment/updateUserInfoAtComplimentsSentNumbers')
+exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSentNumbers.updateUserInfoAtTheComplimentSentNumbers
