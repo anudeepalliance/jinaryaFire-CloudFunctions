@@ -6,12 +6,23 @@ const admin = require('firebase-admin')
 //2.A Notification payload is created and sent via FCM to the client
 //3. A Notification Object is created and added to the Notifications Sub Collection of the Client
   export const addTheNewCompliment = functions.region('asia-east2').https.onCall((complimentData, context) => {
+    //check if request came from an authenticated user
     if (!context.auth) {
       throw new functions.https.HttpsError(
         'unauthenticated', 
         'only authenticated users can send feedback'
       )
     } 
+
+    //Check if the sender is blocked by the recipent, if yes then throw an error
+    return admin.firestore().collection('Users').doc(complimentData.receiverUid).collection('blocked')
+    .doc(complimentData.senderUid).get().then((doc: { exists: any; data: () => any }) => {
+      if (doc.exists) {
+        throw new functions.https.HttpsError(
+          'unauthenticated', 
+          'Sender is blocked by receiver'
+        )
+      } else {
     
   //random 11 digital ComplimentId converted to String
   const randomComplimentId = (Math.random() * 100000000000).toString()
@@ -101,5 +112,9 @@ if ( receiverNotificationToken !== null ) {
 return Promise.all(promises)
 
     })
+
+  }
+
+})
 
 })
