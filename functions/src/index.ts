@@ -78,3 +78,8 @@ exports.updateUserInfoAtComplimentLikes = updateUserInfoAtComplimentLikes.update
 //reflected in the complimentSentNumbers coll of all users who have sent this person a compliment
 import updateUserInfoAtComplimentsSentNumbers = require('./Compliment/updateUserInfoAtComplimentsSentNumbers')
 exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSentNumbers.updateUserInfoAtTheComplimentSentNumbers
+
+//When a receiver deletes a compliment received then reduce the no of compliments sent
+//at sender's complimentsSentNos sub Collection
+import decrementComplimentsSentNo = require('./Compliment/decrementComplimentsSentNo')
+exports.decrementComplimentsSentNo = decrementComplimentsSentNo.decrementTheComplimentsSentNo
