@@ -46,11 +46,11 @@ const admin = require('firebase-admin')
     }
 
 
-    //get the notification token of the complimentReceiver to identify & send notification to his device
+  //get the notification token of the complimentReceiver to identify & send notification to his device
   return admin.firestore().collection('Users').doc(complimentData.receiverUid).collection('notificationToken')
   .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
 
-    const receiverNotificationToken = notificationTokenDoc.data().notificationToken
+    const receiverNotificationToken = notificationTokenDoc.data()?.notificationToken
 
     //Create the Notification Payload content
     const notificationPayload = {
@@ -91,6 +91,7 @@ const admin = require('firebase-admin')
     intentExtrasUid: complimentData.senderUid,
     intentExtrasName: complimentData.senderName,
     intentExtrasUserName: complimentData.senderUserName,
+    contentId: randomComplimentId
   }
 
 
@@ -103,7 +104,7 @@ promises.push(p)
 const p1 = admin.firestore().collection('Users').doc(complimentReceivedObject.receiverUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
 promises.push(p1)
 //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
-if ( receiverNotificationToken !== null ) {
+if ( receiverNotificationToken ) {
   //Send the notification to the user
   const p2 = admin.messaging().sendToDevice(receiverNotificationToken, notificationPayload)
   promises.push(p2)

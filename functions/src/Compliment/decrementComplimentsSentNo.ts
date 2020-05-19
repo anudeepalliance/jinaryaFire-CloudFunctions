@@ -7,11 +7,11 @@ export const decrementTheComplimentsSentNo = functions.region('asia-east2').fire
   ('Users/{userId}/complimentsReceived/{complimentId}').onDelete((snap, context) => {
 
   //get the data of the deleted compliment document
-  const deletedCompliment = snap.data();
+  const deletedCompliment = snap.data()
   //get the Uid of the compliment deleter
   const receiverUid = context.params.userId
   //get Uid of the compliment Sender
-  const senderUid = deletedCompliment!!.senderUid
+  const senderUid = deletedCompliment?.senderUid
 
 return admin.firestore().collection('Users').doc(senderUid).collection('complimentsSentNumbers')
   .doc(receiverUid).update({
