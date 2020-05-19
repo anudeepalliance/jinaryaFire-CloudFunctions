@@ -14,7 +14,7 @@ const admin = require('firebase-admin')
       )
     } 
 
-    //Check if the sender is blocked by the recipent, if yes then throw an error
+    //Check if the sender is blocked by the recipent, if yes then throw an error.
     return admin.firestore().collection('Users').doc(complimentData.receiverUid).collection('blocked')
     .doc(complimentData.senderUid).get().then((doc: { exists: any; data: () => any }) => {
       if (doc.exists) {
