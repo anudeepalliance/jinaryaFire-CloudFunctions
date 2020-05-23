@@ -149,7 +149,14 @@ service cloud.firestore {
     	//Users can read data about all other users
     	allow read : if request.auth.uid in resource.data.followers || resource.data.following
     }
-    
+
+match/ComplimentIdeas/{ideaId} {
+  //everyone can read compliment ideas, only admins will create & write to this via console
+  allow read: if true;
+}
+
+
+  //End of rules  
   }
   
 }

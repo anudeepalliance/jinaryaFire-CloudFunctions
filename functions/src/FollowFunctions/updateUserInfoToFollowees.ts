@@ -22,7 +22,7 @@ return userFollowingColl.get().then((querySnapshot: { docs: DocumentSnapshot[] }
         const followeeUid = doc.id
         //go to the follower Doc in the followee's followers sub collection
         return admin.firestore().collection('Users').doc(followeeUid).collection('followers')
-        .doc(updatersUserId).set({
+        .doc(updatersUserId).update({
             name: newName, 
             userName: newUserName,
             uid: updatersUserId,

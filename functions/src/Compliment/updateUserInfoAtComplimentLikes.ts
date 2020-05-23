@@ -21,7 +21,7 @@ const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimen
     const updateAtComplimentLikesPromises = querySnapshot.docs.map((doc) => {
         //get a string representation of the documentPath and use that to update the doc
         const complimentLikerDocPath = doc.ref.path
-        return admin.firestore().doc(complimentLikerDocPath).set({
+        return admin.firestore().doc(complimentLikerDocPath).update({
             name: newName,
             nameLowerCase: newNameLowerCase,
             userName: newUserName,

@@ -20,7 +20,7 @@ return userFollowersColl.get().then((querySnapshot: { docs: DocumentSnapshot[] }
     const promises = querySnapshot.docs.map((doc) => {
         const followerUid = doc.id
         return admin.firestore().collection('Users').doc(followerUid).collection('following')
-        .doc(updatersUserId).set({
+        .doc(updatersUserId).update({
             name: newName, 
             userName: newUserName,
             uid: updatersUserId,
