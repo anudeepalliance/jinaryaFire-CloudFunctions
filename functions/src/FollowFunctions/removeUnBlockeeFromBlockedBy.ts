@@ -11,8 +11,6 @@ export const removeTheUnBlockeeFromBlockedBy = functions.region('asia-east2').fi
 
   
       //Remove Unblocker from unBlocked person's BlockedBy Sub Coll
-      return admin.firestore()
-      .collection('Users').doc(unBlockedUid).collection('blockedBy').doc(unBlockerUid)
-      .delete()
+      return admin.firestore().collection('Users').doc(unBlockedUid).collection('blockedBy').doc(unBlockerUid).delete()
     
   })

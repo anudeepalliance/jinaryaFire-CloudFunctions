@@ -6,20 +6,26 @@ const admin = require('firebase-admin')
 export const stopFollowingTheBlockerAndToBlockedBy = functions.region('asia-east2').firestore.document
   ('Users/{blockerUid}/blocked/{blockeeUid}').onCreate((blockedData, context) => {
 
-      const blockeeUid = context.params.blockeeUid
+      const blockedUid = context.params.blockeeUid
       const blockerUid = context.params.blockerUid
 
-      //Add Blocker to Blocked by Sub Collection of the Blockee
+      const promises = []
+      //Add Blocker to Blocked by Sub Collection of the Blocked
       //User need not know whom all he has been blocked by hence just the Uid is added for
       //Checking purposes in perope recycler views
-      admin.firestore().collection('Users').doc(blockeeUid).collection('blockedBy').doc(blockerUid)
-      .set({
+      const p =  admin.firestore().collection('Users').doc(blockedUid).collection('blockedBy').doc(blockerUid).set({
         uid: blockerUid
       })
-  
-      //Stop the Blockee from following the Blocker
-      return admin.firestore()
-      .collection('Users').doc(blockeeUid).collection('following').doc(blockerUid)
-      .delete()
+      promises.push(p)
+      //Stop the Blocked from following the Blocker
+      const p1 = admin.firestore().collection('Users').doc(blockedUid).collection('following').doc(blockerUid).delete()
+      promises.push(p1)
+      //Blocked has stop following a user so reduce the noOfFollowing count in his ProfileInfo Doc
+      const p2 = admin.firestore().collection('Users').doc(blockedUid).collection('ProfileInfo').doc(blockedUid).update({
+        noOfFollowing : admin.firestore.FieldValue.increment(-1)
+      })
+      promises.push(p2)
+      //run all the promises
+      return Promise.all(promises)
     
   })

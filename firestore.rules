@@ -140,7 +140,7 @@ service cloud.firestore {
         //sender is already a follower but separate rule is added just in case the sender unfollows a person later
         allow read: if request.auth.uid == resource.data.receiverUid || 
           exists(/databases/$(database)/documents/Users/$(resource.data.receiverUid)/followers/$(request.auth.uid)) || 
-          resource.data.senderUid == request.auth.uid;
+          request.auth.uid == resource.data.senderUid;
 
       }
 

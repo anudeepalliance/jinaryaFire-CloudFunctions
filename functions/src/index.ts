@@ -77,7 +77,7 @@ exports.updateUserInfoAtComplimentLikes = updateUserInfoAtComplimentLikes.update
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the complimentSentNumbers coll of all users who have sent this person a compliment
 import updateUserInfoAtComplimentsSentNumbers = require('./Compliment/updateUserInfoAtComplimentsSentNumbers')
-exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSentNumbers.updateUserInfoAtTheComplimentSentNumbers
+exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSentNumbers.updateUserInfoAtTheComplimentsSentNumbers
 
 //When a receiver deletes a compliment received then reduce the no of compliments sent
 //at sender's complimentsSentNos sub Collection

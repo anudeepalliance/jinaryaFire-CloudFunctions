@@ -42,7 +42,9 @@ const admin = require('firebase-admin')
         complimentId: randomComplimentId,
         followingStatus: complimentData.followingStatus,
         senderBlocked: false,
-        receiverBlocked: false
+        receiverBlocked: false,
+        //the below field value needs to be same as the CO defined in the client
+        contentCategory: "compliment"
     }
 
 
@@ -96,7 +98,7 @@ const admin = require('firebase-admin')
 
 
 const promises = []
-//The compliment Object is added to the complimentsReceived Sub Coll of the receiver
+//The compliment Object is added to the whatsNew Sub Coll of the receiver
 const p = admin.firestore().collection('Users').doc(complimentReceivedObject.receiverUid).collection('complimentsReceived')
 .doc(randomComplimentId).set(complimentReceivedObject)
 promises.push(p)

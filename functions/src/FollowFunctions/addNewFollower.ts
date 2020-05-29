@@ -89,10 +89,15 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
           promises.push(p1)
           //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
           // if ( followeeNotificationToken ) {
-            //Send the notification to the user
-            const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
-            promises.push(p2)
-          // }
+          //Send the notification to the user
+          const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
+          promises.push(p2)
+          //User gained a new Follower so increase the followerCount in his profileInfo Doc
+          const p3 = admin.firestore().collection('Users').doc(followedUid).collection('ProfileInfo').doc(followedUid).update({
+            noOfFollowers : admin.firestore.FieldValue.increment(1)
+          })
+          promises.push(p3)
+          //run all the promises
           return Promise.all(promises)
       })
 
