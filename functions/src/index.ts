@@ -36,8 +36,8 @@ exports.removeUserAsFollower = removeUserAsFollower.removeUserAsTheFollower
 
 //When client blocks a person, it  calls a callable function to remove blocker(himself)
 //from the blocked person's following sub collection
-import stopFollowingBlockerAddToBlockedBy = require('./FollowFunctions/stopFollowingBlockerAndAddToBlockedBy')
-exports.stopFollowingBlockerAddToBlockedBy = stopFollowingBlockerAddToBlockedBy.stopFollowingTheBlockerAndToBlockedBy
+import stopFollowingBlockerAndAddToBlockedBy = require('./FollowFunctions/stopFollowingBlockerAndAddToBlockedBy')
+exports.stopFollowingBlockerAndAddToBlockedBy = stopFollowingBlockerAndAddToBlockedBy.stopFollowingTheBlockerAndToBlockedBy
 
 //When client unBlocks a person, it  calls a callable function to remove unblockee(himself)
 //from the blockedBy Sub Col of the blocked
