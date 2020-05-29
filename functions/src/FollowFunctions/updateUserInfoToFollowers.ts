@@ -14,19 +14,24 @@ const updatersUserId = upDatedUserData?.uid
 const newUserName = upDatedUserData?.userName
 const newprofilePhotoChosenBoolean = upDatedUserData?.profilePhotoChosen
 
+const batch = admin.firestore().batch()
+
 const userFollowersColl = admin.firestore().collection('Users').doc(updatersUserId).collection('followers')
 
 return userFollowersColl.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
-    const promises = querySnapshot.docs.map((doc) => {
+    querySnapshot.docs.map((doc) => {
+        //get the followerUid
         const followerUid = doc.id
-        return admin.firestore().collection('Users').doc(followerUid).collection('following')
-        .doc(updatersUserId).update({
+        //go to the following Doc in the follower's following sub collection
+        const updatersDocAtFollower = admin.firestore().collection('Users').doc(followerUid).collection('following')
+        .doc(updatersUserId)
+        return batch.update(updatersDocAtFollower,{
             name: newName, 
             userName: newUserName,
             uid: updatersUserId,
             profilePhotoChosen : newprofilePhotoChosenBoolean
         })
     })
-    return Promise.all(promises)
+    return batch.commit()
     })
 })

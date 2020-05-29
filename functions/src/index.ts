@@ -36,8 +36,8 @@ exports.removeUserAsFollower = removeUserAsFollower.removeUserAsTheFollower
 
 //When client blocks a person, it  calls a callable function to remove blocker(himself)
 //from the blocked person's following sub collection
-import stopFollowingBlockerAndAddToBlockedBy = require('./FollowFunctions/stopFollowingBlockerAndAddToBlockedBy')
-exports.stopFollowingBlockerAndAddToBlockedBy = stopFollowingBlockerAndAddToBlockedBy.stopFollowingTheBlockerAndToBlockedBy
+import stopBlockedFromFollowingAndAddToHisBlockedBy = require('./FollowFunctions/stopBlockedFromFollowingAndAddToHisBlockedBy')
+exports.stopBlockedFromFollowingAndAddToHisBlockedBy = stopBlockedFromFollowingAndAddToHisBlockedBy.stopBlockedFromFollowingAndAddToTheHisBlockedBy
 
 //When client unBlocks a person, it  calls a callable function to remove unblockee(himself)
 //from the blockedBy Sub Col of the blocked
@@ -47,8 +47,8 @@ exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeTheUnB
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the followees' followers sub coll of all the other users that the this user to following
-import updateUserInfoToFollowees = require('./FollowFunctions/updateUserInfoToFollowees')
-exports.updateUserInfoToFollowees = updateUserInfoToFollowees.updateUserInfoToTheFollowees
+import updateUserInfoAtFollowedPeople = require('./FollowFunctions/updateUserInfoAtFollowedPeople')
+exports.updateUserInfoAtFollowedPeople = updateUserInfoAtFollowedPeople.updateUserInfoAtTheFollowedPeople
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the followers' following doc of all the other users that is a follower of this user 

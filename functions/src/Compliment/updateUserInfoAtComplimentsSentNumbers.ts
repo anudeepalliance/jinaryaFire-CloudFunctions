@@ -15,13 +15,17 @@ const updatersUserId = upDatedUserData?.uid
 const newUserName = upDatedUserData?.userName
 const newprofilePhotoChosenBoolean = upDatedUserData?.profilePhotoChosen
 
+const batch = admin.firestore().batch()
+
 const userComplimentsSentNumbersDocs = admin.firestore().collectionGroup('complimentsSentNumbers').where('uid', '==',`${updatersUserId}`)
 
     return userComplimentsSentNumbersDocs.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
-        const updateAtComplimentsSentPromises = querySnapshot.docs.map((doc) => {
-            //get a string representation of the documentPath and use that to update the doc
-            const complimentsSentNumbersDocPath = doc.ref.path
-            return admin.firestore().doc(complimentsSentNumbersDocPath).update({
+        querySnapshot.docs.map((doc) => {
+        //get a string representation of the documentPath and use that to update the doc
+        const complimentsSentNumbersDocPath = doc.ref.path
+        //get a DB representation of the documentPath and use that to update the doc
+        const userAtCompSentNumbers = admin.firestore().doc(complimentsSentNumbersDocPath)
+            return batch.update(userAtCompSentNumbers,{
                 name: newName,
                 nameLowerCase: newNameLowerCase,
                 userName: newUserName,
@@ -29,7 +33,7 @@ const userComplimentsSentNumbersDocs = admin.firestore().collectionGroup('compli
             })
         })
         
-        return Promise.all(updateAtComplimentsSentPromises)
+        return batch.commit()
         
     })
 
