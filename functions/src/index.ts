@@ -1,8 +1,13 @@
 // Just import the functions from other files
 // import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
+//Access to  a service Account to access sensitive data in firestore
+const serviceAccount = require("path/to/serviceAccountKey.json");
 //The initialization should happen only once hence this line does not appear in other files
-admin.initializeApp()
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://jinaryafire.firebaseio.com"
+  })
 
 //export the functions in other files, callable https functions 
 //dont work if they are in other files hence they are declared in this file
