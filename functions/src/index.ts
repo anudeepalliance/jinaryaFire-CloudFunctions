@@ -1,8 +1,15 @@
 // Just import the functions from other files
 // import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
+
+const serviceAccount = require('./server/jinaryafire-firebase-adminsdk-db1fd-7d896fb9d8.json')
+
 //The initialization should happen only once hence this line does not appear in other files
-admin.initializeApp()
+// admin.initializeApp()
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://jinaryafire.firebaseio.com"
+});
 
 //export the functions in other files, callable https functions 
 //dont work if they are in other files hence they are declared in this file
@@ -58,8 +65,8 @@ exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToTh
 
 //When an Image is upload to Cloud Storage which can only be the profilePhotos of users,
 //generate thumbnail in 100 * 100px  and save it back to the same folder in Cloud Storage
-import profilePhotoThumbnail = require('./CloudStorageFunctions/profilePhotoThumbnail')
-exports.profilePhotoThumbnail = profilePhotoThumbnail.profilePhotoMakeThumbnail
+// import profilePhotoThumbnail = require('./CloudStorageFunctions/profilePhotoThumbnail')
+// exports.profilePhotoThumbnail = profilePhotoThumbnail.profilePhotoMakeThumbnail
 
 
 //When a compliment is sent by the user then the following are done

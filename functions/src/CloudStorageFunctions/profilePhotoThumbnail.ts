@@ -74,23 +74,24 @@ export const profilePhotoMakeThumbnail = functions.region('asia-east2').storage.
     //Append the fileName to the directory so it becomes a filePath
     thumbFileName)
   
-    await bucket.upload(tempFilePath, {
-      destination: thumbFilePath, metadata: metadata,
-    })
+    // Upload the thumbnail to the thumbFilePath created above
+    // await bucket.upload(tempFilePath, {
+    //   destination: thumbFilePath, metadata: metadata,
+    // })
 
   // // Upload the thumbnail to the thumbFilePath created above
-  // const uploadTask = await bucket.upload(tempFilePath, {
-  //   destination: thumbFilePath, metadata: metadata,
-  // })
+  const uploadTask = await bucket.upload(tempFilePath, {
+    destination: thumbFilePath, metadata: metadata,
+  })
 
-  // const downloadUrl = uploadTask[0].metada.mediaLink
-  // admin.firestore().collection('Users').doc(photoOwnerUid).update({
-  //   thumbnailUrl : downloadUrl.toString()
-  // })
+  const downloadUrl = uploadTask[0].metadata.mediaLink
+  admin.firestore().collection('Users').doc(photoOwnerUid).update({
+    thumbnailUrl : downloadUrl.toString()
+  })
 
-  //get a string url reference to the thumbnail Image
+  // get a string url reference to the thumbnail Image
   // const thumbnailPath = `profilePhotos/${photoOwnerUid}/thumb_100x100_profilePhoto`
-  //push the Download Url of this thumbnail image to the user doc of the owner
+  // push the Download Url of this thumbnail image to the user doc of the owner
   // await bucket.file(thumbFileName).getSignedUrl({
   //   action: 'read',
   //   expires: '03-09-2491'

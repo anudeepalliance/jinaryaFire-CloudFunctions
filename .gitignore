@@ -47,7 +47,7 @@ build/Release
 node_modules/
 
 #server folder which contains service account json files
-service_account/
+server/
 
 # Optional npm cache directory
 .npm
