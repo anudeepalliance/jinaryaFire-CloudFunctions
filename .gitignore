@@ -46,6 +46,9 @@ build/Release
 # Dependency directories
 node_modules/
 
+#server folder which contains service account json files
+service_account/
+
 # Optional npm cache directory
 .npm
 
