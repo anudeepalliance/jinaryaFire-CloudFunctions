@@ -27,7 +27,8 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       uid: followerUid,
       userName: doc.data().userName,
       profilePhotoChosen: doc.data().profilePhotoChosen,
-      followedAt: data.data()?.followedAt
+      followedAt: data.data()?.followedAt,
+      bio: data.data()?.bio
     }
     
 
@@ -53,6 +54,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       PERSON_UID_INTENT_EXTRA: followerUid,
       PERSON_NAME_INTENT_EXTRA: followerData.name,
       PERSON_USERNAME_INTENT_EXTRA: followerData.userName,
+      PERSON_BIO_INTENT_EXTRA: followerData.bio,
       //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
       //be created at the client else, this will fail
       CHANNEL_ID: "Follow Update ID"
