@@ -18,8 +18,6 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
   //And also added to the notification Payload data
   return admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
 
-    //Extracting this separately as this need not be copied to the Followers sub-collection
-    const followerImageUrl = doc.data().DOWNLOAD_URL
 
     //This data will be copied to the followers sub collection
     const followerData = {
@@ -36,7 +34,9 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
   return admin.firestore().collection('Users').doc(followedUid).collection('notificationToken')
     .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
 
+      //the fields to be same as the ones at Fs
       const followeeNotificationToken = notificationTokenDoc.data().notificationToken
+      const followerThumbnailImageUrl = notificationTokenDoc.data().thumbnailUrl
 
   //Create the Notification Payload content
   const notificationPayload = {
@@ -46,7 +46,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       //Add an additional intent filter in manifest file for android for the activity with the name 
       //same as the clickAction here 
       clickAction: ".People.PersonProfileActivity",
-      image: `${followerImageUrl}`
+      image: `${followerThumbnailImageUrl}`
     },
     data: {
       ACTIVITY_NAME: "PersonProfileActivity",

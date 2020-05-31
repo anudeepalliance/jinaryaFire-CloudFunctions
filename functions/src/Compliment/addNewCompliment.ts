@@ -53,7 +53,9 @@ const admin = require('firebase-admin')
   return admin.firestore().collection('Users').doc(complimentData.receiverUid).collection('notificationToken')
   .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
 
+    //the fields to be same as the ones at Fs
     const receiverNotificationToken = notificationTokenDoc.data()?.notificationToken
+    const senderThumbnailImageUrl = notificationTokenDoc.data().thumbnailUrl
 
     //Create the Notification Payload content
     const notificationPayload = {
@@ -63,7 +65,7 @@ const admin = require('firebase-admin')
         //Add an additional intent filter in manifest file for android for the activity with the name 
         //same as the clickAction here
         clickAction: ".source.SourceActivity",
-        image: `${complimentData.senderProfileImageDownloadUrl}`
+        image: `${senderThumbnailImageUrl}`
       },
       data: {
         ACTIVITY_NAME: "SOURCE_COMPLIMENTS_RECEIVED_ACTIVITY_NAME",
