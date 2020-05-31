@@ -22,9 +22,9 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     //This data will be copied to the followers sub collection
     const followerData = {
       name:  doc.data().name,
-      uid: followerUid,
+      nameLowerCase:  doc.data().nameLowerCase,
       userName: doc.data().userName,
-      profilePhotoChosen: doc.data().profilePhotoChosen,
+      uid: followerUid,
       followedAt: data.data()?.followedAt,
       bio: data.data()?.bio
     }
