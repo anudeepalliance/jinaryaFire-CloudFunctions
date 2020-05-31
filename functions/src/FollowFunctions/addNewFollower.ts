@@ -79,6 +79,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     intentExtrasUid: followerData.uid,
     intentExtrasName: followerData.name,
     intentExtrasUserName: followerData.userName,
+    intentExtrasBio: followerData.bio
   }
       
 
