@@ -14,29 +14,31 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
   //for identification and notification payload data (Intent Extras for client)
   const followerUid = context.params.followerUserId
 
-  //Get Follower user details that needs to be duplicated to the Followee's following Sub Coll
+  //Get Follower user details that needs to be duplicated to the Followed's follower Sub Coll
   //And also added to the notification Payload data
-  return admin.firestore().collection('Users').doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
+  return admin.firestore()
+  .collection('Users').doc(followerUid).collection('ProfileInfo')
+  .doc(followerUid).get().then((doc:{ exists: any; data: () => any }) => {
 
 
-    //This data will be copied to the followers sub collection
+    //This data will be copied to the followers sub collection of followed
     const followerData = {
       name:  doc.data().name,
-      nameLowerCase:  doc.data().nameLowerCase,
+      nameLowerCase:  doc.data().name.toLowerCase().toString(),
       userName: doc.data().userName,
       uid: followerUid,
-      followedAt: data.data()?.followedAt,
-      bio: data.data()?.bio
+      followedAt: Date.now(),
+      bio: doc.data().bio
     }
     
+    const followerThumbnailImageUrl = doc.data().photoUrl
 
   //get the notification token of the followed to identify & send notification to his device
   return admin.firestore().collection('Users').doc(followedUid).collection('notificationToken')
     .doc('theNotificationToken').get().then((notificationTokenDoc:{ exists: any; data: () => any }) => {
 
       //the fields to be same as the ones at Fs
-      const followeeNotificationToken = notificationTokenDoc.data().notificationToken
-      const followerThumbnailImageUrl = notificationTokenDoc.data().thumbnailUrl
+      const followedNotificationToken = notificationTokenDoc.data().notificationToken
 
   //Create the Notification Payload content
   const notificationPayload = {
@@ -93,7 +95,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
           //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
           //if ( followeeNotificationToken ) {
           //Send the notification to the user
-          const p2 = admin.messaging().sendToDevice(followeeNotificationToken, notificationPayload)
+          const p2 = admin.messaging().sendToDevice(followedNotificationToken, notificationPayload)
           promises.push(p2)
           //User gained a new Follower so increase the followerCount in his profileInfo Doc
           const p3 = admin.firestore().collection('Users').doc(followedUid).collection('ProfileInfo').doc(followedUid).update({

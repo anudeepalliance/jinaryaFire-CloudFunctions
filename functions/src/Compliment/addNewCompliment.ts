@@ -55,7 +55,7 @@ const admin = require('firebase-admin')
 
     //the fields to be same as the ones at Fs
     const receiverNotificationToken = notificationTokenDoc.data()?.notificationToken
-    const senderThumbnailImageUrl = notificationTokenDoc.data().thumbnailUrl
+    const senderThumbnailImageUrl = complimentData.photoUrl
 
     //Create the Notification Payload content
     const notificationPayload = {
