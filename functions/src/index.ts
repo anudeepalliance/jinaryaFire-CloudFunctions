@@ -11,6 +11,8 @@ admin.initializeApp({
   databaseURL: "https://jinaryafire.firebaseio.com"
 });
 
+// import utilityFunctions = require('./Utils/utilityFunctions')
+
 //export the functions in other files, callable https functions 
 //dont work if they are in other files hence they are declared in this file
 export { newUserSignUp } from './for Development/userCreated'

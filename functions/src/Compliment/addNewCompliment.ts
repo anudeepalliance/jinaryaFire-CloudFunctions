@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
+// import utilityFunctions = require('../Utils/utilityFunctions')
 
 //When a compliment is sent by the user then the following are done
 //1.it is added to the compliments received sub collection of the receiver via callable Cf as the sender does not have permission to write that sub collection
@@ -14,7 +15,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
     )
   }
 
-  //Check if the sender is blocked by the recipent, if yes then throw an error.
+  //Check if the sender is blocked by the recipent, if yes then throw an error
   return admin.firestore().collection('Users').doc(complimentData.receiverUid).collection('blocked')
     .doc(complimentData.senderUid).get().then((doc: { exists: any; data: () => any }) => {
       if (doc.exists) {
@@ -25,7 +26,10 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
       } else {
 
         //random 11 digital ComplimentId converted to String
-        const randomComplimentId = (Math.random() * 100000000000).toString()
+        const randomComplimentId = randomDocumentId()
+        // const randomComplimentId = utilityFunctions.theRandomDocId(28)
+        // const randomComplimentId = (Math.random() * 100000000000).toString()
+
 
         const complimentReceivedObject = {
           senderUserName: complimentData.senderUserName,
@@ -63,15 +67,14 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
                 title: 'You received a new Compliment!',
                 body: `${complimentData.senderName}`,
                 //Add an additional intent filter in manifest file for android for the activity with the name 
-                //same as the clickAction here
-                clickAction: ".source.SourceActivity",
+                //same as the clickAction here or Off Screen Notification click action wont work
+                clickAction: ".compliments.complimentReceived.NewComplimentReceivedActivity",
                 image: `${senderThumbnailImageUrl}`
               },
               data: {
-                ACTIVITY_NAME: "SOURCE_COMPLIMENTS_RECEIVED_ACTIVITY_NAME",
-                //The below field name to be same as the one used in the client
-                SOURCE_ACTIVITY_INTENT_EXTRA: "COMPLIMENTS_RECEIVED_FRAGMENT_INTENT_EXTRA",
-                COMPLIMENT_SENDER_UID_INTENT_EXTRA: complimentData.senderUid,
+                ACTIVITY_NAME: "NewComplimentReceivedActivity",
+                //pass the complimentId to the Notification so the client can know which compliment to retreive
+                NEW_COMPLIMENT_ID_FIELD: randomComplimentId,
                 //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
                 //be created at the client else, this will fail
                 CHANNEL_ID: "Follow Update ID"
@@ -79,20 +82,21 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
             }
 
             //random 11 digital Notification Doc Id
-            const randomNotificationDocId = (Math.random() * 100000000000).toString()
+            const randomNotificationDocId = randomDocumentId()
 
             const notificationObject = {
-              message: `${complimentData.senderUserName} sent you a compliment`,
+              title: `${complimentData.senderUserName} sent you a compliment`,
+              message: `${complimentData.complimentReceivedContent}`,
               receivedTime: Date.now(),
               //This is needed for client to access this doc and update the wasClicked field
               notificationDocId: randomNotificationDocId,
-              senderName: complimentData.senderName,
+              senderUserName: complimentData.senderUserName,
               senderUid: complimentData.senderUid,
               //this will be false by default, will turn true at client when clicked
               wasClicked: false,
               //this type has be same as in the client
               notificationChannelId: "New Compliment Received",
-              intentToActivity: "SOURCE_COMPLIMENTS_RECEIVED_ACTIVITY_NAME",
+              intentToActivity: "NEW_COMPLIMENT_RECEIVED_ACTIVITY",
               intentExtrasUid: complimentData.senderUid,
               intentExtrasName: complimentData.senderName,
               intentExtrasUserName: complimentData.senderUserName,
@@ -116,9 +120,9 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
             }
             //User gained a new compliment so increase the noOfCompliment
             const p3 = admin.firestore().collection('Users').doc(complimentReceivedObject.receiverUid).collection('ProfileInfo')
-            .doc(complimentReceivedObject.receiverUid).update({
-              noOfComplimentsReceived: admin.firestore.FieldValue.increment(1)
-            })
+              .doc(complimentReceivedObject.receiverUid).update({
+                noOfComplimentsReceived: admin.firestore.FieldValue.increment(1)
+              })
             promises.push(p3)
 
             return Promise.all(promises)
@@ -130,3 +134,13 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
     })
 
 })
+
+function randomDocumentId(): String {
+  let text = ""
+  let length = 28
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < length; i++) {
+    text += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return text;
+}

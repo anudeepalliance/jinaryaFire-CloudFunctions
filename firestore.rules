@@ -62,9 +62,9 @@ service cloud.firestore {
       }
       
       match /Notifications/{randomId} {
-      //Uuser is authorised to read and update
-      //to his Notifications sub-collection
-      allow read, update: if request.auth.uid == uid;
+      //User is authorised to read, update and dele
+      //to his Notifications sub-collection but not create
+      allow read, update, delete: if request.auth.uid == uid;
       }
 
 
