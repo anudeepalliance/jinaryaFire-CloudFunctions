@@ -92,3 +92,9 @@ exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSent
 //at sender's complimentsSentNos sub Collection
 import decrementComplimentsSentNo = require('./Compliment/decrementComplimentsSentNo')
 exports.decrementComplimentsSentNo = decrementComplimentsSentNo.decrementTheComplimentsSentNo
+
+//When a new notification Doc is added to the Notificatons Sub Coll
+//Check for the notificationNumbers Doc, if it is greater than 99 then delete the oldest notificationDoc
+//else just increment the noOfNotifications received by 1
+import notificationDocsLimit = require('./Maintenance/notificationDocsLimit')
+exports.notificationDocsLimit = notificationDocsLimit.deleteThe101thNotificationDoc

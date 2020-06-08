@@ -62,11 +62,22 @@ service cloud.firestore {
       }
       
       match /Notifications/{randomId} {
-      //User is authorised to read, update and dele
+      //User is authorised to create and read
       //to his Notifications sub-collection but not create
-      allow read, update, delete: if request.auth.uid == uid;
+      allow read: if request.auth.uid == uid;
+      allow update: if request.auth.uid == uid && isUpdatingOnlyWasClickedField();
+      allow create: if request.auth.uid == uid && isCreatingOnlyNoOfNotificationsReceivedDoc();
       }
 
+
+    function isCreatingOnlyNoOfNotificationsReceivedDoc() {
+      return request.resource.data.keys().hasOnly(['noOfNotificationsReceived'])
+    }
+
+
+    function isUpdatingOnlyWasClickedField() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['wasCliked'])
+    }
 
     //custom function to check if client is trying to update anything other 
     //than likes or views field of the complimentSent doc

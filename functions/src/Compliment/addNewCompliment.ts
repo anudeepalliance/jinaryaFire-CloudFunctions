@@ -7,6 +7,9 @@ const admin = require('firebase-admin')
 //2.A Notification payload is created and sent via FCM to the client
 //3. A Notification Object is created and added to the Notifications Sub Collection of the Client
 export const addTheNewCompliment = functions.region('asia-east2').https.onCall((complimentData, context) => {
+
+  const db = admin.firestore()
+
   //check if request came from an authenticated user
   if (!context.auth) {
     throw new functions.https.HttpsError(
@@ -16,7 +19,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
   }
 
   //Check if the sender is blocked by the recipent, if yes then throw an error
-  return admin.firestore().collection('Users').doc(complimentData.receiverUid).collection('blocked')
+  return db.collection('Users').doc(complimentData.receiverUid).collection('blocked')
     .doc(complimentData.senderUid).get().then((doc: { exists: any; data: () => any }) => {
       if (doc.exists) {
         throw new functions.https.HttpsError(
@@ -54,7 +57,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
 
 
         //get the notification token of the complimentReceiver to identify & send notification to his device
-        return admin.firestore().collection('Users').doc(complimentData.receiverUid).collection('notificationToken')
+        return db.collection('Users').doc(complimentData.receiverUid).collection('notificationToken')
           .doc('theNotificationToken').get().then((notificationTokenDoc: { exists: any; data: () => any }) => {
 
             //the fields to be same as the ones at Fs
@@ -103,14 +106,14 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               contentId: randomComplimentId
             }
 
-
             const promises = []
             //The compliment Object is added to the whatsNew Sub Coll of the receiver
-            const p = admin.firestore().collection('Users').doc(complimentReceivedObject.receiverUid).collection('complimentsReceived')
+            const p = db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('complimentsReceived')
               .doc(randomComplimentId).set(complimentReceivedObject)
             promises.push(p)
             //Add the notification doc to the user's notification sub collection
-            const p1 = admin.firestore().collection('Users').doc(complimentReceivedObject.receiverUid).collection('Notifications').doc(randomNotificationDocId).set(notificationObject)
+            const p1 = db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('Notifications')
+              .doc(randomNotificationDocId).set(notificationObject)
             promises.push(p1)
             //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
             if (receiverNotificationToken) {
@@ -119,12 +122,11 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               promises.push(p2)
             }
             //User gained a new compliment so increase the noOfCompliment
-            const p3 = admin.firestore().collection('Users').doc(complimentReceivedObject.receiverUid).collection('ProfileInfo')
+            const p3 = db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('ProfileInfo')
               .doc(complimentReceivedObject.receiverUid).update({
                 noOfComplimentsReceived: admin.firestore.FieldValue.increment(1)
               })
             promises.push(p3)
-
             return Promise.all(promises)
 
           })
@@ -137,7 +139,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
 
 function randomDocumentId(): String {
   let text = ""
-  let length = 28
+  const length = 28
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (let i = 0; i < length; i++) {
     text += characters.charAt(Math.floor(Math.random() * characters.length));
