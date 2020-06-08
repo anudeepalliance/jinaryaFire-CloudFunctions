@@ -9,7 +9,7 @@ export const deleteThe101thNotificationDoc = functions.region('asia-east2').fire
 
         //If it is a new user then a default noOfNotificationsReceivedDoc with value 0
         //will be created, if so then just return else run the function
-        if ( data.data().noOfNotificationsReceived == 0 ) {
+        if ( data.data().noOfNotificationsReceived === 0 ) {
             return
         } else {
             //It is not a new user so run the function as usual
