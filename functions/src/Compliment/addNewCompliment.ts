@@ -31,7 +31,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
         //random 11 digital ComplimentId converted to String
         const randomComplimentId = randomDocumentId()
         // const randomComplimentId = utilityFunctions.theRandomDocId(28)
-        // const randomComplimentId = (Math.random() * 100000000000).toString()
+        // const randomComplimentId = (Math.random() * 10000000)
 
 
         const complimentReceivedObject = {
