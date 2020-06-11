@@ -24,8 +24,22 @@ service cloud.firestore {
       //& delete to his following sub-collection
       allow create, delete: if request.auth.uid == uid;
       //allow update if user is trying to update just the number of compliments sent field
-      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']);
+      allow update: if isUpdatingOnlyNoOfCompsSentOrComplimentSentAtField();
       }
+
+    //custom function to check if client is trying to update anything other 
+    //than likes or views field of the complimentSent doc
+    function isUpdatingOnlyNoOfCompsSentOrComplimentSentAtField() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']) || 
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt'])
+    }
+
+    //custom function to check if client is trying to update anything other 
+    //than followingBack field at FollowerPerson Doc
+    function isUpdatingOnlyFollowingBackField() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followingBack']);
+    }
+
       
       match /followers/{followerPersonUid} {
       //everybody is allowed to see everyone else's followers
@@ -33,6 +47,7 @@ service cloud.firestore {
       //Only the user is authorised to create
       //& delete and add to his followers sub-collection
       allow create, delete: if request.auth.uid == uid;
+      allow update: if request.auth.uid == uid && isUpdatingOnlyFollowingBackField();
       }
       
       match /complimentsSentNumbers/{followingPersonUid} {
@@ -76,7 +91,7 @@ service cloud.firestore {
 
 
     function isUpdatingOnlyWasClickedField() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['wasCliked'])
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['wasClicked'])
     }
 
     //custom function to check if client is trying to update anything other 
@@ -88,21 +103,21 @@ service cloud.firestore {
 
     //function to track if the complimentReceiver to trying to update the wasRead, senderBlocked or 
     //followingStatus Booleans in the ComplimentReceived Doc
-    function isComplimentReceiverUpdatingWasReadOrComplimentBlockedFieldOrFollowingStatus() {
+    function isComplimentReceiverUpdatingWasReadOrComplimentBlockedOrFollowingStatusOrReceivedLikedField() {
       return request.resource.data.receiverUid == uid && 
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentRead']) ||
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderBlocked']) ||
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverLiked']) ||
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followingStatus']);
     }
 
-    function isComplimentSenderUpdatingReceiverBlockedStatusOrHisNameOrUserName() {
+    function isComplimentSenderUpdatingReceiverBlockedStatusOrSenderNameOrSenderUserNameOrSenderLikedField() {
       return resource.data.senderUid == request.auth.uid && 
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverBlocked']) ||
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderName']) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderLiked']) ||
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderUserName']);
     }
-
-
 
     //The rules for complimentsReceivedLike Docs
     match /complimentsReceived/{randomComplimentId} {
@@ -117,8 +132,8 @@ service cloud.firestore {
 
       //allow update only if trying to update the likes or viewCounter fields
       allow update: if isUpdatingOnlyLikesOrViewsCounter() ||
-        isComplimentReceiverUpdatingWasReadOrComplimentBlockedFieldOrFollowingStatus() ||
-        isComplimentSenderUpdatingReceiverBlockedStatusOrHisNameOrUserName();
+        isComplimentReceiverUpdatingWasReadOrComplimentBlockedOrFollowingStatusOrReceivedLikedField() ||
+        isComplimentSenderUpdatingReceiverBlockedStatusOrSenderNameOrSenderUserNameOrSenderLikedField();
 
       //allow delete compliment to only the receiver
       allow delete: if request.auth.uid == uid;
@@ -145,6 +160,7 @@ service cloud.firestore {
     
     //End of Users/{uid} parent
     }
+
 
       //The rules for complimentsReceivedSubCollection
       //Using a collectionGroup query for retreving compliments sent

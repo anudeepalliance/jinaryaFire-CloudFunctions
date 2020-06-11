@@ -47,6 +47,8 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
           receivedTime: Date.now(),
           noOfLikes: 0,
           noOfViews: 0,
+          receiverLiked: false,
+          senderLiked: false,
           complimentId: randomComplimentId,
           followingStatus: complimentData.followingStatus,
           senderBlocked: false,

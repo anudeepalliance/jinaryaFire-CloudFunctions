@@ -21,13 +21,15 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       .doc(followerUid).get().then((doc: { exists: any; data: () => any }) => {
 
 
-        //This data will be copied to the followers sub collection of followed
+        //The FollowerPerson object which will be pushed to the followers sub collection of followed
         const followerData = {
           name: doc.data().name,
           nameLowerCase: doc.data().name.toLowerCase().toString(),
           userName: doc.data().userName,
           uid: followerUid,
           followedAt: Date.now(),
+          followingBack: false,
+          //not adding noOfComplimentsSent as that is added by a different CF 
           bio: doc.data().bio
         }
 
