@@ -19,7 +19,7 @@ service cloud.firestore {
       
       match /following/{followingPersonUid} {
         //everybody is allowed to see everyone else's following
-        allow read: if true
+        allow read: if true;
       //Only the user is authorised to create 
       //& delete to his following sub-collection
       allow create, delete: if request.auth.uid == uid;
@@ -43,7 +43,7 @@ service cloud.firestore {
       
       match /followers/{followerPersonUid} {
       //everybody is allowed to see everyone else's followers
-      allow read: if true
+      allow read: if true;
       //Only the user is authorised to create
       //& delete and add to his followers sub-collection
       allow create, delete: if request.auth.uid == uid;

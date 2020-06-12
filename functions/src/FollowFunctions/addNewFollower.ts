@@ -14,26 +14,37 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
     //for identification and notification payload data (Intent Extras for client)
     const followerUid = context.params.followerUserId
 
+    //Find out if Followed is following the Follower already
+    return admin.firestore().collection('Users').doc(followedUid).collection('following')
+      .doc(followerUid).get().then((doc: { exists: any; data: () => any }) => {
+
+        let followerFollowingBack = false
+
+        //if doc exists mean followed is following the follower so set the variable to true
+        if ( doc.exists) {
+          followerFollowingBack = true
+        }
+
     //Get Follower user details that needs to be duplicated to the Followed's follower Sub Coll
     //And also added to the notification Payload data
-    return admin.firestore()
-      .collection('Users').doc(followerUid).collection('ProfileInfo')
-      .doc(followerUid).get().then((doc: { exists: any; data: () => any }) => {
+    return admin.firestore().collection('Users').doc(followerUid).collection('ProfileInfo')
+      .doc(followerUid).get().then((followerUserProfileDoc: { exists: any; data: () => any }) => {
 
 
         //The FollowerPerson object which will be pushed to the followers sub collection of followed
         const followerData = {
-          name: doc.data().name,
-          nameLowerCase: doc.data().name.toLowerCase().toString(),
-          userName: doc.data().userName,
+          name: followerUserProfileDoc.data().name,
+          nameLowerCase: followerUserProfileDoc.data().name.toLowerCase().toString(),
+          userName: followerUserProfileDoc.data().userName,
           uid: followerUid,
           followedAt: Date.now(),
-          followingBack: false,
-          //not adding noOfComplimentsSent as that is added by a different CF 
-          bio: doc.data().bio
+          //is the followed following back the follower,
+          followingBack: followerFollowingBack,
+          //not adding noOfComplimentsSent as that is added by a different CF
+          bio: followerUserProfileDoc.data().bio
         }
 
-        const followerThumbnailImageUrl = doc.data().photoUrl
+        const followerThumbnailImageUrl = followerUserProfileDoc.data().photoUrl
 
         //get the notification token of the followed to identify & send notification to his device
         return admin.firestore().collection('Users').doc(followedUid).collection('notificationToken')
@@ -108,6 +119,8 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
             //run all the promises
             return Promise.all(promises)
           })
+
+        })
 
       })
 
