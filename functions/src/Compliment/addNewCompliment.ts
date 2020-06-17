@@ -91,7 +91,6 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
             // const randomNotificationDocId : String = theRandomDocumentId(28)
 
             const notificationObject = {
-              title: `${complimentData.senderUserName} sent you a compliment`,
               message: `${complimentData.complimentReceivedContent}`,
               receivedTime: Date.now(),
               //This is needed for client to access this doc and update the wasClicked field

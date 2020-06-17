@@ -119,16 +119,29 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderUserName']);
     }
 
+    //Check if the requested client is a follower
+    function isFollower() {
+      return exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid)) 
+    }
+
+    //Check if the insight owner is updating ownerLiked field
+    function isInsightOwnerUpdatingOwnerLikedField() {
+      return request.auth.uid == uid && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerLiked'])
+    }
+
     //The rules for complimentsReceivedLike Docs
     match /complimentsReceived/{randomComplimentId} {
       //allow read for compliment receivers, the followers and compliment senders
       //sender is already a follower but separate rule is added just in case the sender unfollows a person later
       allow read: if request.auth.uid == uid
-      || exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid)) 
+      || isFollower()
       || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
 
       //allow create for the followers
-      allow create: if exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid))
+      // allow create: if exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid))
+      //compliments are sent and received via CF only so no one is allowed to create compliments
+      allow create: if false
 
       //allow update only if trying to update the likes or viewCounter fields
       allow update: if isUpdatingOnlyLikesOrViewsCounter() ||
@@ -150,8 +163,34 @@ service cloud.firestore {
         //allow read, create for compliment receivers, the followers and compliment senders
         //sender is already a follower but separate rule is added just in case the sender unfollows a person later
         allow read, create: if request.auth.uid != null
-         || exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid)) 
+         || isFollower()
           || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
+
+        //allow delete to only the likers so users can unlike their own likes and cannot unlike for other users
+        allow delete: if request.auth.uid == likerUid;
+        }
+
+    //The rules for insights sub coll
+    match /insights/{randomInsightId} {
+      //allow read for insight owners and the followers
+      allow read: if request.auth.uid == uid
+      || isFollower()
+
+      //allow create for owners only
+      allow create: if request.auth.uid == uid
+
+      //allow update only if trying to update the likes or viewCounter fields
+      allow update: if isUpdatingOnlyLikesOrViewsCounter() || isInsightOwnerUpdatingOwnerLikedField();
+
+      //allow delete insight by owner of the insight
+      allow delete: if request.auth.uid == uid;
+    }
+
+        //The rules for insight likes sub coll
+        match /insights/{randomInsightId}/insightLikes/{likerUid} {
+        //allow read, create for owners and the followers
+        allow read, create: if request.auth.uid == uid
+         || isFollower()
 
         //allow delete to only the likers so users can unlike their own likes and cannot unlike for other users
         allow delete: if request.auth.uid == likerUid;
@@ -171,21 +210,25 @@ service cloud.firestore {
         //and the sender of the compliment 
         //sender is already a follower but separate rule is added just in case the sender unfollows a person later
         allow read: if request.auth.uid == resource.data.receiverUid || 
-          exists(/databases/$(database)/documents/Users/$(resource.data.receiverUid)/followers/$(request.auth.uid)) || 
-          request.auth.uid == resource.data.senderUid;
-
+        request.auth.uid == resource.data.senderUid ||
+          exists(/databases/$(database)/documents/Users/$(resource.data.receiverUid)/followers/$(request.auth.uid));
       }
 
-    //Experiment Collection users-t
-    match /users-t/{userdIds} {
-    	//Users can read data about all other users
-    	allow read : if request.auth.uid in resource.data.followers || resource.data.following
-    }
+      //Experiment Collection users-t
+      match /users-t/{userdIds} {
+        //Users can read data about all other users
+        allow read : if request.auth.uid in resource.data.followers || resource.data.following
+      }
 
-match/ComplimentIdeas/{ideaId} {
-  //everyone can read compliment ideas, only admins will create & write to this via console
-  allow read: if true;
-}
+      match/ComplimentIdeas/{ideaId} {
+        //everyone can read compliment ideas, only admins will create & write to this via console
+        allow read: if true;
+      }
+
+      match/InsightIdeas/{ideaId} {
+        //everyone can read insight ideas, only admins will create & write to this via console
+        allow read: if true;
+      }
 
 
   //End of rules  
