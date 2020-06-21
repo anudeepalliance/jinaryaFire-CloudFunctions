@@ -10,9 +10,12 @@ export const updateUserInfoToTheFollowers = functions.region('asia-east2').fires
 const upDatedUserData = change.after.data()
 
 const newName = upDatedUserData?.name
+const newLowerCaseName = upDatedUserData?.nameLowerCase
 const updatersUserId = upDatedUserData?.uid
 const newUserName = upDatedUserData?.userName
-const newprofilePhotoChosenBoolean = upDatedUserData?.profilePhotoChosen
+const newBio = upDatedUserData?.bio
+const newInsightsAdded = upDatedUserData?.insightsAdded
+
 
 const batch = admin.firestore().batch()
 
@@ -26,10 +29,12 @@ return userFollowersColl.get().then((querySnapshot: { docs: DocumentSnapshot[] }
         const updatersDocAtFollower = admin.firestore().collection('Users').doc(followerUid).collection('following')
         .doc(updatersUserId)
         return batch.update(updatersDocAtFollower,{
-            name: newName, 
-            userName: newUserName,
+            name: newName,
+            nameLowerCase: newLowerCaseName,
             uid: updatersUserId,
-            profilePhotoChosen : newprofilePhotoChosenBoolean
+            userName: newUserName,
+            bio: newBio,
+            insightsAdded: newInsightsAdded
         })
     })
     return batch.commit()

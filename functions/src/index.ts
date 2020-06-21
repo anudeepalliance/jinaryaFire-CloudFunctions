@@ -99,6 +99,15 @@ exports.decrementComplimentsSentNo = decrementComplimentsSentNo.decrementTheComp
 import notificationDocsLimit = require('./Maintenance/notificationDocsLimit')
 exports.notificationDocsLimit = notificationDocsLimit.deleteThe101thNotificationDoc
 
+//When a poke is received by a user then do the following
+//1.Check if the poker is present in the pokersForInsights sub collection of the poked, 
+//If yes then just return else continue with the function
+//2.Add Poker to the pokersForInsights sub collection of the poked
+//3.A Notification payload is created and sent via FCM to the client
+//4. Create and add a Notification Doc of the type Insight Pokes
+import pokeForInsights = require('./Insights/pokeForInsights')
+exports.pokeForInsights = pokeForInsights.pokeForTheInsights
+
 //When a new notification Doc is added to the Notificatons Sub Coll
 //Check for the notificationNumbers Doc, if it is greater than 99 then delete the oldest notificationDoc
 //else just increment the noOfNotifications received by 1

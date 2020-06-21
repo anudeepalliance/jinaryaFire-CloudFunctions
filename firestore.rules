@@ -20,7 +20,7 @@ service cloud.firestore {
       match /following/{followingPersonUid} {
         //everybody is allowed to see everyone else's following
         allow read: if true;
-      //Only the user is authorised to create 
+      //Only the user is authorised to create
       //& delete to his following sub-collection
       allow create, delete: if request.auth.uid == uid;
       //allow update if user is trying to update just the number of compliments sent field

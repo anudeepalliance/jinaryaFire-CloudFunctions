@@ -82,7 +82,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
                 NEW_COMPLIMENT_ID_FIELD: randomComplimentId,
                 //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
                 //be created at the client else, this will fail
-                CHANNEL_ID: "Follow Update ID"
+                CHANNEL_ID: "New Compliment Received ID"
               }
             }
 
