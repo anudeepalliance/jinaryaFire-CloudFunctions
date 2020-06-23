@@ -108,6 +108,13 @@ exports.notificationDocsLimit = notificationDocsLimit.deleteThe101thNotification
 import pokeForInsights = require('./Insights/pokeForInsights')
 exports.pokeForInsights = pokeForInsights.pokeForTheInsights
 
+//When a poked adds an Insights, do the following:
+//1. Check if there are some pending pokers in the pokersForInsights Sub Collection
+//2. If yes then get their Notification Tokens and send them all a notification
+//3. Then delete the pokers from the sub collection
+import sendNotificationToPokers = require('./Insights/sendNotificationToPokers')
+exports.sendNotificationToPokers = sendNotificationToPokers.sendNotificationToThePokers
+
 //When a new notification Doc is added to the Notificatons Sub Coll
 //Check for the notificationNumbers Doc, if it is greater than 99 then delete the oldest notificationDoc
 //else just increment the noOfNotifications received by 1

@@ -76,7 +76,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                           image: `${followerThumbnailImageUrl}`
                         },
                         data: {
-                          ACTIVITY_NAME: "PersonProfileActivity",
+                          ACTIVITY_NAME: "PERSON_PROFILE_ACTIVITY",
                           //The below field name to be same as the one used in the client
                           PERSON_UID_INTENT_EXTRA: followerUid,
                           PERSON_NAME_INTENT_EXTRA: followerData.name,
@@ -102,7 +102,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                         wasClicked: false,
                         //this type has be same as in the client
                         notificationChannelId: "Follow Updates",
-                        intentToActivity: "PersonProfileActivity",
+                        intentToActivity: "PERSON_PROFILE_ACTIVITY",
                         intentExtrasUid: followerData.uid,
                         intentExtrasName: followerData.name,
                         intentExtrasUserName: followerData.userName,

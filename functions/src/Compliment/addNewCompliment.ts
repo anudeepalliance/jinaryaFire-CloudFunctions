@@ -77,7 +77,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
                 image: `${senderThumbnailImageUrl}`
               },
               data: {
-                ACTIVITY_NAME: "NewComplimentReceivedActivity",
+                ACTIVITY_NAME: "NEW_COMPLIMENT_RECEIVED_ACTIVITY",
                 //pass the complimentId to the Notification so the client can know which compliment to retreive
                 NEW_COMPLIMENT_ID_FIELD: randomComplimentId,
                 //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to

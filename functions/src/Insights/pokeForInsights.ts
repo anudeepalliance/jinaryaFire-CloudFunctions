@@ -56,15 +56,15 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                     //Create the Notification Payload content
                                     const notificationPayload = {
                                         notification: {
-                                            title: `${pokeForInsightData.pokerUserName} has poked you for Insights!`,
-                                            body: `Add some insights now`,
+                                            title: `${pokeForInsightData.pokerUserName} has poked you`,
+                                            body: `too add Insights`,
                                             //Add an additional intent filter in manifest file for android for the activity with the name 
                                             //same as the clickAction here or Off Screen Notification click action wont work
                                             clickAction: ".insights.writeInsight.WriteInsight",
                                             image: `${pokeForInsightData.photoUrl}`
                                         },
                                         data: {
-                                            ACTIVITY_NAME: "WriteInsightActivity",
+                                            ACTIVITY_NAME: "WRITE_INSIGHT_ACTIVITY",
                                             //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
                                             //be created at the client else, this will fail 
                                             CHANNEL_ID: "Poke for Insights ID"
@@ -76,7 +76,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                     // const randomNotificationDocId : String = theRandomDocumentId(28)
 
                                     const notificationObject = {
-                                        message: `${pokeForInsightData.pokerUserName} has poked you for insights`,
+                                        message: null,
                                         receivedTime: Date.now(),
                                         //This is needed for client to access this doc and update the wasClicked field
                                         notificationDocId: randomNotificationDocId,
@@ -86,11 +86,12 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                         wasClicked: false,
                                         //this type has be same as in the client
                                         notificationChannelId: "Pokes for Insights",
-                                        intentToActivity: "POKERS_ACTIVITY",
+                                        intentToActivity: "WRITE_INSIGHT_ACTIVITY",
                                         intentExtrasUid: null,
                                         intentExtrasName: null,
                                         intentExtrasUserName: null,
-                                        contentId: randomNotificationDocId
+                                        //There is no content here, just a poke so this will be empty
+                                        contentId: null
                                     }
 
                                     const promises = []

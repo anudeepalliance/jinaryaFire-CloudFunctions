@@ -84,6 +84,13 @@ service cloud.firestore {
       allow create: if request.auth.uid == uid && isCreatingOnlyNoOfNotificationsReceivedDoc();
       }
 
+     match /pokersForInsights/{randomId} {
+      //User is authorised to read
+      //to his pokersForInsights sub-collection but not create
+      //create and delete will be done by CF only
+      allow read: if request.auth.uid == uid;
+     }
+
 
     function isCreatingOnlyNoOfNotificationsReceivedDoc() {
       return request.resource.data.keys().hasOnly(['noOfNotificationsReceived'])
