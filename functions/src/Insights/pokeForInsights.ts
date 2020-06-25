@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
+const utilityFunctions =  require('frequentFunctions')
 
 //When a poke is received by a user then do the following
 //1.Check if the poker is present in the pokersForInsights sub collection of the poked, 
@@ -72,8 +73,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                     }
 
                                     //random 11 digital Notification Doc Id
-                                    const randomNotificationDocId = randomDocumentId()
-                                    // const randomNotificationDocId : String = theRandomDocumentId(28)
+                                    const randomNotificationDocId : () => String = utilityFunctions.randomId()
 
                                     const notificationObject = {
                                         message: null,
@@ -119,13 +119,3 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
             }
         })
 })
-
-function randomDocumentId(): String {
-    let text = ""
-    const length = 28
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < length; i++) {
-        text += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return text;
-}

@@ -1,0 +1,11 @@
+{
+    "name": "random-doc-id",
+    "version": "1.0.0",
+    "description": "Returns a random aplphanumeric String of 28 characters",
+    "main": "globalVariables.js",
+    "author": "Anudeep Ananth",
+    "license": "None",
+      "dependencies": {
+        
+  }
+}

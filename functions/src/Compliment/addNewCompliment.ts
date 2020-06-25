@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
-// import utilityFunctions = require('../Utils/utilityFunctions')
+const utilityFunctions =  require('frequentFunctions')
 
 //When a compliment is sent by the user then the following are done
 //1.it is added to the compliments received sub collection of the receiver via callable Cf as the sender does not have permission to write that sub collection
@@ -29,9 +29,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
       } else {
 
         //random 11 digital ComplimentId converted to String
-        const randomComplimentId = randomDocumentId()
-        // const randomComplimentId = utilityFunctions.theRandomDocId(28)
-        // const randomComplimentId = (Math.random() * 10000000)
+        const randomComplimentId = utilityFunctions.randomId()
 
 
         const complimentReceivedObject = {
@@ -87,7 +85,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
             }
 
             //random 11 digital Notification Doc Id
-            const randomNotificationDocId = randomDocumentId()
+            const randomNotificationDocId = utilityFunctions.randomId()
             // const randomNotificationDocId : String = theRandomDocumentId(28)
 
             const notificationObject = {
@@ -138,13 +136,3 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
     })
 
 })
-
-function randomDocumentId(): String {
-  let text = ""
-  const length = 28
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < length; i++) {
-    text += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return text;
-}

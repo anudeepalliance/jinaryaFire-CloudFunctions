@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
+const utilityFunctions =  require('frequentFunctions')
 
 //When client followes a user, a firestore .onCreate() background function is triggered to
 //1.add follower to the followed's followers sub collection
@@ -89,7 +90,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                       }
 
                       //random 11 digital Notification Doc Id
-                      const randomNotificationDocId = randomDocumentId()
+                      const randomNotificationDocId = utilityFunctions.randomId()
 
                       const notificationObject = {
                         message: `${followerData.bio}`,
@@ -140,13 +141,3 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
       })
 
   })
-
-function randomDocumentId(): String {
-  let text = ""
-  const length = 28
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < length; i++) {
-    text += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return text;
-}

@@ -186,7 +186,7 @@ service cloud.firestore {
       //allow create for owners only
       allow create: if request.auth.uid == uid
 
-      //allow update only if trying to update the likes or viewCounter fields
+      //allow update only if user or watcher is trying to update the likes or viewCounter fields
       allow update: if isUpdatingOnlyLikesOrViewsCounter() || isInsightOwnerUpdatingOwnerLikedField();
 
       //allow delete insight by owner of the insight

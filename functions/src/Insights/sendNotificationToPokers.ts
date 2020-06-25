@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions'
 import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
+const utilityFunctions =  require('frequentFunctions')
 
 //When a poked adds an Insights, do the following:
 //1. Check if there are some pending pokers in the pokersForInsights Sub Collection
@@ -52,8 +53,7 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                             }
 
                             //random 11 digital Notification Doc Id
-                            const randomNotificationDocId = randomDocumentId()
-                            // const randomNotificationDocId : String = theRandomDocumentId(28)
+                            const randomNotificationDocId = utilityFunctions.randomId()
 
                             const notificationObject = {
                                 message: `${insightData.data().insightContent}`,
@@ -105,13 +105,3 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
             })
 
     })
-
-function randomDocumentId(): String {
-    let text = ""
-    const length = 28
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < length; i++) {
-        text += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return text;
-}
