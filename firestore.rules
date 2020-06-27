@@ -5,14 +5,14 @@ service cloud.firestore {
      //Rules for the User Document
     match /Users/{uid} {
     	//Users can read data about all other users
-    	allow read : if request.auth != null;
+    	allow read: if request.auth != null;
       //Users can edit data if it is their own data
       allow write: if request.auth.uid == uid;
 
     //Rules for the User Profile Document
     match /ProfileInfo/{againUid} {
     	//Users can read data about all other users
-    	allow read : if request.auth != null
+    	allow read: if request.auth != null
       //Users can edit data if it is their own data
       allow write: if request.auth.uid == uid;
     }
@@ -24,14 +24,15 @@ service cloud.firestore {
       //& delete to his following sub-collection
       allow create, delete: if request.auth.uid == uid;
       //allow update if user is trying to update just the number of compliments sent field
-      allow update: if isUpdatingOnlyNoOfCompsSentOrComplimentSentAtField();
+      allow update: if isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrFollowingBackFields();
       }
 
     //custom function to check if client is trying to update anything other 
     //than likes or views field of the complimentSent doc
-    function isUpdatingOnlyNoOfCompsSentOrComplimentSentAtField() {
+    function isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrFollowingBackFields() {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']) || 
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt'])
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt']) ||
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followingBack'])
     }
 
     //custom function to check if client is trying to update anything other 
@@ -53,8 +54,8 @@ service cloud.firestore {
       match /complimentsSentNumbers/{followingPersonUid} {
       //Only the owner can create and read
       //can update if updating the noOfComplimentsSent
-      allow read,create : if request.auth.uid == uid;
-      allow update : if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']);
+      allow read, create: if request.auth.uid == uid;
+      allow update: if request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']);
       }
       
       match /blocked/{blockedPersonUid} {

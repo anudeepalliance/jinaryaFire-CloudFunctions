@@ -4,9 +4,9 @@ const admin = require('firebase-admin')
 //When client blocks a person, Firestore triggers a background function to remove blocker(himself)
 //from the blocked person's following sub collection
 export const stopBlockedFromFollowingAndAddToTheHisBlockedBy = functions.region('asia-east2').firestore.document
-  ('Users/{blockerUid}/blocked/{blockeeUid}').onCreate((blockedData, context) => {
+  ('Users/{blockerUid}/blocked/{blockedUid}').onCreate((blockedData, context) => {
 
-      const blockedUid = context.params.blockeeUid
+      const blockedUid = context.params.blockedUid
       const blockerUid = context.params.blockerUid
 
       const promises = []
