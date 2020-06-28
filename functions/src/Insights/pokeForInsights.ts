@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
-const utilityFunctions =  require('frequentFunctions')
 
 //When a poke is received by a user then do the following
 //1.Check if the poker is present in the pokersForInsights sub collection of the poked, 
@@ -72,14 +71,10 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                         }
                                     }
 
-                                    //random 11 digital Notification Doc Id
-                                    const randomNotificationDocId : () => String = utilityFunctions.randomId()
 
                                     const notificationObject = {
                                         message: null,
                                         receivedTime: Date.now(),
-                                        //This is needed for client to access this doc and update the wasClicked field
-                                        notificationDocId: randomNotificationDocId,
                                         senderUserName: pokeForInsightData.pokerUserName,
                                         senderUid: pokeForInsightData.pokerUid,
                                         //this will be false by default, will turn true at client when clicked
@@ -90,8 +85,8 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                         intentExtrasUid: null,
                                         intentExtrasName: null,
                                         intentExtrasUserName: null,
-                                        //There is no content here, just a poke so this will be empty
-                                        contentId: null
+                                        //This is needed for client to access this doc and update the wasClicked field
+                                        contentId: pokeForInsightData.pokerUid
                                     }
 
                                     const promises = []
@@ -102,7 +97,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
 
                                     //Add the notification doc to the user's notification sub collection
                                     const p1 = db.collection('Users').doc(pokeForInsightData.pokedUid).collection('Notifications')
-                                        .doc(randomNotificationDocId).set(notificationObject)
+                                        .doc(pokeForInsightData.pokerUid).set(notificationObject)
                                     promises.push(p1)
 
                                     //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways

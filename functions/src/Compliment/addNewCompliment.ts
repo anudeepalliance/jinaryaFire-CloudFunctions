@@ -84,15 +84,9 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               }
             }
 
-            //random 11 digital Notification Doc Id
-            const randomNotificationDocId = utilityFunctions.randomId()
-            // const randomNotificationDocId : String = theRandomDocumentId(28)
-
             const notificationObject = {
               message: `${complimentData.complimentReceivedContent}`,
               receivedTime: Date.now(),
-              //This is needed for client to access this doc and update the wasClicked field
-              notificationDocId: randomNotificationDocId,
               senderUserName: complimentData.senderUserName,
               senderUid: complimentData.senderUid,
               //this will be false by default, will turn true at client when clicked
@@ -103,6 +97,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               intentExtrasUid: complimentData.senderUid,
               intentExtrasName: complimentData.senderName,
               intentExtrasUserName: complimentData.senderUserName,
+              //This is needed for client to access this doc and update the wasClicked field
               contentId: randomComplimentId
             }
 
@@ -113,7 +108,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
             promises.push(p)
             //Add the notification doc to the user's notification sub collection
             const p1 = db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('Notifications')
-              .doc(randomNotificationDocId).set(notificationObject)
+              .doc(randomComplimentId).set(notificationObject)
             promises.push(p1)
             //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
             if (receiverNotificationToken) {

@@ -1,7 +1,6 @@
 import * as functions from 'firebase-functions'
 import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
-const utilityFunctions =  require('frequentFunctions')
 
 //When a poked adds an Insights, do the following:
 //1. Check if there are some pending pokers in the pokersForInsights Sub Collection
@@ -52,14 +51,9 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                                 }
                             }
 
-                            //random 11 digital Notification Doc Id
-                            const randomNotificationDocId = utilityFunctions.randomId()
-
                             const notificationObject = {
                                 message: `${insightData.data().insightContent}`,
                                 receivedTime: Date.now(),
-                                //This is needed for client to access this doc and update the wasClicked field
-                                notificationDocId: randomNotificationDocId,
                                 senderUserName: pokedUserName,
                                 senderUid: pokedUid,
                                 //this will be false by default, will turn true at client when clicked
@@ -70,6 +64,7 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                                 intentExtrasUid: pokedUid,
                                 intentExtrasName: null,
                                 intentExtrasUserName: pokedUserName,
+                                //This is needed for client to access this doc and update the wasClicked field
                                 contentId: insightData.data().insightId
                             }
 
@@ -91,7 +86,7 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                                         promises.push(p2)
                                         //Add the notification doc to the user's notification sub collection
                                         const p3 = db.collection('Users').doc(pokerUid).collection('Notifications')
-                                            .doc(randomNotificationDocId).set(notificationObject)
+                                            .doc(insightData.data().insightId).set(notificationObject)
                                         promises.push(p3)
                                     })
 

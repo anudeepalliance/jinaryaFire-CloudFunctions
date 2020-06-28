@@ -83,6 +83,7 @@ service cloud.firestore {
       allow read: if request.auth.uid == uid;
       allow update: if request.auth.uid == uid && isUpdatingOnlyWasClickedField();
       allow create: if request.auth.uid == uid && isCreatingOnlyNoOfNotificationsReceivedDoc();
+      allow delete: if request.auth.uid == uid;
       }
 
      match /pokersForInsights/{randomId} {
@@ -105,14 +106,13 @@ service cloud.firestore {
     //custom function to check if client is trying to update anything other 
     //than likes or views field of the complimentSent doc
     function isUpdatingOnlyLikesOrViewsCounter() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) || 
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews'])
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes', 'noOfViews']);
     }
 
     //function to track if the complimentReceiver to trying to update the wasRead, senderBlocked or 
     //followingStatus Booleans in the ComplimentReceived Doc
     function isComplimentReceiverUpdatingWasReadOrComplimentBlockedOrFollowingStatusOrReceivedLikedField() {
-      return request.resource.data.receiverUid == uid && 
+      return resource.data.receiverUid == uid && 
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentRead']) ||
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderBlocked']) ||
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverLiked']) ||
@@ -121,10 +121,10 @@ service cloud.firestore {
 
     function isComplimentSenderUpdatingReceiverBlockedStatusOrSenderNameOrSenderUserNameOrSenderLikedField() {
       return resource.data.senderUid == request.auth.uid && 
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverBlocked']) ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderName']) ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderLiked']) ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderUserName']);
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverBlocked', 'senderName', 'senderLiked','senderUserName']);
+        // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderName']) ||
+        // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderLiked']) ||
+        // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderUserName']);
     }
 
     //Check if the requested client is a follower
@@ -133,9 +133,9 @@ service cloud.firestore {
     }
 
     //Check if the insight owner is updating ownerLiked field
-    function isInsightOwnerUpdatingOwnerLikedField() {
+    function isInsightOwnerUpdatingOwnerLikedOrNoOfLikesField() {
       return request.auth.uid == uid && 
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerLiked'])
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerLiked', 'noOfLikes'])
     }
 
     //The rules for complimentsReceivedLike Docs
@@ -170,7 +170,7 @@ service cloud.firestore {
         match /complimentsReceived/{randomComplimentId}/complimentLikes/{likerUid} {
         //allow read, create for compliment receivers, the followers and compliment senders
         //sender is already a follower but separate rule is added just in case the sender unfollows a person later
-        allow read, create: if request.auth.uid != null
+        allow read, create: if request.auth.uid == uid
          || isFollower()
           || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
 
@@ -188,7 +188,7 @@ service cloud.firestore {
       allow create: if request.auth.uid == uid
 
       //allow update only if user or watcher is trying to update the likes or viewCounter fields
-      allow update: if isUpdatingOnlyLikesOrViewsCounter() || isInsightOwnerUpdatingOwnerLikedField();
+      allow update: if isUpdatingOnlyLikesOrViewsCounter() || isInsightOwnerUpdatingOwnerLikedOrNoOfLikesField();
 
       //allow delete insight by owner of the insight
       allow delete: if request.auth.uid == uid;
