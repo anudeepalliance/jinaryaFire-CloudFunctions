@@ -13,25 +13,28 @@ export const updateUserInfoAtTheComplimentLikes = functions.region('asia-east2')
         const newNameLowerCase = upDatedUserData?.nameLowerCase
         const updatersUserId = upDatedUserData?.uid
         const newUserName = upDatedUserData?.userName
-        const newprofilePhotoChosenBoolean = upDatedUserData?.profilePhotoChosen
+        const newBio = upDatedUserData?.bio
 
         const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimentLikes').where('uid', '==', `${updatersUserId}`)
 
-        return userComplimentLikedUserDocs.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
-            querySnapshot.docs.map((doc) => {
-                //get a string representation of the documentPath and use that to update the doc
-                const complimentLikerDocPath = doc.ref.path
-                //get a DB reference to the userDoc at complimentLike
-                const userAtComplimentLike = admin.firestore().doc(complimentLikerDocPath)
-                return userAtComplimentLike.update({
-                    name: newName,
-                    nameLowerCase: newNameLowerCase,
-                    userName: newUserName,
-                    uid: updatersUserId,
-                    profilePhotoChosen: newprofilePhotoChosenBoolean
-                })
-            })
+        return userComplimentLikedUserDocs.get().then(
+            async (querySnapshot: { docs: DocumentSnapshot[] }) => {
+                await Promise.all(querySnapshot.docs.map((doc) => {
+                    //get a string representation of the documentPath and use that to update the doc
+                    const complimentLikerDocPath = doc.ref.path
+                    //get a DB reference to the userDoc at complimentLike
+                    const userAtComplimentLike = admin.firestore().doc(complimentLikerDocPath)
+                    return userAtComplimentLike.update({
+                        name: newName,
+                        nameLowerCase: newNameLowerCase,
+                        userName: newUserName,
+                        uid: updatersUserId,
+                        bio: newBio
+                    })
 
-        })
+                })
+                )
+
+            })
 
     })

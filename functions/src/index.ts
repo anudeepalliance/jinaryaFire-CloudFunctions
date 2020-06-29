@@ -118,3 +118,23 @@ exports.sendNotificationToPokers = sendNotificationToPokers.sendNotificationToTh
 //else just increment the noOfNotifications received by 1
 // import generateRandomDocId = require('./Utils/utilityFunctions')
 // exports.generateRandomDocId = theRandomDocumentId(28)
+
+//When a user blocks another user then set the compsReceived senderBlocked field to true
+//So the blocker or blocked dont see the compliments exchanged between them
+import blockCompsReceived = require('./Compliment/blockCompsReceived')
+exports.blockCompsReceived = blockCompsReceived.blockTheCompsReceived
+
+//When a user blocks another user then set the compliments Sent receivedBlocked field to true
+//So the blocker or blocked dont see the compliments exchanged between them
+import blockCompsSent = require('./Compliment/blockCompsSent')
+exports.blockCompsSent = blockCompsSent.blockTheCompsSent
+
+//When a user unBlocks another user then set the compsReceived senderBlocked field to false
+//So the unBlocker and UnBlocked can see the compliments exchanged between them
+import unBlockCompsReceived = require('./Compliment/unBlockCompsReceived')
+exports.unBlockCompsReceived = unBlockCompsReceived.unBlockTheCompsReceived
+
+//When a user unBlocks another user then set the compliments Sent receivedBlocked field to false
+//So the unBlocker or unBlocked can see the compliments exchanged between them
+import unBlockCompsSent = require('./Compliment/unBlockCompsSent')
+exports.unBlockCompsSent = unBlockCompsSent.unBlockTheCompsSent

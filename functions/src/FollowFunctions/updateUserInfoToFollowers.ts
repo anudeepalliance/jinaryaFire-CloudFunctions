@@ -18,22 +18,24 @@ export const updateUserInfoToTheFollowers = functions.region('asia-east2').fires
 
         const userFollowersColl = admin.firestore().collection('Users').doc(updatersUserId).collection('followers')
 
-        return userFollowersColl.get().then((querySnapshot: { docs: DocumentSnapshot[] }) => {
-            querySnapshot.docs.map((doc) => {
-                //get the followerUid
-                const followerUid = doc.id
-                //go to the following Doc in the follower's following sub collection
-                const updatersDocAtFollower = admin.firestore().collection('Users').doc(followerUid).collection('following')
-                    .doc(updatersUserId)
-                return updatersDocAtFollower.update({
-                    name: newName,
-                    nameLowerCase: newLowerCaseName,
-                    uid: updatersUserId,
-                    userName: newUserName,
-                    bio: newBio,
-                    insightsAdded: newInsightsAdded
+        return userFollowersColl.get().then(
+            async (querySnapshot: { docs: DocumentSnapshot[] }) => {
+                await Promise.all(querySnapshot.docs.map((doc) => {
+                    //get the followerUid
+                    const followerUid = doc.id
+                    //go to the following Doc in the follower's following sub collection
+                    const updatersDocAtFollower = admin.firestore().collection('Users').doc(followerUid).collection('following')
+                        .doc(updatersUserId)
+                    return updatersDocAtFollower.update({
+                        name: newName,
+                        nameLowerCase: newLowerCaseName,
+                        uid: updatersUserId,
+                        userName: newUserName,
+                        bio: newBio,
+                        insightsAdded: newInsightsAdded
+                    })
                 })
-            })
+                )
 
-        })
+            })
     })
