@@ -36,7 +36,6 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
           senderUserName: complimentData.senderUserName,
           senderName: complimentData.senderName,
           senderUid: complimentData.senderUid,
-          senderBio: complimentData.senderBio,
           complimentReceivedContent: complimentData.complimentReceivedContent,
           receiverUid: complimentData.receiverUid,
           receiverUserName: complimentData.receiverUserName,
