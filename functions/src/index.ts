@@ -138,3 +138,18 @@ exports.unBlockCompsReceived = unBlockCompsReceived.unBlockTheCompsReceived
 //So the unBlocker or unBlocked can see the compliments exchanged between them
 import unBlockCompsSent = require('./Compliment/unBlockCompsSent')
 exports.unBlockCompsSent = unBlockCompsSent.unBlockTheCompsSent
+
+//When a user follows another user then set the compsReceived from the followed person
+//following status field to true so that comp receiver has the updated comp received doc
+import markFollowedPersonCompsReceivedToTrue = require('./Compliment/markFollowedPersonCompsReceivedToTrue')
+exports.markFollowedPersonCompsReceivedToTrue = markFollowedPersonCompsReceivedToTrue.markTheFollowedPersonCompsReceivedToTrue
+
+//When a user UnFollows another user then set the compsReceived from the UnFollowed person
+//following status field to false so that comp receiver has the updated comp received doc
+import markUnFollowedCompsReceivedToFalse = require('./Compliment/markUnFollowedCompsReceivedToFalse')
+exports.markUnFollowedCompsReceivedToFalse = markUnFollowedCompsReceivedToFalse.markTheUnFollowedCompsReceivedToFalse
+
+//When a user updates his userDoc with name or UserName then this updated info needs to be
+//reflected in all the compliments Sent Docs by this person, this will run only if name or userName was changed
+import updateUserDetailsAtCompsSent = require('./Compliment/updateUserDetailsAtCompsSent')
+exports.updateUserDetailsAtCompsSent = updateUserDetailsAtCompsSent.updateTheUserDetailsAtCompsSent
