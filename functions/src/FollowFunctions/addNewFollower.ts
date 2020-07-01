@@ -96,7 +96,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                         //this will be false by default, will turn true at client when clicked
                         wasClicked: false,
                         //this type has be same as in the client
-                        notificationChannelId: "Follow Updates",
+                        notificationChannelId: "Follow Update ID",
                         intentToActivity: "PERSON_PROFILE_ACTIVITY",
                         intentExtrasUid: followerData.uid,
                         intentExtrasName: followerData.name,

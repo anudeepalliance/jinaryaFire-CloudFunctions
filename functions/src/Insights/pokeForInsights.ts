@@ -80,7 +80,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                         //this will be false by default, will turn true at client when clicked
                                         wasClicked: false,
                                         //this type has be same as in the client
-                                        notificationChannelId: "Pokes for Insights",
+                                        notificationChannelId: "Poke for Insights ID",
                                         intentToActivity: "WRITE_INSIGHT_ACTIVITY",
                                         intentExtrasUid: null,
                                         intentExtrasName: null,

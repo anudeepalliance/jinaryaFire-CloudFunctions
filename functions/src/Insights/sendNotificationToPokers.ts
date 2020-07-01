@@ -59,7 +59,7 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                                 //this will be false by default, will turn true at client when clicked
                                 wasClicked: false,
                                 //this type has be same as in the client
-                                notificationChannelId: "Poked Insights Available",
+                                notificationChannelId: "Poked Insights Available ID",
                                 intentToActivity: "POKED_CONNECTION_INSIGHTS_ACTIVITY",
                                 intentExtrasUid: pokedUid,
                                 intentExtrasName: null,

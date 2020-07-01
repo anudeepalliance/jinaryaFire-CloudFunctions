@@ -21,7 +21,7 @@ export const updateTheUserDetailsAtCompsSent = functions.region('asia-east2').fi
 
         //check if either userName or Name was changed as these are only fields that needs to be updated
         //at the compliments sent docs, not interested in bio field
-        if (newName == oldName && newUserName == oldUserName) {
+        if (newName === oldName && newUserName === oldUserName) {
             console.log('The user did not update his userName or Name so returning from this function');
             return Promise
         } else {

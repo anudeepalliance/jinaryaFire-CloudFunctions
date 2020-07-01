@@ -91,7 +91,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               //this will be false by default, will turn true at client when clicked
               wasClicked: false,
               //this type has be same as in the client
-              notificationChannelId: "New Compliment Received",
+              notificationChannelId: "New Compliment Received ID",
               intentToActivity: "NEW_COMPLIMENT_RECEIVED_ACTIVITY",
               intentExtrasUid: complimentData.senderUid,
               intentExtrasName: complimentData.senderName,
