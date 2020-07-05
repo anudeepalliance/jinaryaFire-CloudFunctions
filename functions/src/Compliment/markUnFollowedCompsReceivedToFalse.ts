@@ -16,8 +16,8 @@ export const markTheUnFollowedCompsReceivedToFalse = functions.region('asia-east
             .where('senderUid', '==', unFollowedUid)
 
         return unFollowedPersonCompsReceivedDocs.get().then(
-            async (querySnapshot: { docs: DocumentSnapshot[] }) => {
-                await Promise.all(querySnapshot.docs.map((doc) => {
+            async (querySnapshot: DocumentSnapshot[]) => {
+                await Promise.all(querySnapshot.map((doc) => {
                     //get a reference to the document
                     const complimentDocRef = doc.ref
                     return complimentDocRef.update({

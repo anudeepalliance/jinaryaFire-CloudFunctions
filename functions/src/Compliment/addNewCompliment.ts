@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 const utilityFunctions =  require('frequentFunctions')
 
@@ -20,7 +21,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
 
   //Check if the sender is blocked by the recipent, if yes then throw an error
   return db.collection('Users').doc(complimentData.receiverUid).collection('blocked')
-    .doc(complimentData.senderUid).get().then((doc: { exists: any; data: () => any }) => {
+    .doc(complimentData.senderUid).get().then((doc: DocumentSnapshot) => {
       if (doc.exists) {
         throw new functions.https.HttpsError(
           'unauthenticated',
@@ -29,7 +30,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
       } else {
 
         //random 11 digital ComplimentId converted to String
-        const randomComplimentId = utilityFunctions.randomId()
+        const randomComplimentId : String = utilityFunctions.randomId()
 
 
         const complimentReceivedObject = {
@@ -57,7 +58,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
 
         //get the notification token of the complimentReceiver to identify & send notification to his device
         return db.collection('Users').doc(complimentData.receiverUid).collection('notificationToken')
-          .doc('theNotificationToken').get().then((notificationTokenDoc: { exists: any; data: () => any }) => {
+          .doc('theNotificationToken').get().then((notificationTokenDoc: DocumentSnapshot) => {
 
             //the fields to be same as the ones at Fs
             const receiverNotificationToken = notificationTokenDoc.data()?.notificationToken

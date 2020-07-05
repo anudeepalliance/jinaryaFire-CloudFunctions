@@ -31,8 +31,8 @@ export const updateTheUserDetailsAtCompsSent = functions.region('asia-east2').fi
                 .where('senderUid', '==', `${updaterUid}`)
 
             return compsSentByUpdaterDocs.get().then(
-                async (querySnapshot: { docs: DocumentSnapshot[] }) => {
-                    await Promise.all(querySnapshot.docs.map((doc) => {
+                async (querySnapshot: DocumentSnapshot[] ) => {
+                    await Promise.all(querySnapshot.map((doc) => {
                         //get a string representation of the documentPath and use that to update the doc
                         const compsSentDocPath = doc.ref.path
                         //get a DB reference to the compsSent by the updater

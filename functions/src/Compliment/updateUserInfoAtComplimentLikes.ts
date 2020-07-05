@@ -18,8 +18,8 @@ export const updateUserInfoAtTheComplimentLikes = functions.region('asia-east2')
         const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimentLikes').where('uid', '==', `${updatersUserId}`)
 
         return userComplimentLikedUserDocs.get().then(
-            async (querySnapshot: { docs: DocumentSnapshot[] }) => {
-                await Promise.all(querySnapshot.docs.map((doc) => {
+            async (querySnapshot: DocumentSnapshot[]) => {
+                await Promise.all(querySnapshot.map((doc) => {
                     //get a string representation of the documentPath and use that to update the doc
                     const complimentLikerDocPath = doc.ref.path
                     //get a DB reference to the userDoc at complimentLike

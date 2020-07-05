@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 
 //When a poke is received by a user then do the following
@@ -22,7 +23,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
 
     //Check if the poker has already poked this user, if yes then throw an error
     return db.collection('Users').doc(pokeForInsightData.pokedUid).collection('pokersForInsights')
-        .doc(pokeForInsightData.pokerUid).get().then((doc: { exists: any; data: () => any }) => {
+        .doc(pokeForInsightData.pokerUid).get().then((doc: any ) => {
             if (doc.exists) {
                 //print a message to console that poker has already poked this user
                 console.log('Poker has already poked this user')
@@ -30,7 +31,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
             } else {
                 //Check if the poker is blocked by the poked, if yes then throw an error
                 return db.collection('Users').doc(pokeForInsightData.pokedUid).collection('blocked')
-                    .doc(pokeForInsightData.pokerUid).get().then((pokerBlockedDoc: { exists: any; data: () => any }) => {
+                    .doc(pokeForInsightData.pokerUid).get().then((pokerBlockedDoc: DocumentSnapshot) => {
                         if (pokerBlockedDoc.exists) {
                             throw new functions.https.HttpsError(
                                 'unauthenticated',
@@ -47,7 +48,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
 
                             //get the notification token of the poked to identify & send notification to his device
                             return db.collection('Users').doc(pokeForInsightData.pokedUid).collection('notificationToken')
-                                .doc('theNotificationToken').get().then((notificationTokenDoc: { exists: any; data: () => any }) => {
+                                .doc('theNotificationToken').get().then((notificationTokenDoc: DocumentSnapshot ) => {
 
                                     //the fields to be same as the ones at Fs
                                     const pokedNotificationToken = notificationTokenDoc.data()?.notificationToken

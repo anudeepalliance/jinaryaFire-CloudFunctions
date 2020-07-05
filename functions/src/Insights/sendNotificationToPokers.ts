@@ -16,8 +16,8 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
 
         //Check if the poked has any pending pokers
         return db.collection('Users').doc(pokedUid).collection('pokersForInsights')
-            .get().then((pokers: { docs: DocumentSnapshot[] }) => {
-                if (pokers.docs.length === 0) {
+            .get().then((pokers: DocumentSnapshot[] ) => {
+                if (pokers.length === 0) {
                     console.log('The poked does not have any pending Pokers');
                     return
                 } else {
@@ -71,7 +71,7 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                             //initialize a promises array for all the tasks
                             const promises = []
 
-                            pokers.docs.forEach(poker => {
+                            pokers.forEach(poker => {
 
                                 const pokerUid = poker.data()?.uid
 

@@ -16,8 +16,8 @@ export const blockTheCompsSent = functions.region('asia-east2').firestore.docume
             .where('senderUid', '==', blockerUid).where('receiverUid', '==', blockedUid)
 
         return blockedCompsSentDocs.get().then(
-            async (querySnapshot: { docs: DocumentSnapshot[] }) => {
-                await Promise.all(querySnapshot.docs.map((doc) => {
+            async (querySnapshot:DocumentSnapshot[]) => {
+                await Promise.all(querySnapshot.map((doc) => {
                     //get a reference to the document
                     const complimentDocRef = doc.ref
                     return complimentDocRef.update({

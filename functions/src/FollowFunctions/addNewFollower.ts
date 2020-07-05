@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 
 //When client followes a user, a firestore .onCreate() background function is triggered to
@@ -15,7 +16,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
 
     // Check if follower is blocked by the followed, if yes then throw an error
     return admin.firestore().collection('Users').doc(followedUid).collection('blocked')
-      .doc(followerUid).get().then((blockedFollower: { exists: any; data: () => any }) => {
+      .doc(followerUid).get().then((blockedFollower: DocumentSnapshot ) => {
         if (blockedFollower.exists) {
           //print a message to console that follower was not added
           console.log('cannot add follower, follower is blocked by followed')
@@ -28,42 +29,42 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
 
           //Find out if Followed is following the Follower already
           return admin.firestore().collection('Users').doc(followedUid).collection('following')
-            .doc(followerUid).get().then((doc: { exists: any; data: () => any }) => {
+            .doc(followerUid).get().then((followerPerson: DocumentSnapshot) => {
 
-              let followerFollowingBack = false
+              let followedFollowingBack = false
 
               //if doc exists mean followed is following the follower so set the variable to true
-              if (doc.exists) {
-                followerFollowingBack = true
+              if (followerPerson.exists) {
+                followedFollowingBack = true
               }
 
               //Get Follower user details that needs to be duplicated to the Followed's follower Sub Coll
               //And also added to the notification Payload data
               return admin.firestore().collection('Users').doc(followerUid).collection('ProfileInfo')
-                .doc(followerUid).get().then((followerUserProfileDoc: { exists: any; data: () => any }) => {
+                .doc(followerUid).get().then((followerUserProfileDoc: DocumentSnapshot) => {
 
 
                   //The FollowerPerson object which will be pushed to the followers sub collection of followed
                   const followerData = {
-                    name: followerUserProfileDoc.data().name,
-                    nameLowerCase: followerUserProfileDoc.data().name.toLowerCase().toString(),
-                    userName: followerUserProfileDoc.data().userName,
+                    name: followerUserProfileDoc.data()!.name,
+                    nameLowerCase: followerUserProfileDoc.data()!.name.toLowerCase().toString(),
+                    userName: followerUserProfileDoc.data()!.userName,
                     uid: followerUid,
                     followedAt: Date.now(),
                     //is the followed following back the follower,
-                    followingBack: followerFollowingBack,
+                    followingBack: followedFollowingBack,
                     //not adding noOfComplimentsSent as that is added by a different CF
-                    bio: followerUserProfileDoc.data().bio
+                    bio: followerUserProfileDoc.data()!.bio
                   }
 
-                  const followerThumbnailImageUrl = followerUserProfileDoc.data().photoUrl
+                  const followerThumbnailImageUrl = followerUserProfileDoc.data()!.photoUrl
 
                   //get the notification token of the followed to identify & send notification to his device
                   return admin.firestore().collection('Users').doc(followedUid).collection('notificationToken')
-                    .doc('theNotificationToken').get().then((notificationTokenDoc: { exists: any; data: () => any }) => {
+                    .doc('theNotificationToken').get().then((notificationTokenDoc: DocumentSnapshot) => {
 
                       //the fields to be same as the ones at Fs
-                      const followedNotificationToken = notificationTokenDoc.data().notificationToken
+                      const followedNotificationToken = notificationTokenDoc.data()!.notificationToken
 
                       //Create the Notification Payload content
                       const notificationPayload = {

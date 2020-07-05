@@ -19,8 +19,8 @@ export const updateUserInfoAtTheComplimentsSentNumbers = functions.region('asia-
         const userComplimentsSentNumbersDocs = admin.firestore().collectionGroup('complimentsSentNumbers').where('uid', '==', `${updatersUserId}`)
 
         return userComplimentsSentNumbersDocs.get().then(
-            async (querySnapshot: { docs: DocumentSnapshot[] }) => {
-                await Promise.all(querySnapshot.docs.map((doc) => {
+            async (querySnapshot: DocumentSnapshot[]) => {
+                await Promise.all(querySnapshot.map((doc) => {
                     //get a string representation of the documentPath and use that to update the doc
                     const complimentsSentNumbersDocPath = doc.ref.path
                     //get a DB representation of the documentPath and use that to update the doc
