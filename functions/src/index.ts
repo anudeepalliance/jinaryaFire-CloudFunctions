@@ -153,3 +153,23 @@ exports.markUnFollowedCompsReceivedToFalse = markUnFollowedCompsReceivedToFalse.
 //reflected in all the compliments Sent Docs by this person, this will run only if name or userName was changed
 import updateUserDetailsAtCompsSent = require('./Compliment/updateUserDetailsAtCompsSent')
 exports.updateUserDetailsAtCompsSent = updateUserDetailsAtCompsSent.updateTheUserDetailsAtCompsSent
+
+//When a person likes a compliment, then send a notification to the comp receiver if the liker is not the receiver
+//and add a notificationDoc to their notifications Sub Coll as long as they are not the same as liker
+import sendCompLikeNotificationToReceiver = require('./Compliment/sendCompLikeNotificationToReceiver')
+exports.sendCompLikeNotificationToReceiver = sendCompLikeNotificationToReceiver.sendTheCompLikeNotificationToReceiver
+
+//When a person likes a compliment, then send a notification to the comp sender if the liker is not the sender
+//and add a notificationDoc to their notifications Sub Coll
+import sendCompLikeNotificationToSender = require('./Compliment/sendCompLikeNotificationToSender')
+exports.sendCompLikeNotificationToSender = sendCompLikeNotificationToSender.sendTheCompLikeNotificationToSender
+
+//When a follower doc is added to the User's followers sub coll then
+//increase noOfFollowers field by 1 the profileInfo doc
+import incrementNoOfFollowers = require('./FollowFunctions/incrementNoOfFollowers')
+exports.incrementNoOfFollowers = incrementNoOfFollowers.incrementTheNoOfFollowers
+
+//When a follower doc is added to the User's followers sub coll then
+//decrease noOfFollowers field by 1 the profileInfo doc
+import decrementNoOfFollowers = require('./FollowFunctions/decrementNoOfFollowers')
+exports.decrementNoOfFollowers = decrementNoOfFollowers.decrementTheNoOfFollowers

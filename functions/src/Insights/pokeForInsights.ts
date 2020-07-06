@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions'
 import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
+const utilityFunctions = require('frequentFunctions')
 
 //When a poke is received by a user then do the following
 //1.Check if the poker is present in the pokersForInsights sub collection of the poked, 
@@ -72,6 +73,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                         }
                                     }
 
+                                    const nofiticationDocId = utilityFunctions.randomId()
 
                                     const notificationObject = {
                                         message: null,
@@ -87,7 +89,8 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                         intentExtrasName: null,
                                         intentExtrasUserName: null,
                                         //This is needed for client to access this doc and update the wasClicked field
-                                        contentId: pokeForInsightData.pokerUid
+                                        contentId: pokeForInsightData.pokerUid,
+                                        notificationId: nofiticationDocId
                                     }
 
                                     const promises = []

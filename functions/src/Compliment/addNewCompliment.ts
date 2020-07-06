@@ -84,6 +84,8 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               }
             }
 
+            const nofiticationDocId = utilityFunctions.randomId()
+
             const notificationObject = {
               message: `${complimentData.complimentReceivedContent}`,
               receivedTime: Date.now(),
@@ -98,7 +100,8 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               intentExtrasName: complimentData.senderName,
               intentExtrasUserName: complimentData.senderUserName,
               //This is needed for client to access this doc and update the wasClicked field
-              contentId: randomComplimentId
+              contentId: randomComplimentId,
+              notificationId: nofiticationDocId
             }
 
             const promises = []

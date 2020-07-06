@@ -9,18 +9,10 @@ export const removeUserAsTheFollower = functions.region('asia-east2').firestore.
     const unFollowerUserId = context.params.unFollowerUserId
     const unFollowedUserId = context.params.unFollowedUserId
 
-
-    const promises = []
     //UnFollower needs to be deleted from the UnFollowed's followers sub collection
     const p = admin.firestore()
       .collection('Users').doc(unFollowedUserId).collection('followers').doc(unFollowerUserId).delete()
-    promises.push(p)
-    //UnFollowed lost a follower so reduce the number of followers at his ProfileInfo Doc
-    const p1 = admin.firestore().collection('Users').doc(unFollowedUserId).collection('ProfileInfo').doc(unFollowedUserId).update({
-      noOfFollowers: admin.firestore.FieldValue.increment(-1)
-    })
-    promises.push(p1)
     //run all the promises
-    return Promise.all(promises)
+    return Promise.all(p)
 
   })

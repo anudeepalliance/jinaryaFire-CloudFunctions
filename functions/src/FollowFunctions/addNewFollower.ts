@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions'
 import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
+const utilityFunctions = require('frequentFunctions')
 
 //When client followes a user, a firestore .onCreate() background function is triggered to
 //1.add follower to the followed's followers sub collection
@@ -89,6 +90,8 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                         }
                       }
 
+                      const nofiticationDocId = utilityFunctions.randomId()
+                      
                       const notificationObject = {
                         message: `${followerData.bio}`,
                         receivedTime: Date.now(),
@@ -103,7 +106,9 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                         intentExtrasName: followerData.name,
                         intentExtrasUserName: followerData.userName,
                         intentExtrasBio: followerData.bio,
-                        contentId: followerUid
+                        //This is needed for client to access this doc and update the wasClicked field
+                        contentId: followerUid,
+                        notificationId: nofiticationDocId
                       }
 
 
@@ -119,11 +124,6 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                       //Send the notification to the user
                       const p2 = admin.messaging().sendToDevice(followedNotificationToken, notificationPayload)
                       promises.push(p2)
-                      //User gained a new Follower so increase the followerCount in his profileInfo Doc
-                      const p3 = admin.firestore().collection('Users').doc(followedUid).collection('ProfileInfo').doc(followedUid).update({
-                        noOfFollowers: admin.firestore.FieldValue.increment(1)
-                      })
-                      promises.push(p3)
                       //run all the promises
                       return Promise.all(promises)
                     })
