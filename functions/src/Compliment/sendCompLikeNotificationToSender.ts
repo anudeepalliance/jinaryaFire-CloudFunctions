@@ -5,7 +5,7 @@ const utilityFunctions = require('frequentFunctions')
 
 //When a person likes a compliment, then send a notification to the comp sender if the liker is not the sender
 //and add a notificationDoc to their notifications Sub Coll
-export const sendTheCompLikeNotificationToSender = functions.region('asia-east2').firestore.document
+export const sendCompLikeNotificationToSender = functions.region('asia-east2').firestore.document
     ('Users/{userId}/complimentsReceived/{complimentId}/complimentLikes/{likerUid}')
     .onCreate((data, context) => {
 
@@ -27,8 +27,8 @@ export const sendTheCompLikeNotificationToSender = functions.region('asia-east2'
 
                 //Is the liker same as the receiver, then just return in that case
                 if (senderUid === likerUid) {
-                    console.log('liker is same as receiver')
-                    return
+                    console.log('liker is same as sender')
+                    return Promise
                 } else {
                     //get the likerProfilePhotoUrl
                     return admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
@@ -43,13 +43,15 @@ export const sendTheCompLikeNotificationToSender = functions.region('asia-east2'
                                     body: `${likerUserName}`,
                                     //Add an additional intent filter in manifest file for android for the activity with the name 
                                     //same as the clickAction here or Off Screen Notification click action wont work
-                                    clickAction: ".compliments.complimentReceived.NewComplimentReceivedActivity",
-                                    image: `${likerProfileImageUrl}`
+                                    clickAction: ".compliments.likedComplimentSent.LikeReceivedContentActivity",
+                                    image: likerProfileImageUrl
                                 },
                                 data: {
-                                    ACTIVITY_NAME: "NEW_COMPLIMENT_RECEIVED_ACTIVITY",
+                                    ACTIVITY_NAME: "LIKE_RECEIVED_CONTENT_ACTIVITY",
                                     //pass the complimentId to the Notification so the client can know which compliment to retreive
-                                    NEW_COMPLIMENT_ID_FIELD: complimentId,
+                                    LIKE_RECEIVED_CONTENT_ID_FIELD: complimentId,
+                                    //add the content type for the activity to know which fragment to populate
+                                    LIKE_RECEIVED_CONTENT_SENT_TYPE: 'COMPLIMENT_CATEGORY',
                                     //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
                                     //be created at the client else, this will fail
                                     CHANNEL_ID: "Compliment Likes ID"
@@ -65,9 +67,9 @@ export const sendTheCompLikeNotificationToSender = functions.region('asia-east2'
                                 senderUid: likerUid,
                                 //this will be false by default, will turn true at client when clicked
                                 wasClicked: false,
-                                //this type has be same as in the client
+                                //this type has to be same as in the client
                                 notificationChannelId: "Compliment Likes ID",
-                                intentToActivity: "NEW_COMPLIMENT_RECEIVED_ACTIVITY",
+                                intentToActivity: "LIKE_RECEIVED_CONTENT_ACTIVITY",
                                 intentExtrasUid: likerUid,
                                 intentExtrasName: likerName,
                                 intentExtrasUserName: likerUserName,

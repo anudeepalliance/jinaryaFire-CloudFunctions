@@ -5,7 +5,7 @@ const utilityFunctions = require('frequentFunctions')
 
 //When a person likes a compliment, then send a notification to the comp receiver if the liker is not the receiver
 //and add a notificationDoc to their notifications Sub Coll
-export const sendTheCompLikeNotificationToReceiver = functions.region('asia-east2').firestore.document
+export const sendCompLikeNotificationToReceiver = functions.region('asia-east2').firestore.document
     ('Users/{userId}/complimentsReceived/{complimentId}/complimentLikes/{likerUid}')
     .onCreate((data, context) => {
 
@@ -22,7 +22,7 @@ export const sendTheCompLikeNotificationToReceiver = functions.region('asia-east
         //Is the liker same as the receiver, then just return in that case
         if (receiverUid === likerUid) {
             console.log('liker is same as receiver')
-            return
+            return Promise
         } else {
             //get the likerProfilePhotoUrl
             return admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
@@ -43,6 +43,7 @@ export const sendTheCompLikeNotificationToReceiver = functions.region('asia-east
                         data: {
                             ACTIVITY_NAME: "NEW_COMPLIMENT_RECEIVED_ACTIVITY",
                             //pass the complimentId to the Notification so the client can know which compliment to retreive
+                            //field name is kept same as the addNewCompliment as both CFs take users to the same activity
                             NEW_COMPLIMENT_ID_FIELD: complimentId,
                             //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
                             //be created at the client else, this will fail
