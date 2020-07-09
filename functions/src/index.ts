@@ -173,3 +173,8 @@ exports.incrementNoOfFollowers = incrementNoOfFollowers.incrementTheNoOfFollower
 //decrease noOfFollowers field by 1 the profileInfo doc
 import decrementNoOfFollowers = require('./FollowFunctions/decrementNoOfFollowers')
 exports.decrementNoOfFollowers = decrementNoOfFollowers.decrementTheNoOfFollowers
+
+//When a n insight received a like then send a notification to the owner of the insight 
+//unless the liker is different from the insight owner
+import sendInsightLikeNotificationToOwner = require('./Insights/sendInsightLikeNotificationToOwner')
+exports.sendInsightLikeNotificationToOwner = sendInsightLikeNotificationToOwner.sendInsightLikeNotificationToOwner

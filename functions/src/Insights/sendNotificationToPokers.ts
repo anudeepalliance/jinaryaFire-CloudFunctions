@@ -38,11 +38,13 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                                     body: `${insightData.data().insightContent}`,
                                     //Add an additional intent filter in manifest file for android for the activity with the name 
                                     //same as the clickAction here or Off Screen Notification click action wont work
-                                    clickAction: ".insights.connectionInsights.PokedConnectionInsightActivity",
+                                    clickAction: ".insights.connectionInsights.SpecificInsightHolderActivity",
                                     image: `${pokedPhotoUrl}`
                                 },
                                 data: {
-                                    ACTIVITY_NAME: "POKED_CONNECTION_INSIGHTS_ACTIVITY",
+                                    ACTIVITY_NAME: "SPECIFIC_INSIGHT_HOLDER_ACTIVITY",
+                                    //specify the insight category to hold, poked insight or likedReceived insight?
+                                    INSIGHT_CATEGORY: "POKED_INSIGHT_CATEGORY",
                                     //The below field name to be same as the one used in the client
                                     NEW_INSIGHT_FOLLOWED_ID_FIELD: pokedUid,
                                     NEW_INSIGHT_ID_FIELD: `${insightData.data().insightId}`,
@@ -63,7 +65,7 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                                 wasClicked: false,
                                 //this type has be same as in the client
                                 notificationChannelId: "Poked Insights Available ID",
-                                intentToActivity: "POKED_CONNECTION_INSIGHTS_ACTIVITY",
+                                intentToActivity: "SPECIFIC_INSIGHT_HOLDER_ACTIVITY",
                                 intentExtrasUid: pokedUid,
                                 intentExtrasName: null,
                                 intentExtrasUserName: pokedUserName,

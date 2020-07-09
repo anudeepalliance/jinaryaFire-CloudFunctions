@@ -43,15 +43,13 @@ export const sendCompLikeNotificationToSender = functions.region('asia-east2').f
                                     body: `${likerUserName}`,
                                     //Add an additional intent filter in manifest file for android for the activity with the name 
                                     //same as the clickAction here or Off Screen Notification click action wont work
-                                    clickAction: ".compliments.likedComplimentSent.LikeReceivedContentActivity",
+                                    clickAction: ".compliments.likedComplimentSent.LikeReceivedComplimentSentActivity",
                                     image: likerProfileImageUrl
                                 },
                                 data: {
-                                    ACTIVITY_NAME: "LIKE_RECEIVED_CONTENT_ACTIVITY",
+                                    ACTIVITY_NAME: "LIKE_RECEIVED_COMPLIMENT_SENT_ACTIVITY",
                                     //pass the complimentId to the Notification so the client can know which compliment to retreive
-                                    LIKE_RECEIVED_CONTENT_ID_FIELD: complimentId,
-                                    //add the content type for the activity to know which fragment to populate
-                                    LIKE_RECEIVED_CONTENT_SENT_TYPE: 'COMPLIMENT_CATEGORY',
+                                    LIKE_RECEIVED_COMPLIMENT_ID_FIELD: complimentId,
                                     //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
                                     //be created at the client else, this will fail
                                     CHANNEL_ID: "Compliment Likes ID"
@@ -69,7 +67,7 @@ export const sendCompLikeNotificationToSender = functions.region('asia-east2').f
                                 wasClicked: false,
                                 //this type has to be same as in the client
                                 notificationChannelId: "Compliment Likes ID",
-                                intentToActivity: "LIKE_RECEIVED_CONTENT_ACTIVITY",
+                                intentToActivity: "LIKE_RECEIVED_COMPLIMENT_SENT_ACTIVITY",
                                 intentExtrasUid: likerUid,
                                 intentExtrasName: likerName,
                                 intentExtrasUserName: likerUserName,
