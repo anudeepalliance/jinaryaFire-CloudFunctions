@@ -24,15 +24,14 @@ service cloud.firestore {
       //& delete to his following sub-collection
       allow create, delete: if request.auth.uid == uid;
       //allow update if user is trying to update just the number of compliments sent field
-      allow update: if isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrFollowingBackFields();
+      allow update: if isUpdatingOnlyNoOfCompsSentOrComplimentSentAt();
       }
 
     //custom function to check if client is trying to update anything other 
     //than likes or views field of the complimentSent doc
-    function isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrFollowingBackFields() {
+    function isUpdatingOnlyNoOfCompsSentOrComplimentSentAt() {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']) || 
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt']) ||
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followingBack'])
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt'])
     }
 
     //custom function to check if client is trying to update anything other 
@@ -43,54 +42,54 @@ service cloud.firestore {
 
       
       match /followers/{followerPersonUid} {
-      //everybody is allowed to see everyone else's followers
-      allow read: if true;
-      //Only the user is authorised to create
-      //& delete and add to his followers sub-collection
-      allow create, delete: if request.auth.uid == uid;
-      allow update: if request.auth.uid == uid && isUpdatingOnlyFollowingBackField();
+        //everybody is allowed to see everyone else's followers
+        allow read: if true;
+        //Only the user is authorised to create
+        //& delete and add to his followers sub-collection
+        allow create, delete: if request.auth.uid == uid;
+        allow update: if request.auth.uid == uid && isUpdatingOnlyFollowingBackField();
       }
       
       match /complimentsSentNumbers/{followingPersonUid} {
-      //Only the owner can create and read
-      //can update if updating the noOfComplimentsSent
-      allow read, create: if request.auth.uid == uid;
-      allow update: if request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']);
+        //Only the owner can create and read
+        //can update if updating the noOfComplimentsSent
+        allow read, create: if request.auth.uid == uid;
+        allow update: if request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']);
       }
       
       match /blocked/{blockedPersonUid} {
-      //Only the user is authorised to read, delete 
-      //and add to his blocked sub-collection
-      allow read,create, delete: if request.auth.uid == uid;
+        //Only the user is authorised to read, delete 
+        //and add to his blocked sub-collection
+        allow read,create, delete: if request.auth.uid == uid;
       }
       
       match /blockedBy/{blockedByPersonUid} {
-      //User is authorised to just read 
-      //his blocked sub-collection
-      allow read: if request.auth.uid == uid;
+        //User is authorised to just read 
+        //his blocked sub-collection
+        allow read: if request.auth.uid == uid;
       }
       
       match /notificationToken/{tokenId} {
-      //Only the user is authorised to read and write
-      //to his followers sub-collection
-      allow read, create, update: if request.auth.uid == uid;
-      allow delete : if false;
+        //Only the user is authorised to read and write
+        //to his followers sub-collection
+        allow read, create, update: if request.auth.uid == uid;
+        allow delete : if false;
       }
       
       match /Notifications/{randomId} {
-      //User is authorised to create and read
-      //to his Notifications sub-collection but not create
-      allow read: if request.auth.uid == uid;
-      allow update: if request.auth.uid == uid && isUpdatingOnlyWasClickedField();
-      allow create: if request.auth.uid == uid && isCreatingOnlyNoOfNotificationsReceivedDoc();
-      allow delete: if request.auth.uid == uid;
+        //User is authorised to create and read
+        //to his Notifications sub-collection but not create
+        allow read: if request.auth.uid == uid;
+        allow update: if request.auth.uid == uid && isUpdatingOnlyWasClickedField();
+        allow create: if request.auth.uid == uid && isCreatingOnlyNoOfNotificationsReceivedDoc();
+        allow delete: if request.auth.uid == uid;
       }
 
      match /pokersForInsights/{randomId} {
-      //User is authorised to read
-      //to his pokersForInsights sub-collection but not create
-      //create and delete will be done by CF only
-      allow read: if request.auth.uid == uid;
+        //User is authorised to read
+        //to his pokersForInsights sub-collection but not create
+        //create and delete will be done by CF only
+        allow read: if request.auth.uid == uid;
      }
 
 

@@ -8,7 +8,8 @@ const serviceAccount = require('./server/jinaryafire-firebase-adminsdk-db1fd-7d8
 // admin.initializeApp()
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://jinaryafire.firebaseio.com"
+  databaseURL: "https://jinaryafire.firebaseio.com",
+  storageBucket: "gs://jinaryafire.appspot.com"
 });
 
 //export the functions in other files, callable https functions 
@@ -88,8 +89,8 @@ exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSent
 
 //When a receiver deletes a compliment received then reduce the no of compliments sent
 //at sender's complimentsSentNos sub Collection
-import decrementComplimentsSentNo = require('./Compliment/decrementComplimentsSentNo')
-exports.decrementComplimentsSentNo = decrementComplimentsSentNo.decrementTheComplimentsSentNo
+import decrementCompSentNoAndDeleteCompImage = require('./Compliment/decrementCompSentNoAndDeleteCompImage')
+exports.decrementCompSentNoAndDeleteCompImage = decrementCompSentNoAndDeleteCompImage.decrementTheCompSentNoAndDeleteCompImage
 
 //When a new notification Doc is added to the Notificatons Sub Coll
 //Check for the notificationNumbers Doc, if it is greater than 99 then delete the oldest notificationDoc

@@ -30,7 +30,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
       } else {
 
         //random 11 digital ComplimentId converted to String
-        const randomComplimentId : String = utilityFunctions.randomId()
+        const complimentId : String = complimentData.complimentId
 
 
         const complimentReceivedObject = {
@@ -45,12 +45,15 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
           receivedTime: Date.now(),
           noOfLikes: 0,
           noOfViews: 0,
+          //compliment is just being added so neither of them would have liked this content
           receiverLiked: false,
+          //added this variable as the same object is used as compReceived and compSent Object
           senderLiked: false,
-          complimentId: randomComplimentId,
+          complimentId: complimentId,
           followingStatus: complimentData.followingStatus,
           senderBlocked: false,
           receiverBlocked: false,
+          hasImage: complimentData.hasImage,
           //the below field value needs to be same as the CO defined in the client
           contentCategory: "compliment"
         }
@@ -77,7 +80,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               data: {
                 ACTIVITY_NAME: "NEW_COMPLIMENT_RECEIVED_ACTIVITY",
                 //pass the complimentId to the Notification so the client can know which compliment to retreive
-                NEW_COMPLIMENT_ID_FIELD: randomComplimentId,
+                NEW_COMPLIMENT_ID_FIELD: complimentId,
                 //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
                 //be created at the client else, this will fail
                 CHANNEL_ID: "New Compliment Received ID"
@@ -100,18 +103,18 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
               intentExtrasName: complimentData.senderName,
               intentExtrasUserName: complimentData.senderUserName,
               //This is needed for client to access this doc and update the wasClicked field
-              contentId: randomComplimentId,
+              contentId: complimentId,
               notificationId: nofiticationDocId
             }
 
             const promises = []
             //The compliment Object is added to the whatsNew Sub Coll of the receiver
             const p = db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('complimentsReceived')
-              .doc(randomComplimentId).set(complimentReceivedObject)
+              .doc(complimentId).set(complimentReceivedObject)
             promises.push(p)
             //Add the notification doc to the user's notification sub collection
             const p1 = db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('Notifications')
-              .doc(randomComplimentId).set(notificationObject)
+              .doc(complimentId).set(notificationObject)
             promises.push(p1)
             //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
             if (receiverNotificationToken) {
