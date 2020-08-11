@@ -51,7 +51,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                     nameLowerCase: followerUserProfileDoc.data()!.name.toLowerCase().toString(),
                     userName: followerUserProfileDoc.data()!.userName,
                     uid: followerUid,
-                    followedAt: Date.now(),
+                    followedYouAt: Date.now(),
                     //is the followed following back the follower,
                     followingBack: followedFollowingBack,
                     //not adding noOfComplimentsSent as that is added by a different CF

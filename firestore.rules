@@ -16,6 +16,13 @@ service cloud.firestore {
       //Users can edit data if it is their own data
       allow write: if request.auth.uid == uid;
     }
+
+    match /whatsNew/{whatsNewDocId} {
+      allow create: if isCreatingOnlyTotalNoItemsOrNoOfUnReadWhatsItemsDoc();
+      allow update: if isUpdatingOnlyIsReadFieldOrNoOfUnReadItemsField();
+      //users are allows to read their WhatsNew Documents
+      allow read: if true;
+    }
       
       match /following/{followingPersonUid} {
         //everybody is allowed to see everyone else's following
@@ -24,14 +31,29 @@ service cloud.firestore {
       //& delete to his following sub-collection
       allow create, delete: if request.auth.uid == uid;
       //allow update if user is trying to update just the number of compliments sent field
-      allow update: if isUpdatingOnlyNoOfCompsSentOrComplimentSentAt();
+      allow update: if isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrInterestMeter();
       }
 
-    //custom function to check if client is trying to update anything other 
-    //than likes or views field of the complimentSent doc
-    function isUpdatingOnlyNoOfCompsSentOrComplimentSentAt() {
+    
+    //In whatsNewSubColl check if user is creating only 
+    //totalNoOfWhatsNewItems or totalNoOfUnReadWhatsNewItems Doc
+    function isCreatingOnlyTotalNoItemsOrNoOfUnReadWhatsItemsDoc() {
+      return request.resource.data.keys().hasOnly(['totalNoOfItems']) || 
+      request.resource.data.keys().hasOnly(['noOfUnReadItems'])
+    }
+
+    //Allow update only if user is updating the isRead field or the noOfUnRead Items field 
+    //of the WhatsNewDoc
+    function isUpdatingOnlyIsReadFieldOrNoOfUnReadItemsField() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfUnReadItems'])
+    }
+    
+    
+    function isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrInterestMeter() {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']) || 
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt'])
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt']) || 
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['interestMeter'])
     }
 
     //custom function to check if client is trying to update anything other 
