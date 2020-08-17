@@ -28,10 +28,10 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
   console.log(`noOfFollowing is ${noOfFollowing}`)
   console.log(`executing getTopInterestedPeopleAndTheirData function`)
   //There is no main block just execute functions
-  return getTopInterestedPeopleAndTheirData()
+  getTopInterestedPeopleAndTheirData()
 
   //get the top 50 interestPeople
-  async function getTopInterestedPeopleAndTheirData() {
+  function getTopInterestedPeopleAndTheirData() {
     userDocRef.collection('following')
       .orderBy('interestMeter', 'desc')
       .limit(50)
@@ -55,7 +55,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
   }
 
   //get the next 50 interestedPeople
-  async function getTheNext50InterestedPeopleAndTheirData(lastPersonInterestedMeter: number | null) {
+  function getTheNext50InterestedPeopleAndTheirData(lastPersonInterestedMeter: number | null) {
     //save the next 50 interestedPeople as we need to get data just for these 50 people
     const nextFiftyInterestedPeople: InterestedPerson[] = []
     userDocRef.collection('following')
@@ -83,20 +83,19 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
         })
   }
 
-
-  async function getTheData(theInterestedPeople : InterestedPerson[]) {
-    await getCompsReceived(theInterestedPeople)
+  //get the Data for the interestedPeople in the argument
+  async function getTheData(theInterestedPeople: InterestedPerson[]) {
+    console.log(`no of interested people to get comps and insights is ${theInterestedPeople.length}`)
+    await getTheLatestCompliments(theInterestedPeople)
+    console.log(`noOfComps queried is ${whatsNewObjects.length}`)
     await getTheLatestInsights(theInterestedPeople)
-    await checkIfWhatsNewObjectsAreSufficient()
-  }
-
-  async function checkIfWhatsNewObjectsAreSufficient() {
+    console.log(`noOfComps + noOfInsights queried is ${whatsNewObjects.length}`)
     //check if whatsNewObjects are less than 80 and there more followedPeople to get data from
     if ( whatsNewObjects.length < 80 && interestedPeople.length < noOfFollowing ) {
       console.log(`whatsNewItems is less than 80 and there are more followingPeople left to query`)
       //Get the interest meter of the last person in the Array and query the next 50 people & their data
       const lastInterestedPerson = interestedPeople[interestedPeople.length - 1]
-      await getTheNext50InterestedPeopleAndTheirData(lastInterestedPerson.interestMeter)
+      getTheNext50InterestedPeopleAndTheirData(lastInterestedPerson.interestMeter)
     } 
     //If there are sufficient WhatsNewObjects or if all followedPeople data has been queried then
     //just add it to the user's WhatsNewSub Coll
@@ -105,58 +104,49 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
       //loop through each WhatsNewObject in the Array and add it the WhatsNewDoc
       whatsNewObjects.forEach(async whatsNewDoc => {
         console.log(`Adding ${whatsNewDoc.id} to the whatsNewSubColl`)
-        await userDocRef.collection('whatsNew').doc(whatsNewDoc.id).set(whatsNewDoc)
+        return userDocRef.collection('whatsNew').doc(whatsNewDoc.id).set(whatsNewDoc)
       })
       console.log(`executing the increment method`)
       await incrementsTheTotalNoItemsAndUnReadItems()
     }
   }
 
-  //get the latest comps received by these interestedPeople
-  async function getCompsReceived(theInterestedPeople: InterestedPerson[]) {
+  async function getTheLatestCompliments(theInterestedPeople: InterestedPerson[]) {
 
-    console.log(`no of interested people to get compsReceived from is ${theInterestedPeople.length}`)
+    theInterestedPeople.forEach(async person => {
 
-      theInterestedPeople.forEach(async person => {
-
-
-        let documentsSnapshot = null
-        const latestCompReceivedTime = await getLatestCompReceivedTimeInRecord(person.uid)
-
-        if ( latestCompReceivedTime === 0 ) {
-          documentsSnapshot = await db.collection('Users').doc(person.uid).collection('complimentsReceived')
-          .orderBy('receivedTime', 'desc')
-          .limit(documentLimit)
-          .get()
-        } else {
-          documentsSnapshot = await db.collection('Users').doc(person.uid).collection('complimentsReceived')
+      let latestCompsReceivedDocRef = null
+      const latestCompReceivedTime = await getLatestCompReceivedTimeInRecord(person.uid)
+      //assign a query based on the nullability of the existing compReceived in the WhatsNewSub Coll
+      if (latestCompReceivedTime !== 0) {
+        //if compReceived exists in recored then get the later comps
+        latestCompsReceivedDocRef = db.collection('Users').doc(person.uid).collection('complimentsReceived')
           .where('receivedTime', '>', latestCompReceivedTime)
+          .limit(documentLimit)
+      } else {
+        //if compReceived does not exist in recored then just get latest 10 comps
+        latestCompsReceivedDocRef = db.collection('Users').doc(person.uid).collection('complimentsReceived')
           .orderBy('receivedTime', 'desc')
           .limit(documentLimit)
-          .get()
-        }
+      }
 
-        console.log(`compsReceived documentsSnapshot length is ${documentsSnapshot.length}`)
+      //get the latestCompsReceived by this person
+      latestCompsReceivedDocRef.get().then(async (newCompsReceived: DocumentSnapshot[]) => {
 
-        if (documentsSnapshot.empty) {
-          console.log(`${person.userName} has no compsReceived`)
-          return
-        }
+        newCompsReceived.forEach(newCompReceived => {
 
-        console.log(`compliment documentsSnapshot of ${person.userName} is greater than 0`)
-        await documentsSnapshot.forEach((newCompReceived: { receiverUid: string; receiverUserName: string; complimentsReceivedContent: string | null; hasImage: boolean | null; senderUid: string | null; senderUserName: string | null; noOfLikes: number | null; receivedTime: number | null; complimentId: string | null }) => {
           //Add each new Compliment to the WhatsNewObjects Array
           const whatsNewDoc = new WhatsNewObject(
-            newCompReceived.receiverUid,
-            newCompReceived.receiverUserName,
+            newCompReceived.data()?.receiverUid,
+            newCompReceived.data()?.receiverUserName,
             true,
-            newCompReceived.complimentsReceivedContent,
-            newCompReceived.hasImage,
-            newCompReceived.senderUid,
-            newCompReceived.senderUserName,
-            newCompReceived.noOfLikes,
-            newCompReceived.receivedTime,
-            newCompReceived.complimentId,
+            newCompReceived.data()?.complimentsReceivedContent,
+            newCompReceived.data()?.hasImage,
+            newCompReceived.data()?.senderUid,
+            newCompReceived.data()?.senderUserName,
+            newCompReceived.data()?.noOfLikes,
+            newCompReceived.data()?.receivedTime,
+            newCompReceived.data()?.complimentId,
             'PERSON_COMPLIMENT_RECEIVED'
           )
 
@@ -164,73 +154,83 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
 
         })
 
-        console.log(`no of comps queried is ${whatsNewObjects.length}`)
-
       })
+    })
 
   }
 
-  //get the latest insights added by these interestedPeople
   async function getTheLatestInsights(theInterestedPeople: InterestedPerson[]) {
 
-    console.log(`no of interested people to get insightsAdded is ${theInterestedPeople.length}`)
-
-      theInterestedPeople.forEach(async person => {
-
-        let documentsSnapshot = null
-
-        const latestInsightAddedTime = await getLatestInsightAddedTimeInRecord(person.uid)
-
-        if ( latestInsightAddedTime === 0 ) {
-          documentsSnapshot = await db.collection('Users').doc(person.uid).collection('insights')
-          .orderBy('addedAt', 'desc')
-          .limit(documentLimit)
-          .get()
-        } else {
-          documentsSnapshot = await db.collection('Users').doc(person.uid).collection('insights')
+    theInterestedPeople.forEach(async person => {
+      let latestInsightAddedDocRef = null
+      const latestInsightAddedTime = await getLatestInsightAddedTimeInRecord(person.uid)
+      //assign a query based on the nullability of the existing insightsAdded in the WhatsNewSub Coll
+      if (latestInsightAddedTime !== 0) {
+        //if insightsAdded exists in record then get the later insights
+        latestInsightAddedDocRef = db.collection('Users').doc(person.uid).collection('insights')
           .where('addedAt', '>', latestInsightAddedTime)
+          .limit(documentLimit)
+      } else {
+        //if insightsAdded does not exist in record then just get latest 10 insights
+        latestInsightAddedDocRef = db.collection('Users').doc(person.uid).collection('insights')
           .orderBy('addedAt', 'desc')
           .limit(documentLimit)
-          .get()
-        }
+      }
 
-        console.log(`insights added documentsSnapshot length is ${documentsSnapshot.length}`)
+      //get the latestCompsReceived by this person
+      latestInsightAddedDocRef.get().then(async (newInsightsAdded: DocumentSnapshot[]) => {
 
-        if (documentsSnapshot.empty) {
-          console.log(`${person.userName} has no insights added`)
-          return
-        }
+        if (newInsightsAdded.length > 0) {
 
-        console.log(`insights added documentsSnapshot of ${person.userName} is greater than 0`)
-        await documentsSnapshot.forEach((newInsightAdded: { insightOwnerUid: string; userName: string; insightContent: string | null; hasImage: boolean | null; senderUid: string | null; senderUserName: string | null; noOfLikes: number | null; addedAt: number | null; insightId: string | null }) => {
-          //Add each new Compliment to the WhatsNewObjects Array
+          newInsightsAdded.forEach(newInsightAdded => {
+
+            //Add each new Compliment to the WhatsNewObjects Array
+            const whatsNewDoc = new WhatsNewObject(
+              newInsightAdded.data()?.insightOwnerUid,
+              newInsightAdded.data()?.person.userName,
+              true,
+              newInsightAdded.data()?.insightContent,
+              newInsightAdded.data()?.hasImage,
+              null,
+              null,
+              newInsightAdded.data()?.noOfLikes,
+              newInsightAdded.data()?.addedAt,
+              newInsightAdded.data()?.insightId,
+              'PERSON_INSIGHT_ADDED'
+            )
+
+            whatsNewObjects.push(whatsNewDoc)
+
+          })
+        } else {
+
+          //Add a poke for Insights doc
           const whatsNewDoc = new WhatsNewObject(
-            newInsightAdded.insightOwnerUid,
-            newInsightAdded.userName,
-            true,
-            newInsightAdded.insightContent,
-            newInsightAdded.hasImage,
+            person.uid,
+            person.userName,
+            false,
             null,
             null,
-            newInsightAdded.noOfLikes,
-            newInsightAdded.addedAt,
-            newInsightAdded.insightId,
-            'PERSON_INSIGHT_ADDED'
+            null,
+            null,
+            null,
+            null,
+            null,
+            'POKE_FOR_INSIGHTS'
           )
 
           whatsNewObjects.push(whatsNewDoc)
 
-        })
-
-        console.log(`no of insights + comps queried is ${whatsNewObjects.length}`)
+        }
 
       })
+
+    })
 
   }
 
   async function incrementsTheTotalNoItemsAndUnReadItems() {
     const totalNoOfItemsAdded = whatsNewObjects.length
-    console.log(`incrementing the values by : ${whatsNewObjects.length}`)
     await userDocRef.collection('whatsNew').doc('noOfUnReadItems').update({
       noOfUnReadItems: admin.firestore.FieldValue.increment(totalNoOfItemsAdded)
     })
@@ -238,8 +238,6 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
       totalNoOfItems: admin.firestore.FieldValue.increment(totalNoOfItemsAdded)
     })
   }
-
-
 
   async function getLatestCompReceivedTimeInRecord(personUid: string): Promise<number> {
     const documentSnapshot = await userDocRef.collection('whatsNew')
@@ -256,6 +254,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
         console.log(`the latestComp does not exist in record`)
         return 0
       }
+    
   }
 
   async function getLatestInsightAddedTimeInRecord(personUid: string): Promise<number> {
