@@ -1,0 +1,53 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /Users/{userId} {
+        //allow users to write to their own profile
+        //photos folder, others can just read to it
+        match /profilePhotos/{allPaths=**} {
+					//only owners of the folder can create Images
+        	allow create: if request.auth.uid == userId
+          //if they are uploading then the photo size cannot be
+          //more than 2MB
+          && request.resource.size < 2 * 1024 * 1024
+          //Only Image type content is allowed to be uploaded
+          //into the storage
+          && request.resource.contentType.matches('image/.*')
+          //allow user to delete his own profilePhotos
+          allow delete: if request.auth.uid == userId
+          //allow anyone to view the profilePhotos of the user
+          allow read: if request.auth.uid != null
+        }
+    
+        //allow insight owners to create and delete 
+        //their own insight Images
+        match /insights/{allPaths=**} {
+          allow create: if request.auth.uid == userId
+          //if they are uploading then the photo size cannot be
+          //more than 2MB
+          && request.resource.size < 2 * 1024 * 1024
+          //Only Image type content is allowed to be uploaded
+          //into the storage
+          && request.resource.contentType.matches('image/.*')
+          allow delete: if request.auth.uid == userId
+          //allow anyone to view the insightImages of the user
+          allow read: if request.auth.uid != null
+        }
+        
+        //rules for the compliment images folder
+        match /complimentsSent/{allPaths=**} {
+          //allow anyone to create complimentSent Images to any userId
+          allow create: if request.auth.uid == userId
+          //if they are uploading then the photo size cannot be
+          //more than 2MB
+          && request.resource.size < 2 * 1024 * 1024
+          //Only Image type content is allowed to be uploaded
+          //into the storage
+          && request.resource.contentType.matches('image/.*')
+          //delete in this folder will be done by CF only
+          //allow to be read by any authenticated user
+          allow read: if request.auth.uid != null
+        }
+    }
+  }
+}

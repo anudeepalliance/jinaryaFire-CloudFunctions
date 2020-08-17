@@ -1,4 +1,220 @@
 {
-  "indexes": [],
-  "fieldOverrides": []
+  "indexes": [
+    {
+      "collectionGroup": "complimentsReceived",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "complimentId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderUid",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentsReceived",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "receiverBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "receiverUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "receivedTime",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentsReceived",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "receiverBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "receivedTime",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentsReceived",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "receiverUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderUid",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentsReceived",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "complimentRead",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "receiverBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "receivedTime",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentsReceived",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "receiverBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "complimentId",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentsReceived",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "receiverBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "complimentId",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "following",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "insightsAdded",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "followedId",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "complimentLikes",
+      "fieldPath": "uid",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "arrayConfig": "CONTAINS",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentsReceived",
+      "fieldPath": "senderUid",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "arrayConfig": "CONTAINS",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentsSentNumbers",
+      "fieldPath": "uid",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "arrayConfig": "CONTAINS",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    }
+  ]
 }

@@ -46,7 +46,7 @@ build/Release
 # Dependency directories
 node_modules/
 
-#server folder which contains service account json files
+#server folder which contains service account json file(s)
 server/
 
 # Optional npm cache directory
@@ -66,3 +66,11 @@ server/
 
 # dotenv environment variables file
 .env
+
+
+## Compiled JavaScript files
+**/*.js
+**/*.js.map
+
+# Typescript v1 declaration files
+typings/

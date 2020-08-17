@@ -260,7 +260,7 @@ service cloud.firestore {
       }
 
 
-  //End of rules  
+  //End of rules
   }
   
 }

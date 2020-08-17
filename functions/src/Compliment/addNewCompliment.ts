@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions'
 import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
-const utilityFunctions =  require('frequentFunctions')
+const utilityFunctions = require('frequentFunctions')
 
 //When a compliment is sent by the user then the following are done
 //1.it is added to the compliments received sub collection of the receiver via callable Cf as the sender does not have permission to write that sub collection
@@ -30,7 +30,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
       } else {
 
         //random 11 digital ComplimentId converted to String
-        const complimentId : String = complimentData.complimentId
+        const complimentId: String = complimentData.complimentId
 
 
         const complimentReceivedObject = {
@@ -135,5 +135,4 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
       }
 
     })
-
 })
