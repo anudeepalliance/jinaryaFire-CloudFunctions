@@ -108,7 +108,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
             }
 
             const promises = []
-            //The compliment Object is added to the whatsNew Sub Coll of the receiver
+            //The compliment Object is added to the compsReceived Sub Coll of the receiver
             const p = db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('complimentsReceived')
               .doc(complimentId).set(complimentReceivedObject)
             promises.push(p)
