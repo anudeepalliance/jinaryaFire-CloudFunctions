@@ -259,7 +259,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
       .orderBy('timeStamp', 'desc')
       .limit(1)
       .get()
-
+ 
       if ( documentSnapshot.exists ) {
         console.log(`the latestComp in record is ${documentSnapshot.data()}`)
         return documentSnapshot.data()?.timeStamp
