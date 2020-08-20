@@ -8,13 +8,20 @@ const admin = require('firebase-admin')
 //1.Gets top 50 interested People
 //2.If their comps and insights exist in the current WhatsNew SubColl then get
 //content more recent than that
-//3.if content does not exist in the current WhatsNewSub Coll then
+//3.If insights do not exist for a specific followed person then add a poke for insight doc
+//for the person
+//4.if content does not exist in the current WhatsNewSub Coll then
 //just get recent 10 comps and insights
-//4.If WhatsNew Items after this process is less than 80 and more followedPeople left then
+//5.If WhatsNew Items after this process is less than 80 and more followedPeople left then
 //query the next 50 interested people and repeat this process until either whatsNewObjects is 80
 //or there no more followedPeople to get content from
-//5.Push the content to WhatsNewSubColl
-//6.increment the WhatsNew record numbers by the noOfItems added
+//6.Push the content to WhatsNewSubColl
+//7.increment the WhatsNew record numbers by the noOfItems added
+//8. check if sufficent noOfInterested people did not add insights to add poke_for_insights whatsNewDocs
+//If yes then run a function to identify more followedPeople who do not have
+// insights and add poke whatsNewDocs for those users
+//NOTE: do not consider addition of poke_for_insights whatsNewDoc to the whatsNewDoc
+//records for incrementing at this function or decrementing at client
 export const populateWhatsNew = functions.region('asia-east2').https.onCall((populateWhatsNewData, context) => {
 
   const db = admin.firestore()
@@ -25,6 +32,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
   const interestedPeople: any[] = []
   let latestCompReceivedTimeInRecord = 0
   let latestInsightAddedInRecord = 0
+  const maxNumberOfPokeForInsightDocs = 10
 
   //check if request came from an authenticated user
   if (!context.auth) {
@@ -94,6 +102,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
     await getCompsReceived(theInterestedPeople)
     await getTheLatestInsights(theInterestedPeople)
     await checkIfWhatsNewObjectsAreSufficient()
+    await getNoInsightFollowedPeople()
   }
 
   //get the latest comps received by these interestedPeople
@@ -194,7 +203,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
 
           //if insight does not exist then the value be 0 so just get recent insights
           if (latestInsightAddedInRecord === 0) {
-            console.log(`insights for ${person.userName} does not exist in record`)
+            console.log(`insights for ${person.userName} does not exist n record`)
             insightAddedRef = await db.collection('Users').doc(person.uid).collection('insights')
               .orderBy('addedAt', 'desc')
               .limit(documentLimit)
@@ -272,6 +281,42 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
     await userDocRef.collection('whatsNewRecords').doc('noOfUnReadWhatsNewItems').update({
       noOfUnReadWhatsNewItems: admin.firestore.FieldValue.increment(noOfWhatsNewObjects)
     })
+
+  }
+
+  //Get more NoInsightAdded FollowedPeople to add Poke for Insights WhatsNewDocs
+  async function getNoInsightFollowedPeople() {
+    await userDocRef.collection('following')
+      .where('insightsAdded', '==', false)
+      .orderBy('interestMeter', 'desc')
+      //limit the followedPeople to just how many more we need to meet the maxNumberOfPokeForInsightDocs
+      .limit(maxNumberOfPokeForInsightDocs)
+      .get().then(async (followedPeople: DocumentSnapshot[]) => {
+
+        followedPeople.forEach(async person => {
+
+          //create a whatsNewObject for this person
+          const whatsNewDoc = {
+            primaryProfileUid: person.data()?.uid,
+            primaryProfileUserName: person.data()?.userName,
+            content: null,
+            contentQuestion: null,
+            hasImage: false,
+            secondaryProfileUid: null,
+            secondaryProfileUserName: null,
+            noOfLIkes: null,
+            timestamp: Date.now(),
+            id: person.data()?.uid,
+            hasRead: false,
+            contentType: 'POKE_FOR_INSIGHTS'
+          }
+          await userDocRef.collection('whatsNew').doc(whatsNewDoc.id).set(whatsNewDoc)
+          
+        })
+
+        console.log(`${followedPeople.length} followed people have not added insights`)
+
+      })
 
   }
 
