@@ -19,6 +19,7 @@ export const whatsNewCollectionMaintenance = functions.region('asia-east2').fire
 
         if (currentTotalNoOfItems > maxDocsInWhatsNewThreshold) {
             const excessDocs = currentTotalNoOfItems - maxDocsInWhatsNewThreshold
+            console.log(`There are ${excessDocs} excess documents in the collection`)
             await userDocRef.collection('whatsNew')
                 .where('hasRead', '==', true)
                 .orderBy('timestamp', 'asc')
@@ -41,6 +42,6 @@ export const whatsNewCollectionMaintenance = functions.region('asia-east2').fire
             await userDocRef.collection('whatsNewRecords').doc('totalNoOfWhatsNewItems').update({
                 totalNoOfWhatsNewItems: admin.firestore.FieldValue.increment(-noOfItemsDeleted)
             })
-        } 
+        }
 
     })
