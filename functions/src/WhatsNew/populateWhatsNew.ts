@@ -90,6 +90,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
   }
 
   async function getTheData(theInterestedPeople: any[]) {
+    //await keyword ensures every function is called only after the previous function has finished executing
     await getCompsReceived(theInterestedPeople)
     await getTheLatestInsights(theInterestedPeople)
     await checkIfWhatsNewObjectsAreSufficient()
@@ -98,9 +99,10 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
   //get the latest comps received by these interestedPeople
   async function getCompsReceived(theInterestedPeople: any[]) {
 
+    //the reference which is assigned dynamically based on whether comps exists in the current whatsNew SubColl
     let compsReceivedRef = null
 
-    //do not  theInterestedPeople.forEach(async (person) => { , as this syntax will be skipped in async functions
+    //do not theInterestedPeople.forEach(async (person) => { , as this syntax will be skipped in async functions
     for (const person of theInterestedPeople) {
  
       //get the latest complimentReceived time that exists in the current whatsNew collection
@@ -111,7 +113,6 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
         .limit(1)
         .get().then(async (latestCompsReceived: DocumentSnapshot[]) => {
           latestCompsReceived.forEach(latestCompReceived => {
-            // for ( const latestCompReceived of latestCompsReceived ) {
             latestCompReceivedTimeInRecord = latestCompReceived.data()?.timestamp
           })
 
@@ -126,7 +127,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
               .limit(documentLimit)
 
           }
-          //if comp exists then the get comps more recent than the receivedTime of the exisiting comp
+          //if comp exists then the the receivedTime value is assigned and get comps more recent than the receivedTime in the exisiting coll
           else {
             console.log(`compliments for ${person.userName} exists in record`)
             compsReceivedRef = await db.collection('Users').doc(person.uid).collection('complimentsReceived')
@@ -138,7 +139,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
               .limit(documentLimit)
           }
 
-
+          //Now just query the comps and convert them into a custom object and add it to the WhatsNewObjects Array
           await compsReceivedRef.get().then((compReceived: DocumentSnapshot[]) => {
 
             compReceived.forEach(document => {
@@ -174,10 +175,13 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
   //get the latest insights added by these interestedPeople
   async function getTheLatestInsights(theInterestedPeople: any[]) {
 
+    //the reference which is assigned dynamically based on whether insights exists in the current whatsNew SubColl
     let insightAddedRef = null
 
+    //do not theInterestedPeople.forEach(async (person) => { , as this syntax will be skipped in async functions
     for (const person of theInterestedPeople) {
 
+      //get the latest insight time that exists in the current whatsNew collection
       await userDocRef.collection('whatsNew')
         .where('contentType', '==', 'PERSON_INSIGHT_ADDED')
         .where('primaryProfileUid', '==', person.uid)
@@ -185,16 +189,18 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
         .limit(1)
         .get().then(async (latestInsightsAdded: DocumentSnapshot[]) => {
           latestInsightsAdded.forEach(latestInsightAdded => {
-            // for ( const latestInsightAdded of latestInsightsAdded ) {
             latestInsightAddedInRecord = latestInsightAdded.data()?.timestamp
           })
 
+          //if insight does not exist then the value be 0 so just get recent insights
           if (latestInsightAddedInRecord === 0) {
             console.log(`insights for ${person.userName} does not exist in record`)
             insightAddedRef = await db.collection('Users').doc(person.uid).collection('insights')
               .orderBy('addedAt', 'desc')
               .limit(documentLimit)
-          } else {
+          }
+          //if insight exists then the the addedTime value is assigned and get insights more recent than the addedTime in the exisiting coll
+          else {
             console.log(`insights for ${person.userName} exists in record`)
             insightAddedRef = await db.collection('Users').doc(person.uid).collection('insights')
               .where('addedAt', '>', latestInsightAddedInRecord)
@@ -202,10 +208,11 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
               .limit(documentLimit)
           }
 
+          //Now just query the insights and convert them into a custom object and add it to the WhatsNewObjects Array
           await insightAddedRef.get().then((insightsAdded: DocumentSnapshot[]) => {
 
             insightsAdded.forEach(document => {
-              //Add each new Compliment to the WhatsNewObjects Array
+              //Add each new Insight to the WhatsNewObjects Array
               const whatsNewDoc = {
                 primaryProfileUid: document.data()?.insightOwnerUid,
                 primaryProfileUserName: person.userName,
@@ -234,7 +241,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
   }
 
   async function checkIfWhatsNewObjectsAreSufficient() {
-
+    //get the length of the whatsNewObjects
     const noOfWhatsNewObjects = whatsNewObjects.length
 
     console.log(`no of whats new items is ${noOfWhatsNewObjects}`)
@@ -242,7 +249,6 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
     if (noOfWhatsNewObjects < 80 && interestedPeople.length < noOfFollowing) {
       console.log(`whatsNewItems is less than 80 and there are more followingPeople left to query`)
       //Get the interest meter of the last person in the Array and query the next 50 people & their data
-      
       const lastInterestedPerson = interestedPeople[interestedPeople.length - 1]
       await getTheNext50InterestedPeopleAndTheirData(lastInterestedPerson.interestMeter)
     }

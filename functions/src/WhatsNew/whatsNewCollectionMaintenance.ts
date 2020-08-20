@@ -17,21 +17,20 @@ export const whatsNewCollectionMaintenance = functions.region('asia-east2').fire
         const maxDocsInWhatsNewThreshold = 4
         let noOfWhatsNewDocsDeleted = 0
 
-        if ( currentTotalNoOfItems > maxDocsInWhatsNewThreshold ) {
+        if (currentTotalNoOfItems > maxDocsInWhatsNewThreshold) {
             const excessDocs = currentTotalNoOfItems - maxDocsInWhatsNewThreshold
             await userDocRef.collection('whatsNew')
-            .where('hasRead', '==', true)
-            .orderBy('timeStamp', 'asc')
-            .limit(excessDocs)
-            .get().then( 
-                async ( readWhatsNewItems: DocumentSnapshot[]) => {
-                    for ( const readWhatsNewItem of readWhatsNewItems ) {
-                         await userDocRef.collection('whatsNew').doc(readWhatsNewItem.data()?.id).delete()
-                         noOfWhatsNewDocsDeleted++
-                    }
+                .where('hasRead', '==', true)
+                .orderBy('timestamp', 'asc')
+                .limit(excessDocs)
+                .get().then((readWhatsNewItems: DocumentSnapshot[]) => {
+                    readWhatsNewItems.forEach(async readWhatsNewItem => {
+                        await userDocRef.collection('whatsNew').doc(readWhatsNewItem.data()?.id).delete()
+                        noOfWhatsNewDocsDeleted++
+                    })
                     return decrementTheTotalNoItems(noOfWhatsNewDocsDeleted)
                 })
-            
+
         } else {
             console.log(`no of whatsNewItems is equal to or less than 99`)
             return
@@ -40,8 +39,8 @@ export const whatsNewCollectionMaintenance = functions.region('asia-east2').fire
 
         async function decrementTheTotalNoItems(noOfItemsDeleted: number) {
             await userDocRef.collection('whatsNewRecords').doc('totalNoOfWhatsNewItems').update({
-              totalNoOfWhatsNewItems: admin.firestore.FieldValue.increment(-noOfItemsDeleted)
-            }) 
-          } 
+                totalNoOfWhatsNewItems: admin.firestore.FieldValue.increment(-noOfItemsDeleted)
+            })
+        } 
 
     })
