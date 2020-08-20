@@ -115,3 +115,6 @@ exports.sendInsightLikeNotificationToOwner = sendInsightLikeNotificationToOwner.
 
 import populateWhatsNew = require('./WhatsNew/populateWhatsNew')
 exports.populateWhatsNew = populateWhatsNew.populateWhatsNew
+
+import whatsNewCollectionMaintenance = require('./WhatsNew/whatsNewCollectionMaintenance')
+exports.whatsNewCollectionMaintenance = whatsNewCollectionMaintenance.whatsNewCollectionMaintenance

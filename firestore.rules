@@ -17,11 +17,24 @@ service cloud.firestore {
       allow write: if request.auth.uid == uid;
     }
 
+    match /whatsNewRecords/totalNoOfWhatsNewItems {
+      allow create: if request.resource.data.keys().hasOnly(['totalNoOfWhatsNewItems']);
+      //users are allows to read their totalNoOfWhatsNewItems Document
+      allow read: if request.auth != null;
+    }
+
+    match /whatsNewRecords/noOfUnReadWhatsNewItems {
+      allow create: if request.resource.data.keys().hasOnly(['noOfUnReadWhatsNewItems']);
+      //users are allowed to update how many unRead WhatsNewItems they have
+      allow update: if request.auth.uid == uid;
+      //users are allows to read their noOfUnReadWhatsNewItems Document
+      allow read: if request.auth.uid == uid;
+    }
+
     match /whatsNew/{whatsNewDocId} {
-      allow create: if isCreatingOnlyTotalNoItemsOrNoOfUnReadWhatsItemsDoc();
-      allow update: if isUpdatingOnlyIsReadFieldOrNoOfUnReadItemsField();
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasRead']);
       //users are allows to read their WhatsNew Documents
-      allow read: if true;
+      allow read: if request.auth.uid == uid;
     }
       
       match /following/{followingPersonUid} {
@@ -44,8 +57,8 @@ service cloud.firestore {
 
     //Allow update only if user is updating the isRead field or the noOfUnRead Items field 
     //of the WhatsNewDoc
-    function isUpdatingOnlyIsReadFieldOrNoOfUnReadItemsField() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) ||
+    function isUpdatingOnlyHasReadFieldOrNoOfUnReadItemsField() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasRead']) ||
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfUnReadItems'])
     }
     
