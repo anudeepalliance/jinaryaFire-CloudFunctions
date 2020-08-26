@@ -60,6 +60,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
           const interestedPerson = {
             uid: person.data()?.uid,
             userName: person.data()?.userName,
+            name: person.data()?.name,
             interestMeter: person.data()?.interestMeter
           }
           interestedPeople.push(interestedPerson)
@@ -85,6 +86,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
             const interestedPerson = {
               uid: person.data()?.uid,
               userName: person.data()?.userName,
+              name: person.data()?.name,
               interestMeter: person.data()?.interestMeter
             }
             //push to this main array as we need that for comparision
@@ -156,15 +158,19 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
               const whatsNewDoc = {
                 primaryProfileUid: document.data()?.receiverUid,
                 primaryProfileUserName: document.data()?.receiverUserName,
+                primaryProfileName: document.data()?.receiverName,
                 content: document.data()?.complimentReceivedContent,
                 contentQuestion: null,
                 hasImage: document.data()?.hasImage,
                 secondaryProfileUid: document.data()?.senderUid,
                 secondaryProfileUserName: document.data()?.senderUserName,
-                noOfLIkes: document.data()?.noOfLikes,
+                secondaryProfileName: document.data()?.senderName,
+                noOfLikes: document.data()?.noOfLikes,
+                userLiked: false,
                 timestamp: document.data()?.receivedTime,
                 id: document.data()?.complimentId,
                 hasRead: false,
+                isFollowing: true,
                 contentType: 'PERSON_COMPLIMENT_RECEIVED'
               }
 
@@ -225,15 +231,19 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
               const whatsNewDoc = {
                 primaryProfileUid: document.data()?.insightOwnerUid,
                 primaryProfileUserName: person.userName,
+                primaryProfileName: person.name,
                 content: document.data()?.insightContent,
                 contentQuestion: document.data()?.insightQuestion,
                 hasImage: document.data()?.hasImage,
                 secondaryProfileUid: null,
                 secondaryProfileUserName: null,
-                noOfLIkes: document.data()?.noOfLikes,
+                secondaryProfileName: null,
+                noOfLikes: document.data()?.noOfLikes,
+                userLiked: false,
                 timestamp: document.data()?.addedAt,
                 id: document.data()?.insightId,
                 hasRead: false,
+                isFollowing: true,
                 contentType: 'PERSON_INSIGHT_ADDED'
               }
 
@@ -299,15 +309,19 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
           const whatsNewDoc = {
             primaryProfileUid: person.data()?.uid,
             primaryProfileUserName: person.data()?.userName,
+            primaryProfileName: person.data()?.name,
             content: null,
             contentQuestion: null,
             hasImage: false,
             secondaryProfileUid: null,
             secondaryProfileUserName: null,
-            noOfLIkes: null,
+            secondaryProfileName: null,
+            noOfLikes: null,
+            userLiked: null,
             timestamp: Date.now(),
             id: person.data()?.uid,
             hasRead: false,
+            isFollowing: true,
             contentType: 'POKE_FOR_INSIGHTS'
           }
           await userDocRef.collection('whatsNew').doc(whatsNewDoc.id).set(whatsNewDoc)

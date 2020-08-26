@@ -32,9 +32,18 @@ service cloud.firestore {
     }
 
     match /whatsNew/{whatsNewDocId} {
-      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasRead']);
+      allow update: if isUpdatingOnlyNoOfLikesUserLikedHasReadIsFollowingInWhatsNewDoc();
       //users are allows to read their WhatsNew Documents
       allow read: if request.auth.uid == uid;
+    }
+
+    //In whatsNewSubColl check if user is updating only 
+    //noOfLikes, userLiked, hasRead, isFollowing fields
+    function isUpdatingOnlyNoOfLikesUserLikedHasReadIsFollowingInWhatsNewDoc() {
+      return request.auth.uid == uid && 
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes', 'userLiked']) ||
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasRead']) ||
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isFollowing']);
     }
       
       match /following/{followingPersonUid} {
@@ -46,21 +55,6 @@ service cloud.firestore {
       //allow update if user is trying to update just the number of compliments sent field
       allow update: if isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrInterestMeter();
       }
-
-    
-    //In whatsNewSubColl check if user is creating only 
-    //totalNoOfWhatsNewItems or totalNoOfUnReadWhatsNewItems Doc
-    function isCreatingOnlyTotalNoItemsOrNoOfUnReadWhatsItemsDoc() {
-      return request.resource.data.keys().hasOnly(['totalNoOfItems']) || 
-      request.resource.data.keys().hasOnly(['noOfUnReadItems'])
-    }
-
-    //Allow update only if user is updating the isRead field or the noOfUnRead Items field 
-    //of the WhatsNewDoc
-    function isUpdatingOnlyHasReadFieldOrNoOfUnReadItemsField() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasRead']) ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfUnReadItems'])
-    }
     
     
     function isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrInterestMeter() {
@@ -140,7 +134,8 @@ service cloud.firestore {
     //custom function to check if client is trying to update anything other 
     //than likes or views field of the complimentSent doc
     function isUpdatingOnlyLikesOrViewsCounter() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes', 'noOfViews']);
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) ||
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews']);
     }
 
     //function to track if the complimentReceiver to trying to update the wasRead, senderBlocked or 
