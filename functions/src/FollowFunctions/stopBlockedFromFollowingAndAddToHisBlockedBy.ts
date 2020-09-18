@@ -13,20 +13,6 @@ export const stopBlockedFromFollowingAndAddToTheHisBlockedBy = functions.region(
     const blockedUid = context.params.blockedUid
     const blockerUid = context.params.blockerUid
 
-
-    // async function removeBlockedsWhatsNewItemsFromBlockersWhatsNewColl() {
-    //   db.collection('Users').doc(blockerUid).collection('whatsNew')
-    //     .where('primaryProfileUid', '==', blockedUid)
-    //     .get().then(
-    //       async (blockedPersonWhatsNewDocs: DocumentSnapshot[]) => {
-    //         blockedPersonWhatsNewDocs.forEach(blockedPersonWhatsNewDoc => {
-    //           return db.collection('Users').doc(blockerUid).collection('whatsNew')
-    //             .doc(blockedPersonWhatsNewDoc.id).delete()
-    //         })
-
-    //       })
-    // }
-
     const promises = []
     //Add Blocker to Blocked by Sub Collection of the Blocked
     //User need not know whom all he has been blocked by hence just the Uid is added for
@@ -50,9 +36,6 @@ export const stopBlockedFromFollowingAndAddToTheHisBlockedBy = functions.region(
       })
       promises.push(p2)
     }
-    //Add the delete blockedPerson's whatsNewDocs async function as a promise
-    // const p3 = removeBlockedsWhatsNewItemsFromBlockersWhatsNewColl()
-    // promises.push(p3)
     
     //run all the promises
     return Promise.all(promises)
