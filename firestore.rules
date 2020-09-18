@@ -18,13 +18,13 @@ service cloud.firestore {
     }
 
     match /whatsNewRecords/totalNoOfWhatsNewItems {
-      allow create: if request.resource.data.keys().hasOnly(['totalNoOfWhatsNewItems']);
+      allow create: if request.resource.data.keys().hasOnly(['totalNoOfWhatsNewItems'])
       //users are allows to read their totalNoOfWhatsNewItems Document
       allow read: if request.auth != null;
     }
 
-    match /whatsNewRecords/noOfUnReadWhatsNewItems {
-      allow create: if request.resource.data.keys().hasOnly(['noOfUnReadWhatsNewItems']);
+    match /whatsNewRecords/noOfFollowedPersonUnReadWhatsNewItems {
+      allow create: if request.resource.data.keys().hasOnly(['noOfFollowedPersonUnReadWhatsNewItems'])
       //users are allowed to update how many unRead WhatsNewItems they have
       allow update: if request.auth.uid == uid;
       //users are allows to read their noOfUnReadWhatsNewItems Document
@@ -35,6 +35,8 @@ service cloud.firestore {
       allow update: if isUpdatingOnlyNoOfLikesUserLikedHasReadIsFollowingInWhatsNewDoc();
       //users are allows to read their WhatsNew Documents
       allow read: if request.auth.uid == uid;
+      //allow user to delete a whatsNewDoc only if the content type is poke for insights
+      allow delete: if request.auth.uid == uid && resource.data.contentType == 'POKE_FOR_INSIGHTS'; 
     }
 
     //In whatsNewSubColl check if user is updating only 

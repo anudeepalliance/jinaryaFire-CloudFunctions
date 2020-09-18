@@ -26,7 +26,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
 
   const db = admin.firestore()
   const noOfFollowing: number = populateWhatsNewData.noOfFollowing
-  const noOfInterestedPeopleToQuery = 1
+  const noOfInterestedPeopleToQuery = 10
   const documentLimit = 2
   const whatsNewObjects: any[] = []
   const interestedPeople: any[] = []
@@ -136,8 +136,8 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
               // .orderBy('senderUid')
               .orderBy('receivedTime', 'desc')
               .limit(documentLimit)
-
           }
+          
           //if comp exists then the the receivedTime value is assigned and get comps more recent than the receivedTime in the exisiting coll
           else {
             console.log(`compliments for ${person.userName} exists in record`)
@@ -208,7 +208,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
           })
 
           //if insight does not exist then the value be 0 so just get recent insights
-          if (latestInsightAddedInRecord === 0) {
+          if (latestInsightAddedInRecord === 0) { 
             console.log(`insights for ${person.userName} does not exist n record`)
             insightAddedRef = await db.collection('Users').doc(person.uid).collection('insights')
               .orderBy('addedAt', 'desc')
@@ -288,49 +288,87 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
     await userDocRef.collection('whatsNewRecords').doc('totalNoOfWhatsNewItems').update({
       totalNoOfWhatsNewItems: admin.firestore.FieldValue.increment(noOfWhatsNewObjects)
     })
-    await userDocRef.collection('whatsNewRecords').doc('noOfUnReadWhatsNewItems').update({
-      noOfUnReadWhatsNewItems: admin.firestore.FieldValue.increment(noOfWhatsNewObjects)
+    await userDocRef.collection('whatsNewRecords').doc('noOfFollowedPersonUnReadWhatsNewItems').update({
+      noOfFollowedPersonUnReadWhatsNewItems: admin.firestore.FieldValue.increment(noOfWhatsNewObjects)
     })
 
   }
 
   //Get more NoInsightAdded FollowedPeople to add Poke for Insights WhatsNewDocs
+  //1. get the interestedPeople in order of people who have not added insights
+  //2. Check if the user has already poked that person
+  //3. If not check the person's poke for insights doc already exisits in the user's whatsNewDoc
+  //4. If not then create a poke for insights whatsNewDoc and add it to the user's whatsNewCollection
   async function getNoInsightFollowedPeople() {
-    await userDocRef.collection('following')
-      .where('insightsAdded', '==', false)
-      .orderBy('interestMeter', 'desc')
-      //limit the followedPeople to just how many more we need to meet the maxNumberOfPokeForInsightDocs
-      .limit(maxNumberOfPokeForInsightDocs)
-      .get().then(async (followedPeople: DocumentSnapshot[]) => {
+    //rearrange the items in the interestedPeople Array to have insightAdded == false first
+    interestedPeople.sort(
+      function (a, b) {
+        return a.insightsAdded > b.insightsAdded ? 1 : -1
+      }
+    )
+    //get the number of interestedPeople
+    const noOfInterestedPeople = interestedPeople.length
+    //get the number of excessInterestedPeople
+    const excessNoOfInterestedPeopleForInsightPokes = noOfInterestedPeople - maxNumberOfPokeForInsightDocs
+    //Assign the interestedPeople used for whatsNewDocs into noOfInterestedPeopleForInsights Array
+    const interestedPeopleForInsights = interestedPeople
+    //Remove all the excess number of interestedPeople from the Array
+    interestedPeopleForInsights.splice(maxNumberOfPokeForInsightDocs, excessNoOfInterestedPeopleForInsightPokes)
 
-        followedPeople.forEach(async person => {
+    for (const person of interestedPeopleForInsights) {
 
-          //create a whatsNewObject for this person
-          const whatsNewDoc = {
-            primaryProfileUid: person.data()?.uid,
-            primaryProfileUserName: person.data()?.userName,
-            primaryProfileName: person.data()?.name,
-            content: null,
-            contentQuestion: null,
-            hasImage: false,
-            secondaryProfileUid: null,
-            secondaryProfileUserName: null,
-            secondaryProfileName: null,
-            noOfLikes: null,
-            userLiked: null,
-            timestamp: Date.now(),
-            id: person.data()?.uid,
-            hasRead: false,
-            isFollowing: true,
-            contentType: 'POKE_FOR_INSIGHTS'
-          }
-          await userDocRef.collection('whatsNew').doc(whatsNewDoc.id).set(whatsNewDoc)
-          
-        })
+          const personUid = person.uid
+          const personUserName = person.userName
+          const personName = person.name
 
-        console.log(`${followedPeople.length} followed people have not added insights`)
+          //check if this user hasnt already been poked by the user
+          await db.collection('Users').doc(personUid)
+            .collection('pokersForInsights').doc(userId)
+            .get().then((userAsPokerDoc: DocumentSnapshot) => {
+              //check if the user is not a poker
+              if (!userAsPokerDoc.exists) {
+                console.log(`${personUserName} has not been poked by the user`)
+                //check if this person's poke for insights doc doesnt exist in the user's whatsNewColl
+                userDocRef.collection('whatsNew')
+                  .doc(personUid)
+                  .get().then(
+                    async (pokePersonForInsightWhatsNewDoc: DocumentSnapshot) => {
+                      //check if there is no exisiting poke for insight whatsNewDoc
+                      if ( pokePersonForInsightWhatsNewDoc.exists ) {
+                        console.log(`${personUserName}'s poke for insights doc already exists in the user's whatsNewColl`)
+                      } else {
+                        console.log(`${personUserName}'s poke for insights doc does not exist in the user's whatsNewColl`)
+                        //doesnt exist in the user's whatsNewColl so add it to the user's whatsNewColl
+                        //create a whatsNewObject for this person
+                        const whatsNewDoc = {
+                          primaryProfileUid: personUid,
+                          primaryProfileUserName: personUserName,
+                          primaryProfileName: personName,
+                          content: null,
+                          contentQuestion: null,
+                          hasImage: false,
+                          secondaryProfileUid: null,
+                          secondaryProfileUserName: null,
+                          secondaryProfileName: null,
+                          noOfLikes: null,
+                          userLiked: null,
+                          timestamp: Date.now(),
+                          id: person.uid,
+                          hasRead: false,
+                          isFollowing: true,
+                          contentType: 'POKE_FOR_INSIGHTS'
+                        }
+  
+                        //push this poke for Insight to whatsNewColl after the checks
+                        await userDocRef.collection('whatsNew').doc(whatsNewDoc.id).set(whatsNewDoc)
+                      }
+                  })
+              } else {
+                console.log(`${personUserName} has been poked already by the user`)
+              }
+            })
 
-      })
+        }
 
   }
 

@@ -5,31 +5,69 @@ const utilityFunctions = require('frequentFunctions')
 
 //When client followes a user, a firestore .onCreate() background function is triggered to
 //1.add follower to the followed's followers sub collection
-//2.an FCM notification to sent to the users
-//3.A Notification doc is added to Notification Sub Collection
+//2.an FCM notification to sent to the followed
+//3.A Notification doc is added to Notification Sub Collection of the Followed
 export const addTheNewFollower = functions.region('asia-east2').firestore.document
   ('Users/{followerUserId}/following/{followedUserId}').onCreate((data, context) => {
 
+    const db = admin.firestore()
     //get follower and followee Uids for identification
     const followedUid = context.params.followedUserId
     //for identification and notification payload data (Intent Extras for client)
     const followerUid = context.params.followerUserId
+    //get reference to the follower's whatsNewSubColl
+    const followerWhatsNewColl = db.collection('Users').doc(followerUid).collection('whatsNew')
+    //get reference to the follower's noOfFollowedPersonUnReadWhatsNewItems
+    const noOfFollowedPersonUnReadWhatsNewItemsDoc = db.collection('Users').doc(followerUid).collection('whatsNewRecords').doc('noOfFollowedPersonUnReadWhatsNewItems')
+
+    //find the followed person's whatsNew items and mark the following status as true, 
+    //then increment the noOfFollowedPersonUnReadWhatsNewItems
+    //by one if that whatsItem's hasRead field is false as this is a doc that user should read now
+    async function markFollowedPersonWhatsNewItemsFollowingStatusToTrueAndIncrementNoOfUnReadItems() {
+      await followerWhatsNewColl
+        .where('primaryProfileUid', '==', followedUid)
+        .get().then(
+          async (followedWhatsNewItems: DocumentSnapshot[]) => {
+            //check if there are followedPerson's whatsNew items
+            if (followedWhatsNewItems.length !== null) {
+              //loop through each item
+              followedWhatsNewItems.forEach(async followedWhatsNewItem => {
+
+                //update the following status to true
+                await followerWhatsNewColl.doc(followedWhatsNewItem.data()?.id).update({
+                  isFollowing: true
+                })
+
+                //if the whatsNewItem hasRead is false then increment the noOfFollowedPersonUnReadWhatsNewItems
+                if (followedWhatsNewItem.data()?.hasRead === false) {
+                  await noOfFollowedPersonUnReadWhatsNewItemsDoc.update({
+                    noOfFollowedPersonUnReadWhatsNewItems: admin.firestore.FieldValue.increment(1)
+                  })
+                }
+
+              })
+            } else {
+              //print a message to console that no Followed Person whatsNewItems
+              console.log('no Followed Person whatsNewItems available')
+            }
+          })
+    }
 
     // Check if follower is blocked by the followed, if yes then throw an error
-    return admin.firestore().collection('Users').doc(followedUid).collection('blocked')
+    return db.collection('Users').doc(followedUid).collection('blocked')
       .doc(followerUid).get().then((blockedFollower: DocumentSnapshot ) => {
         if (blockedFollower.exists) {
           //print a message to console that follower was not added
           console.log('cannot add follower, follower is blocked by followed')
           //remove the followed from follower's following sub coll
-          return admin.firestore().collection('Users').doc(followerUid)
+          return db.collection('Users').doc(followerUid)
             .collection('following').doc(followedUid).delete()
 
         } else {
           //Follower is not blocked by followed so carry on with the logic
 
           //Find out if Followed is following the Follower already
-          return admin.firestore().collection('Users').doc(followedUid).collection('following')
+          return db.collection('Users').doc(followedUid).collection('following')
             .doc(followerUid).get().then((followerPerson: DocumentSnapshot) => {
 
               let followedFollowingBack = false
@@ -41,7 +79,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
 
               //Get Follower user details that needs to be duplicated to the Followed's follower Sub Coll
               //And also added to the notification Payload data
-              return admin.firestore().collection('Users').doc(followerUid).collection('ProfileInfo')
+              return db.collection('Users').doc(followerUid).collection('ProfileInfo')
                 .doc(followerUid).get().then((followerUserProfileDoc: DocumentSnapshot) => {
 
 
@@ -61,7 +99,7 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
                   const followerThumbnailImageUrl = followerUserProfileDoc.data()!.photoUrl
 
                   //get the notification token of the followed to identify & send notification to his device
-                  return admin.firestore().collection('Users').doc(followedUid).collection('notificationToken')
+                  return db.collection('Users').doc(followedUid).collection('notificationToken')
                     .doc('theNotificationToken').get().then((notificationTokenDoc: DocumentSnapshot) => {
 
                       //the fields to be same as the ones at Fs
@@ -114,18 +152,22 @@ export const addTheNewFollower = functions.region('asia-east2').firestore.docume
 
                       const promises = []
                       //Add the follower to the followee sub-collection
-                      const p = admin.firestore().collection('Users').doc(followedUid).collection('followers').doc(followerUid).set(followerData)
+                      const p = db.collection('Users').doc(followedUid).collection('followers').doc(followerUid).set(followerData)
                       promises.push(p)
                       //Add the notification doc to the user's notification sub collection
-                      const p1 = admin.firestore().collection('Users').doc(followedUid).collection('Notifications').doc(followerUid).set(notificationObject)
+                      const p1 = db.collection('Users').doc(followedUid).collection('Notifications').doc(followerUid).set(notificationObject)
                       promises.push(p1)
                       //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
                       //if ( followeeNotificationToken ) {
                       //Send the notification to the user
                       const p2 = admin.messaging().sendToDevice(followedNotificationToken, notificationPayload)
                       promises.push(p2)
+                      //save the async function as a promise
+                      const p3 = markFollowedPersonWhatsNewItemsFollowingStatusToTrueAndIncrementNoOfUnReadItems()
+                      promises.push(p3)
                       //run all the promises
                       return Promise.all(promises)
+
                     })
 
                 })
