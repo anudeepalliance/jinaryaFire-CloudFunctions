@@ -118,3 +118,9 @@ exports.populateWhatsNew = populateWhatsNew.populateWhatsNew
 
 import whatsNewCollectionMaintenance = require('./WhatsNew/whatsNewCollectionMaintenance')
 exports.whatsNewCollectionMaintenance = whatsNewCollectionMaintenance.whatsNewCollectionMaintenance
+
+import deleteWhatsNewDocWhenCompReceivedDeleted = require('./WhatsNew/deleteWhatsNewDocWhenCompReceivedDeleted')
+exports.deleteWhatsNewDocWhenCompReceivedDeleted = deleteWhatsNewDocWhenCompReceivedDeleted.deleteWhatsNewDocWhenCompReceivedDeleted
+
+import deleteWhatsNewDocWhenInsightAddedDeleted = require('./WhatsNew/deleteWhatsNewDocWhenInsightAddedDeleted')
+exports.deleteWhatsNewDocWhenInsightAddedDeleted = deleteWhatsNewDocWhenInsightAddedDeleted.deleteWhatsNewDocWhenInsightAddedDeleted

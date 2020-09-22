@@ -52,7 +52,7 @@ export const whatsNewCollectionMaintenance = functions.region('asia-east2').fire
 
         async function deleteAllUnFollowedWhatsNewItems() {
             await userDocRef.collection('whatsNew')
-                .where('isFollowing', '==', true)
+                .where('isFollowing', '==', false)
                 .get().then((unFollowedWhatsNewItems: DocumentSnapshot[]) => {
                     unFollowedWhatsNewItems.forEach(async unFollowedWhatsNewItem => {
                         await userDocRef.collection('whatsew').doc(unFollowedWhatsNewItem.data()?.id).delete()

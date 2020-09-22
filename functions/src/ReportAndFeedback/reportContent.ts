@@ -17,6 +17,7 @@ const admin = require('firebase-admin')
         //grab all the fields from the data sent by the client and add it to Firestore Doc
         content : userReportContentData.content,
         ownerUid : userReportContentData.ownerUid,
+        ownerUserName : userReportContentData.ownerUserName,
         receiverUid : userReportContentData.receiverUid,
         sentTime : userReportContentData.sentTime,
         contentCategory : userReportContentData.contentCategory,
@@ -24,6 +25,7 @@ const admin = require('firebase-admin')
         noOfViews : userReportContentData.noOfViews,
         contentId : userReportContentData.contentId,
         reportedTime : userReportContentData.reportedTime,
+        reportedFriendlyTime : userReportContentData.reportedFriendlyTime,
         reportCategory : userReportContentData.reportCategory
      }).then(() => {
       return { ownerUid : userReportContentData.ownerUid}

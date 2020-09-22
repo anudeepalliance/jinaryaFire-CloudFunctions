@@ -5,7 +5,6 @@ const admin = require('firebase-admin')
 //1. remove blocker(himself) from the blocked person's following sub collection
 //2. adds blocker to the blockedBy sub coll of the blocked
 //3. removes blocked as a follower of the blocked
-//4. remove blockeds whatsNewItems from the blockers WhatsNewSubColl
 export const stopBlockedFromFollowingAndAddToTheHisBlockedBy = functions.region('asia-east2').firestore.document
   ('Users/{blockerUid}/blocked/{blockedUid}').onCreate(async (blockedData, context) => {
 
@@ -36,7 +35,7 @@ export const stopBlockedFromFollowingAndAddToTheHisBlockedBy = functions.region(
       })
       promises.push(p2)
     }
-    
+
     //run all the promises
     return Promise.all(promises)
 
