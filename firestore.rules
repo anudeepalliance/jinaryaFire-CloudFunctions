@@ -42,10 +42,21 @@ service cloud.firestore {
     //In whatsNewSubColl check if user is updating only 
     //noOfLikes, userLiked, hasRead, isFollowing fields
     function isUpdatingOnlyNoOfLikesUserLikedHasReadIsFollowingInWhatsNewDoc() {
-      return request.auth.uid == uid && 
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes', 'userLiked']) ||
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasRead']) ||
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isFollowing']);
+      return request.auth.uid == uid 
+      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes', 'userLiked','hasRead', 'hasRead','isFollowing']) 
+      && noOfLikesIsGreaterOrLessThanByOne();
+      // || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasRead'])
+      // || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isFollowing']);
+    }
+
+    function noOfLikesIsGreaterOrLessThanByOne() {
+      return request.resource.data.noOfLikes == resource.data.noOfLikes + 1 || 
+      request.resource.data.noOfLikes == resource.data.noOfLikes - 1;
+    }
+
+    function noOfViewsIsGreaterOrLessThanByOne() {
+      return request.resource.data.noOfViews == resource.data.noOfViews + 1 || 
+      request.resource.data.noOfViews == resource.data.noOfViews - 1;
     }
       
       match /following/{followingPersonUid} {
@@ -60,9 +71,9 @@ service cloud.firestore {
     
     
     function isUpdatingOnlyNoOfCompsSentOrComplimentSentAtOrInterestMeter() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']) || 
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt']) || 
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['interestMeter'])
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent','complimentSentAt','interestMeter']) 
+      // || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentSentAt']) 
+      // || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['interestMeter'])
     }
 
     //custom function to check if client is trying to update anything other 
@@ -136,26 +147,25 @@ service cloud.firestore {
     //custom function to check if client is trying to update anything other 
     //than likes or views field of the complimentSent doc
     function isUpdatingOnlyLikesOrViewsCounter() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) ||
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews']);
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) &&
+      noOfLikesIsGreaterOrLessThanByOne() ||
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews']) &&
+      noOfViewsIsGreaterOrLessThanByOne();
     }
 
     //function to track if the complimentReceiver to trying to update the wasRead, senderBlocked or 
     //followingStatus Booleans in the ComplimentReceived Doc
     function isComplimentReceiverUpdatingWasReadOrComplimentBlockedOrFollowingStatusOrReceivedLikedField() {
       return resource.data.receiverUid == uid && 
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentRead']) ||
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderBlocked']) ||
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverLiked']) ||
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followingStatus']);
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['complimentRead', 'senderBlocked', 'receiverLiked', 'followingStatus']);
+      // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderBlocked']) ||
+      // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverLiked']) ||
+      // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followingStatus']);
     }
 
     function isComplimentSenderUpdatingReceiverBlockedStatusOrSenderNameOrSenderUserNameOrSenderLikedField() {
       return resource.data.senderUid == request.auth.uid && 
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiverBlocked', 'senderName', 'senderLiked','senderUserName']);
-        // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderName']) ||
-        // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderLiked']) ||
-        // request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderUserName']);
     }
 
     //Check if the requested client is a follower
@@ -166,50 +176,11 @@ service cloud.firestore {
     //Check if the insight owner is updating ownerLiked field
     function isInsightOwnerUpdatingOwnerLikedOrNoOfLikesField() {
       return request.auth.uid == uid && 
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerLiked', 'noOfLikes'])
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerLiked', 'noOfLikes']) &&
+        noOfLikesIsGreaterOrLessThanByOne();
     }
 
-    //The rules for complimentsReceivedLike Docs
-    match /complimentsReceived/{randomComplimentId} {
-      //allow read for compliment receivers, the followers and compliment senders
-      //sender is already a follower but separate rule is added just in case the sender unfollows a person later
-      allow read: if request.auth.uid == uid
-      || isFollower()
-      || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
-
-      //allow create for the followers
-      // allow create: if exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid))
-      //compliments are sent and received via CF only so no one is allowed to create compliments
-      allow create: if false
-
-      //allow update only if trying to update the likes or viewCounter fields
-      allow update: if isUpdatingOnlyLikesOrViewsCounter() ||
-        isComplimentReceiverUpdatingWasReadOrComplimentBlockedOrFollowingStatusOrReceivedLikedField() ||
-        isComplimentSenderUpdatingReceiverBlockedStatusOrSenderNameOrSenderUserNameOrSenderLikedField();
-
-      //allow delete compliment to only the receiver
-      allow delete: if request.auth.uid == uid;
-    }
-
-
-    //get complimentReceivedDocData
-    function getComplimentReceivedDocData() {
-      return get(/databases/$(database)/documents/Users/$(request.data.receiverUid)/complimentsReceived/{randomComplimentId}).data
-    }
-
-        //The rules for complimentsReceivedLikes sub coll
-        match /complimentsReceived/{randomComplimentId}/complimentLikes/{likerUid} {
-        //allow read, create for compliment receivers, the followers and compliment senders
-        //sender is already a follower but separate rule is added just in case the sender unfollows a person later
-        allow read, create: if request.auth.uid == uid
-         || isFollower()
-          || getComplimentReceivedDocData().data.senderUid == request.auth.uid;
-
-        //allow delete to only the likers so users can unlike their own likes and cannot unlike for other users
-        allow delete: if request.auth.uid == likerUid;
-        }
-
-    //The rules for insights sub coll
+        //The rules for insights sub coll
     match /insights/{randomInsightId} {
       //allow read for insight owners and the followers
       allow read: if request.auth.uid == uid
@@ -235,6 +206,41 @@ service cloud.firestore {
         allow delete: if request.auth.uid == likerUid;
         }
 
+    //The rules for complimentsReceivedLike Docs
+    match /complimentsReceived/{randomComplimentId} {
+      //allow read for compliment receivers, the followers and compliment senders
+      //senders view the comp based on collection group rules written at the bottom of this file
+      allow read: if request.auth.uid == uid;
+
+      //allow create for the followers
+      // allow create: if exists(/databases/$(database)/documents/Users/$(uid)/followers/$(request.auth.uid))
+      //compliments are sent and received via CF only so no one is allowed to create compliments
+      allow create: if false
+
+      //allow update only if trying to update the likes or viewCounter fields
+      allow update: if isUpdatingOnlyLikesOrViewsCounter() ||
+        isComplimentReceiverUpdatingWasReadOrComplimentBlockedOrFollowingStatusOrReceivedLikedField() ||
+        isComplimentSenderUpdatingReceiverBlockedStatusOrSenderNameOrSenderUserNameOrSenderLikedField();
+
+      //allow delete compliment to only the receiver
+      allow delete: if request.auth.uid == uid;
+    }
+
+   //The rules for complimentsReceivedLikes sub coll
+   match /complimentsReceived/{randomComplimentId}/complimentLikes/{likerUid} {
+      //allow any logged in user to read the likers and add themselves as likers
+      //users need the complimentId to read and add themselves as likers to that compliment
+      //and since compliment rules are secure this rule will not be insecure as the compliment ID is secure
+      allow read, create: if request.auth.uid != null;
+
+      //allow delete to only the likers so users can unlike their own likes and cannot unlike for other users
+      allow delete: if request.auth.uid == likerUid;
+    }
+
+    // //get complimentReceivedDocData
+    // function getComplimentReceivedDocData(randomComplimentId) {
+    //   return get(/databases/$(database)/documents/Users/$(request.data.receiverUid)/complimentsReceived/$(randomComplimentId)).data
+    // }
     
     //End of Users/{uid} parent
     }
