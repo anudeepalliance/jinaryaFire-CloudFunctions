@@ -17,22 +17,21 @@ export const updateUserInfoAtTheFollowedPeople = functions.region('asia-east2').
 
         const updaterFollowingColl = admin.firestore().collection('Users').doc(updatersUserId).collection('following')
 
-        return updaterFollowingColl.get().then(
-            async (querySnapshot: { docs: DocumentSnapshot[] }) => {
-                await Promise.all(querySnapshot.docs.map((doc) => {
-                    //get the followed uid
-                    const followedUid = doc.id
-                    //go to the follower Doc in the followed's followers sub collection
-                    const updatersDocAtFollowed = admin.firestore().collection('Users').doc(followedUid).collection('followers')
-                        .doc(updatersUserId)
-                    return updatersDocAtFollowed.update({
+        async function updateUserDetails() {
+            await updaterFollowingColl.get().then(async ( followedUserDocs: DocumentSnapshot[]) => {
+
+                followedUserDocs.forEach(async followedUserDoc => {
+                    const followedUid = followedUserDoc.data()?.uid
+                    await admin.firestore().collection('Users').doc(followedUid).collection('followers').doc(updatersUserId).update({
                         name: newName,
                         nameLowerCase: newNameLowerCase,
                         uid: updatersUserId,
                         userName: newUserName,
                         bio: newBio
-                    })
+                        })
                 })
-                )
             })
+        }
+
+        return updateUserDetails()
     })

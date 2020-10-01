@@ -15,15 +15,20 @@ export const markTheFollowedPersonCompsReceivedToTrue = functions.region('asia-e
         const followedPersonCompsReceivedDocs = admin.firestore().collection('Users').doc(followerUid).collection('complimentsReceived')
             .where('senderUid', '==', followedUid)
 
-        return followedPersonCompsReceivedDocs.get().then(
-            async (querySnapshot: DocumentSnapshot[] ) => {
-                await Promise.all(querySnapshot.map((doc) => {
-                    //get a reference to the document
-                    const complimentDocRef = doc.ref
-                    return complimentDocRef.update({
-                        followingStatus: true
-                    })
+        async function markAllFollowingStatusToTrue() {
+            await followedPersonCompsReceivedDocs.get().then(async ( compReceivedDocs: DocumentSnapshot[]) => {
+
+                compReceivedDocs.forEach(async compReceivedDoc => {
+                    const complimentId = compReceivedDoc.data()?.complimentId
+                    await admin.firestore().collection('Users').doc(followerUid).collection('complimentsReceived')
+                        .doc(complimentId).update({
+                            followingStatus: true
+                        })
                 })
-                )
             })
+        }
+
+        return markAllFollowingStatusToTrue()
+
+            
     })

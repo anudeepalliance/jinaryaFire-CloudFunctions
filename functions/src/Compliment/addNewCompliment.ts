@@ -37,7 +37,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
           senderUserName: complimentData.senderUserName,
           senderName: complimentData.senderName,
           senderUid: complimentData.senderUid,
-          complimentReceivedContent: complimentData.complimentReceivedContent,
+          complimentContent: complimentData.complimentContent,
           receiverUid: complimentData.receiverUid,
           receiverUserName: complimentData.receiverUserName,
           receiverName: complimentData.receiverName,
@@ -90,7 +90,7 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
             const nofiticationDocId = utilityFunctions.randomId()
 
             const notificationObject = {
-              message: `${complimentData.complimentReceivedContent}`,
+              message: `${complimentData.complimentContent}`,
               receivedTime: Date.now(),
               senderUserName: complimentData.senderUserName,
               senderUid: complimentData.senderUid,

@@ -15,15 +15,18 @@ export const markTheUnFollowedCompsReceivedToFalse = functions.region('asia-east
         const unFollowedPersonCompsReceivedDocs = admin.firestore().collection('Users').doc(unFollowerUid).collection('complimentsReceived')
             .where('senderUid', '==', unFollowedUid)
 
-        return unFollowedPersonCompsReceivedDocs.get().then(
-            async (querySnapshot: DocumentSnapshot[]) => {
-                await Promise.all(querySnapshot.map((doc) => {
-                    //get a reference to the document
-                    const complimentDocRef = doc.ref
-                    return complimentDocRef.update({
-                        followingStatus: false
+
+            async function markAllFollowingStatusToFalse() {
+                await unFollowedPersonCompsReceivedDocs.get().then(async ( compReceivedDocs: DocumentSnapshot[]) => {
+                    compReceivedDocs.forEach(async compReceivedDoc => {
+                        const complimentId = compReceivedDoc.data()?.complimentId
+                        await admin.firestore().collection('Users').doc(unFollowerUid).collection('complimentsReceived')
+                            .doc(complimentId).update({
+                                followingStatus: false
+                            })
                     })
                 })
-                )
-            })
+            } 
+
+        return markAllFollowingStatusToFalse()
     })

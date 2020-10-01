@@ -36,7 +36,7 @@ service firebase.storage {
         
         //rules for the compliment images folder
         match /complimentsSent/{allPaths=**} {
-          //allow anyone to create complimentSent Images to any userId
+          //allow senders to create complimentSent Images
           allow create: if request.auth.uid == userId
           //if they are uploading then the photo size cannot be
           //more than 2MB

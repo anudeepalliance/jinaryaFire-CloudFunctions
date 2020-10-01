@@ -15,21 +15,18 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
         //create a firestore reference variable
         const db = admin.firestore()
 
-        //Check if the poked has any pending pokers
-        return db.collection('Users').doc(pokedUid).collection('pokersForInsights')
-            .get().then((pokers: DocumentSnapshot[] ) => {
-                if (pokers.length === 0) {
-                    console.log('The poked does not have any pending Pokers');
+        let pokedUserName : String = ""
+        let pokedPhotoUrl : String = ""
+
+        async function sendNotificationIfPokersExist() {
+            await db.collection('Users').doc(pokedUid).collection('pokersForInsights').get().then(async (pokers: DocumentSnapshot[]) => {
+                if (pokers.toString().length === 0) {
+                    console.log('The poked does not have any pending Pokers')
                     return
                 } else {
-
+                    console.log('The poked does have Pokers')
                     //get the poked UserName and his profile Photo Url for the notification payload
-                    return db.collection('Users').doc(pokedUid).collection('ProfileInfo')
-                        .doc(pokedUid).get().then((pokedUserProfileDoc: { exists: any; data: () => any }) => {
-
-                            //get the userName of the Poked
-                            const pokedUserName = pokedUserProfileDoc.data().userName
-                            const pokedPhotoUrl = pokedUserProfileDoc.data().photoUrl
+                    await getPokedPersonDetails()
 
                             //Create the Notification Payload content
                             const notificationPayload = {
@@ -74,35 +71,39 @@ export const sendNotificationToThePokers = functions.region('asia-east2').firest
                                 notificationId: nofiticationDocId
                             }
 
-                            //initialize a promises array for all the tasks
-                            const promises = []
-
-                            pokers.forEach(poker => {
+                            pokers.forEach(async poker => {
 
                                 const pokerUid = poker.data()?.uid
 
                                 //get this poker's notificationToken, send a notification and then delete the poker
-                                const p = db.collection('Users').doc(pokerUid).collection('notificationToken')
-                                    .doc('theNotificationToken').get().then((notificationTokenDoc: { exists: any; data: () => any }) => {
+                                await db.collection('Users').doc(pokerUid).collection('notificationToken')
+                                    .doc('theNotificationToken').get().then(async (notificationTokenDoc: DocumentSnapshot) => {
                                         //send a notification to this poker with his notificationToken
-                                        const p1 = admin.messaging().sendToDevice(notificationTokenDoc.data().notificationToken, notificationPayload)
-                                        promises.push(p1)
+                                        await admin.messaging().sendToDevice(notificationTokenDoc.data()?.notificationToken, notificationPayload)
                                         //delete the poker
-                                        const p2 = poker.ref.delete()
-                                        promises.push(p2)
+                                        const pokerDocPath = poker.ref.path
+                                        await db.doc(pokerDocPath).delete()
                                         //Add the notification doc to the user's notification sub collection
-                                        const p3 = db.collection('Users').doc(pokerUid).collection('Notifications')
+                                        await db.collection('Users').doc(pokerUid).collection('Notifications')
                                             .doc(insightData.data().insightId).set(notificationObject)
-                                        promises.push(p3)
+
                                     })
 
-                                promises.push(p)
-
                             })
-
-                        })
                 }
-
             })
+        }
+
+        //get the poked UserName and his profile Photo Url for the notification payload
+        async function getPokedPersonDetails() {
+            await db.collection('Users').doc(pokedUid).collection('ProfileInfo')
+                .doc(pokedUid).get().then(async (pokedUserProfileDoc: DocumentSnapshot) => {
+                    //get the userName of the Poked
+                    pokedUserName = pokedUserProfileDoc.data()?.userName
+                    pokedPhotoUrl = pokedUserProfileDoc.data()?.photoUrl
+                })
+        }
+
+        return sendNotificationIfPokersExist()
 
     })

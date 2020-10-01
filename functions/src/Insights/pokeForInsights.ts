@@ -59,7 +59,7 @@ export const pokeForTheInsights = functions.region('asia-east2').https.onCall((p
                                     const notificationPayload = {
                                         notification: {
                                             title: `${pokeForInsightData.pokerUserName} has poked you`,
-                                            body: `too add Insights`,
+                                            body: `to add Insights`,
                                             //Add an additional intent filter in manifest file for android for the activity with the name 
                                             //same as the clickAction here or Off Screen Notification click action wont work
                                             clickAction: ".insights.writeInsight.WriteInsight",

@@ -15,26 +15,24 @@ export const updateUserInfoAtTheComplimentLikes = functions.region('asia-east2')
         const newUserName = upDatedUserData?.userName
         const newBio = upDatedUserData?.bio
 
-        const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimentLikes').where('uid', '==', `${updatersUserId}`)
+        const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimentLikes')
+            .where('uid', '==', `${updatersUserId}`)
 
-        return userComplimentLikedUserDocs.get().then(
-            async (querySnapshot: DocumentSnapshot[]) => {
-                await Promise.all(querySnapshot.map((doc) => {
-                    //get a string representation of the documentPath and use that to update the doc
-                    const complimentLikerDocPath = doc.ref.path
-                    //get a DB reference to the userDoc at complimentLike
-                    const userAtComplimentLike = admin.firestore().doc(complimentLikerDocPath)
-                    return userAtComplimentLike.update({
+        async function updateUserInfoAtCompLikes() {
+            await userComplimentLikedUserDocs.get().then(async (compLikerDocs: DocumentSnapshot[]) => {
+                compLikerDocs.forEach(async compLikerDoc => {
+                    const docPath = compLikerDoc.ref.path
+                    await admin.firestore().doc(docPath).update({
                         name: newName,
                         nameLowerCase: newNameLowerCase,
                         userName: newUserName,
                         uid: updatersUserId,
                         bio: newBio
-                    })
-
+                        })
                 })
-                )
-
             })
+        }
+
+        return updateUserInfoAtCompLikes()
 
     })

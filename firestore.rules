@@ -222,8 +222,9 @@ service cloud.firestore {
         isComplimentReceiverUpdatingWasReadOrComplimentBlockedOrFollowingStatusOrReceivedLikedField() ||
         isComplimentSenderUpdatingReceiverBlockedStatusOrSenderNameOrSenderUserNameOrSenderLikedField();
 
-      //allow delete compliment to only the receiver
-      allow delete: if request.auth.uid == uid;
+      //allow delete compliment to only the receiver and the sender
+      allow delete: if request.auth.uid == uid ||
+        request.auth.uid == resource.data.senderUid;
     }
 
    //The rules for complimentsReceivedLikes sub coll

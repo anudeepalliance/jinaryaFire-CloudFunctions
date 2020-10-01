@@ -16,16 +16,14 @@ export const updateUserInfoAtTheComplimentsSentNumbers = functions.region('asia-
         const newBio = upDatedUserData?.bio
         const newInsightsAdded = upDatedUserData?.insightsAdded
 
-        const userComplimentsSentNumbersDocs = admin.firestore().collectionGroup('complimentsSentNumbers').where('uid', '==', `${updatersUserId}`)
+        const userComplimentsSentNumbersDocs = admin.firestore().collectionGroup('complimentsSentNumbers')
+            .where('uid', '==', `${updatersUserId}`)
 
-        return userComplimentsSentNumbersDocs.get().then(
-            async (querySnapshot: DocumentSnapshot[]) => {
-                await Promise.all(querySnapshot.map((doc) => {
-                    //get a string representation of the documentPath and use that to update the doc
-                    const complimentsSentNumbersDocPath = doc.ref.path
-                    //get a DB representation of the documentPath and use that to update the doc
-                    const userAtCompSentNumbers = admin.firestore().doc(complimentsSentNumbersDocPath)
-                    return userAtCompSentNumbers.update({
+        async function updateUserDetails() {
+            await userComplimentsSentNumbersDocs.get().then(async (userDocs: DocumentSnapshot[]) => {
+                userDocs.forEach(async userDoc => {
+                    const userDocPath = userDoc.ref.path
+                    await admin.firestire().doc(userDocPath).update({
                         name: newName,
                         nameLowerCase: newNameLowerCase,
                         userName: newUserName,
@@ -33,6 +31,11 @@ export const updateUserInfoAtTheComplimentsSentNumbers = functions.region('asia-
                         insightsAdded: newInsightsAdded
                     })
                 })
-                )
+
             })
+        }
+        
+
+        return updateUserDetails()
+    
     })

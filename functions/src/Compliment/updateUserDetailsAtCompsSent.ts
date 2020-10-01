@@ -30,22 +30,20 @@ export const updateTheUserDetailsAtCompsSent = functions.region('asia-east2').fi
             const compsSentByUpdaterDocs = admin.firestore().collectionGroup('complimentsReceived')
                 .where('senderUid', '==', `${updaterUid}`)
 
-            return compsSentByUpdaterDocs.get().then(
-                async (querySnapshot: DocumentSnapshot[] ) => {
-                    await Promise.all(querySnapshot.map((doc) => {
-                        //get a string representation of the documentPath and use that to update the doc
-                        const compsSentDocPath = doc.ref.path
-                        //get a DB reference to the compsSent by the updater
-                        const compSentByUpdater = admin.firestore().doc(compsSentDocPath)
-                        return compSentByUpdater.update({
+            
+            async function updateUserDetailsAtAllCompsSent() {
+                await compsSentByUpdaterDocs.get().then(async (compSentDocs: DocumentSnapshot[]) => {
+                    compSentDocs.forEach(async compSentDoc => {
+                        const complimentDocPath = compSentDoc.ref.path
+                        await admin.firestore().doc(complimentDocPath).update({
                             senderName: newName,
-                            senderUserName: newUserName,
-                        })
-
+                            senderUserName: newUserName
+                            })
                     })
-                    )
-
                 })
+            }
+
+            return updateUserDetailsAtAllCompsSent()
         }
 
     })

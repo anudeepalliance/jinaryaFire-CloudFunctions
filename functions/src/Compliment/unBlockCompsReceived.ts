@@ -15,15 +15,18 @@ export const unBlockTheCompsReceived = functions.region('asia-east2').firestore.
         const unBlockedCompsReceivedDocs = admin.firestore().collection('Users').doc(unBlockerUid).collection('complimentsReceived')
             .where('senderUid', '==', unBlockedUid)
 
-        return unBlockedCompsReceivedDocs.get().then(
-            async (querySnapshot: DocumentSnapshot[] ) => {
-                await Promise.all(querySnapshot.map((doc) => {
-                    //get a reference to the document
-                    const complimentDocRef = doc.ref
-                    return complimentDocRef.update({
-                        senderBlocked: false
-                    })
+        async function markAllUnBlockedCompsReceivedToFalse() {
+            await unBlockedCompsReceivedDocs.get().then(async (compReceivedDocs: DocumentSnapshot[]) => {
+                compReceivedDocs.forEach(async compReceivedDoc => {
+                    const complimentId = compReceivedDoc.data()?.complimentId
+                    await admin.firestore().collection('Users').doc(unBlockerUid).collection('complimentsReceived')
+                        .doc(complimentId).update({
+                            senderBlocked: false
+                        })
                 })
-                )
             })
+        }
+    
+
+        return markAllUnBlockedCompsReceivedToFalse()
     })
