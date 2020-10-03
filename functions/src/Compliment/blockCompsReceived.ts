@@ -10,20 +10,34 @@ export const blockTheCompsReceived = functions.region('asia-east2').firestore.do
         //get blocker's and blocked's Uids for identification
         const blockerUid = context.params.userId
         const blockedUid = context.params.blockedUid
+        //variable to track the noOfCompliments unblocked
+        let noOfCompsBlocked = 0
 
         //Get all the compliment received documents from the blocked user
         const blockedCompsReceivedDocs = admin.firestore().collection('Users').doc(blockerUid).collection('complimentsReceived')
             .where('senderUid', '==', blockedUid)
+        //get the userProfile document of the blocker
+        const blockerUserProfileDocRef = admin.firestore().collection('Users').doc(blockerUid).collection('ProfileInfo')
+            .doc(blockerUid)
 
-        return blockedCompsReceivedDocs.get().then(
-            async (querySnapshot: DocumentSnapshot[] ) => {
-                await Promise.all(querySnapshot.map((doc) => {
-                    //get a reference to the document
-                    const complimentDocRef = doc.ref
-                    return complimentDocRef.update({
-                        senderBlocked: true
-                    })
+
+        async function markAllBlockedCompsReceivedSenderBlockedToTrue() {
+            await blockedCompsReceivedDocs.get().then(async (compReceivedDocs: DocumentSnapshot[]) => {
+                compReceivedDocs.forEach(async compReceivedDoc => {
+                    noOfCompsBlocked++
+                    const complimentId = compReceivedDoc.data()?.complimentId
+                    await admin.firestore().collection('Users').doc(blockerUid).collection('complimentsReceived')
+                        .doc(complimentId).update({
+                            senderBlocked: true
+                        })
                 })
-                )
+                //increment the noOfComplimentsReceived field by noOfComps unblocked
+                await blockerUserProfileDocRef.update({
+                    noOfComplimentsReceived: admin.firestore.FieldValue.increment(-noOfCompsBlocked)
+                })
             })
+        }
+
+        return markAllBlockedCompsReceivedSenderBlockedToTrue()
+
     })

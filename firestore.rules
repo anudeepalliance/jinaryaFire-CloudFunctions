@@ -96,7 +96,7 @@ service cloud.firestore {
         //Only the owner can create and read
         //can update if updating the noOfComplimentsSent
         allow read, create: if request.auth.uid == uid;
-        allow update: if request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent']);
+        allow update: if request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent', 'interestMeter']);
       }
       
       match /blocked/{blockedPersonUid} {
@@ -275,6 +275,17 @@ service cloud.firestore {
         //everyone can read insight ideas, only admins will create & write to this via console
         allow read: if true;
       }
+
+  
+  //allow logged in users to create reports on other users or any content
+  //reading and deleting the reports are not allowed
+  match /ReportPerson/{reportId} {
+    allow create: if request.auth.uid != null;
+  }
+
+    match /ReportContent/{reportId} {
+    allow create: if request.auth.uid != null;
+  }
 
 
   //End of rules

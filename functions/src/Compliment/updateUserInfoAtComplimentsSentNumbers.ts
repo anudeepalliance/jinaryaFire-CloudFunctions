@@ -13,8 +13,6 @@ export const updateUserInfoAtTheComplimentsSentNumbers = functions.region('asia-
         const newNameLowerCase = upDatedUserData?.nameLowerCase
         const updatersUserId = upDatedUserData?.uid
         const newUserName = upDatedUserData?.userName
-        const newBio = upDatedUserData?.bio
-        const newInsightsAdded = upDatedUserData?.insightsAdded
 
         const userComplimentsSentNumbersDocs = admin.firestore().collectionGroup('complimentsSentNumbers')
             .where('uid', '==', `${updatersUserId}`)
@@ -27,8 +25,6 @@ export const updateUserInfoAtTheComplimentsSentNumbers = functions.region('asia-
                         name: newName,
                         nameLowerCase: newNameLowerCase,
                         userName: newUserName,
-                        bio: newBio,
-                        insightsAdded: newInsightsAdded
                     })
                 })
 

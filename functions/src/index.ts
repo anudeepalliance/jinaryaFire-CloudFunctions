@@ -22,12 +22,12 @@ import sendUserFeedback = require('./ReportAndFeedback/sendUserFeedback')
 exports.sendUserFeedback = sendUserFeedback.sendFeedback
 
 
-import reportPerson = require('./ReportAndFeedback/reportPerson')
-exports.reportPerson = reportPerson.reportThePerson
+// import reportPerson = require('./ReportAndFeedback/reportPerson')
+// exports.reportPerson = reportPerson.reportThePerson
 
 
-import reportContent = require('./ReportAndFeedback/reportContent')
-exports.reportContent = reportContent.reportTheContent
+// import reportContent = require('./ReportAndFeedback/reportContent')
+// exports.reportContent = reportContent.reportTheContent
 
 import addNewFollower = require('./FollowFunctions/addNewFollower')
 exports.addNewFollower = addNewFollower.addTheNewFollower
@@ -38,10 +38,10 @@ exports.removeUserAsFollower = removeUserAsFollower.removeUserAsTheFollower
 
 
 import stopBlockedFromFollowingAndAddToHisBlockedBy = require('./FollowFunctions/stopBlockedFromFollowingAndAddToHisBlockedBy')
-exports.stopBlockedFromFollowingAndAddToHisBlockedBy = stopBlockedFromFollowingAndAddToHisBlockedBy.stopBlockedFromFollowingAndAddToTheHisBlockedBy
+exports.stopBlockedFromFollowingAndAddToHisBlockedBy = stopBlockedFromFollowingAndAddToHisBlockedBy.stopBlockedFromFollowingAndAddToHisBlockedBy
 
 import removeUnBlockeeFromBlockedBy = require('./FollowFunctions/removeUnBlockeeFromBlockedBy')
-exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeTheUnBlockeeFromBlockedBy
+exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeUnBlockeeFromBlockedBy
 
 
 import updateUserInfoAtFollowedPeople = require('./FollowFunctions/updateUserInfoAtFollowedPeople')

@@ -10,22 +10,39 @@ export const unBlockTheCompsSent = functions.region('asia-east2').firestore.docu
         //get blocker's and blocked's Uids for identification
         const unBlockerUid = context.params.userId
         const unBlockedUid = context.params.blockedUid
+        //variable to track the noOfCompliments unblocked
+        let noOfCompsUnblocked = 0
 
         //Get all the compliment received documents from the blocked user
         const unBlockedCompsSentDocs = admin.firestore().collectionGroup('complimentsReceived')
             .where('senderUid', '==', unBlockerUid).where('receiverUid', '==', unBlockedUid)
+        //get the userProfile document of the unBlocker
+        const unBlockerUserProfileDocRef = admin.firestore().collection('Users').doc(unBlockerUid).collection('ProfileInfo')
+            .doc(unBlockerUid)
+        //get the compsSentNumbers document of the blocker
+        const unBlockerCompsSentNumbersDocRef = admin.firestore().collection('Users').doc(unBlockerUid).collection('complimentsSentNumbers')
+            .doc(unBlockedUid)
 
-        async function markAllUnBlockedCompsSentToFalse() {
+
+        async function markAllUnBlockedCompsSentReceiverBlockedToFalse() {
             await unBlockedCompsSentDocs.get().then(async (compSentDocs: DocumentSnapshot[]) => {
                 compSentDocs.forEach(async compSentDoc => {
-                    const complimentId = compSentDoc.data()?.complimentId
-                    await admin.firestore().collection('Users').doc(unBlockerUid).collection('complimentsReceived')
-                        .doc(complimentId).update({
-                            receiverBlocked: false
+                    noOfCompsUnblocked++
+                    const complimentDocRef = compSentDoc.ref.path
+                    await admin.firestore().doc(complimentDocRef).update({
+                        receiverBlocked: false
                         })
+                })
+                //increment the noOfComplimentsReceived field by noOfComps unblocked
+                await unBlockerUserProfileDocRef.update({
+                    noOfComplimentsSent: admin.firestore.FieldValue.increment(noOfCompsUnblocked)
+                })
+                //increment at complimentsSentNumbers
+                await unBlockerCompsSentNumbersDocRef.update({
+                    noOfComplimentsSent: admin.firestore.FieldValue.increment(noOfCompsUnblocked)
                 })
             })
         }
 
-        return markAllUnBlockedCompsSentToFalse()
+        return markAllUnBlockedCompsSentReceiverBlockedToFalse()
     })

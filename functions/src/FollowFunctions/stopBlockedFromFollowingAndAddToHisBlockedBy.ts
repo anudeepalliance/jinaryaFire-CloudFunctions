@@ -2,10 +2,11 @@ import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
 
 //When client blocks a person, Firestore triggers a background function to 
-//1. remove blocker(himself) from the blocked person's following sub collection
-//2. adds blocker to the blockedBy sub coll of the blocked
-//3. removes blocked as a follower of the blocked
-export const stopBlockedFromFollowingAndAddToTheHisBlockedBy = functions.region('asia-east2').firestore.document
+//1. adds blocker to the blockedBy sub coll of the blocked
+//2. Stop the Blocked from following the Blocker
+//3. decrement the noOfFollowing of the blocked
+//4. set the interestMeter at blocked's compsSentNosDoc of the blocker to 0
+export const stopBlockedFromFollowingAndAddToHisBlockedBy = functions.region('asia-east2').firestore.document
   ('Users/{blockerUid}/blocked/{blockedUid}').onCreate(async (blockedData, context) => {
 
     const db = admin.firestore()
@@ -35,6 +36,17 @@ export const stopBlockedFromFollowingAndAddToTheHisBlockedBy = functions.region(
       })
       promises.push(p2)
     }
+    //Check if the blocker exists in the compsSentNosColl of the blocked
+    const compsSentNosDocOfBlockerDocRef = db.collection('Users').doc(blockedUid).collection('complimentsSentNumbers').doc(blockerUid)
+    const compsSentNosDocOfBlocker = await compsSentNosDocOfBlockerDocRef.get()
+    if ( compsSentNosDocOfBlocker.exists ) {
+      //set the interestMeter to 0 at blocked's compsSentNosDoc of the blocker
+      const p3 = compsSentNosDocOfBlockerDocRef.update({
+        interestMeter: 0
+      })
+      promises.push(p3)
+    }
+
 
     //run all the promises
     return Promise.all(promises)
