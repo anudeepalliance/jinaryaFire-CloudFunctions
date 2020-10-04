@@ -8,31 +8,41 @@ export const updateUserInfoAtTheComplimentLikes = functions.region('asia-east2')
     ('Users/{userId}').onUpdate((change, context) => {
 
         const upDatedUserData = change.after.data()
+        const oldUserData = change.before.data()
+
+        //The old user details
+        const oldName: String = oldUserData?.name
+        const oldUserName: String = oldUserData?.userName
 
         const newName = upDatedUserData?.name
         const newNameLowerCase = upDatedUserData?.nameLowerCase
         const updatersUserId = upDatedUserData?.uid
         const newUserName = upDatedUserData?.userName
-        const newBio = upDatedUserData?.bio
 
-        const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimentLikes')
-            .where('uid', '==', `${updatersUserId}`)
+        //check if either userName or Name was changed as these are only fields that needs to be updated
+        //at the compliments sent docs, not interested in insightsAdded field
+        if (newName === oldName && newUserName === oldUserName) {
+            console.log('The user did not update his userName or Name so returning from this function');
+            return Promise
+        } else {
 
-        async function updateUserInfoAtCompLikes() {
-            await userComplimentLikedUserDocs.get().then(async (compLikerDocs: DocumentSnapshot[]) => {
-                compLikerDocs.forEach(async compLikerDoc => {
-                    const docPath = compLikerDoc.ref.path
-                    await admin.firestore().doc(docPath).update({
-                        name: newName,
-                        nameLowerCase: newNameLowerCase,
-                        userName: newUserName,
-                        uid: updatersUserId,
-                        bio: newBio
+            const userComplimentLikedUserDocs = admin.firestore().collectionGroup('complimentLikes')
+                .where('uid', '==', `${updatersUserId}`)
+
+            async function updateUserInfoAtCompLikes() {
+                await userComplimentLikedUserDocs.get().then(async (compLikerDocs: DocumentSnapshot[]) => {
+                    compLikerDocs.forEach(async compLikerDoc => {
+                        const docPath = compLikerDoc.ref.path
+                        await admin.firestore().doc(docPath).update({
+                            name: newName,
+                            nameLowerCase: newNameLowerCase,
+                            userName: newUserName
                         })
+                    })
                 })
-            })
-        }
+            }
 
-        return updateUserInfoAtCompLikes()
+            return updateUserInfoAtCompLikes()
+        }
 
     })

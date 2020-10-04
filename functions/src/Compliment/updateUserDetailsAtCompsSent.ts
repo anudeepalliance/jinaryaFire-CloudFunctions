@@ -20,7 +20,7 @@ export const updateTheUserDetailsAtCompsSent = functions.region('asia-east2').fi
         const oldUserName: String = oldUserData?.userName
 
         //check if either userName or Name was changed as these are only fields that needs to be updated
-        //at the compliments sent docs, not interested in bio field
+        //at the compliments sent docs, not interested in insightsAdded field
         if (newName === oldName && newUserName === oldUserName) {
             console.log('The user did not update his userName or Name so returning from this function');
             return Promise
@@ -30,7 +30,7 @@ export const updateTheUserDetailsAtCompsSent = functions.region('asia-east2').fi
             const compsSentByUpdaterDocs = admin.firestore().collectionGroup('complimentsReceived')
                 .where('senderUid', '==', `${updaterUid}`)
 
-            
+
             async function updateUserDetailsAtAllCompsSent() {
                 await compsSentByUpdaterDocs.get().then(async (compSentDocs: DocumentSnapshot[]) => {
                     compSentDocs.forEach(async compSentDoc => {
@@ -38,7 +38,7 @@ export const updateTheUserDetailsAtCompsSent = functions.region('asia-east2').fi
                         await admin.firestore().doc(complimentDocPath).update({
                             senderName: newName,
                             senderUserName: newUserName
-                            })
+                        })
                     })
                 })
             }
