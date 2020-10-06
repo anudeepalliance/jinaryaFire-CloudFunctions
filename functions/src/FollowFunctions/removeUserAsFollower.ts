@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //When client un-follows a user, it calls a background FS triggered function to remove the client
 //from the unfollowed's followers sub collection
-export const removeUserAsTheFollower = functions.region('asia-east2').firestore.document
+export const removeUserAsFollower = functions.region('asia-east2').firestore.document
   ('Users/{unFollowerUid}/following/{unFollowedUid}').onDelete((data, context) => {
 
     const db = admin.firestore()

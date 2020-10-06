@@ -7,7 +7,7 @@ const utilityFunctions = require('frequentFunctions')
 //1.it is added to the compliments received sub collection of the receiver via callable Cf as the sender does not have permission to write that sub collection
 //2.A Notification payload is created and sent via FCM to the client
 //3. A Notification Object is created and added to the Notifications Sub Collection of the Client
-export const addTheNewCompliment = functions.region('asia-east2').https.onCall((complimentData, context) => {
+export const addNewCompliment = functions.region('asia-east2').https.onCall((complimentData, context) => {
 
   const db = admin.firestore()
 
@@ -17,6 +17,27 @@ export const addTheNewCompliment = functions.region('asia-east2').https.onCall((
       'unauthenticated',
       'only authenticated users can send feedback'
     )
+  }
+
+  async function checkIfSenderIsBlocked() {
+    //For safety check if the comp sender is blocked by the received
+    await db.collection('Users').doc(complimentData.receiverUid).collection('blocked')
+      .doc(complimentData.senderUid).get().then((doc: DocumentSnapshot) => {
+        if (doc.exists) {
+          throw new functions.https.HttpsError(
+            'unauthenticated',
+            'Sender is blocked by receiver'
+          )
+        } else {
+          //sender is not blocked so continue with the function
+          return addNewCompliment()
+
+        }
+      }
+  }
+
+  async function addNewCompliment() {
+    
   }
 
   //Check if the sender is blocked by the recipent, if yes then throw an error

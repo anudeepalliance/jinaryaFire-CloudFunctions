@@ -7,7 +7,7 @@ const utilityFunctions = require('frequentFunctions')
 //1. Check if there are some pending pokers in the pokersForInsights Sub Collection
 //2. If yes then get their Notification Tokens, them send them all FCM notifications and Notification Docs
 //3. Then delete the pokers from the sub collection so they are not notified unnecesarily for future insights
-export const sendNotificationToThePokers = functions.region('asia-east2').firestore.document
+export const sendNotificationToPokers = functions.region('asia-east2').firestore.document
     ('Users/{pokedUid}/insights/{insightId}').onCreate((insightData, context) => {
 
         //get pokedUid

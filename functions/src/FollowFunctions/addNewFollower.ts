@@ -7,7 +7,7 @@ const utilityFunctions = require('frequentFunctions')
 //1.add follower to the followed's followers sub collection
 //2.an FCM notification to sent to the followed
 //3.A Notification doc is added to Notification Sub Collection of the Followed
-export const addTheNewFollower = functions.region('asia-east2').firestore.document
+export const addNewFollower = functions.region('asia-east2').firestore.document
   ('Users/{followerUserId}/following/{followedUserId}').onCreate((data, context) => {
 
     const db = admin.firestore()

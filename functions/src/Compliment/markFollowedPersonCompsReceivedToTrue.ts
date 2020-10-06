@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //When a user follows another user then set the compsReceived from the followed person
 //following status field to true so that comp receiver has the updated comp received doc
-export const markTheFollowedPersonCompsReceivedToTrue = functions.region('asia-east2').firestore.document
+export const markFollowedPersonCompsReceivedToTrue = functions.region('asia-east2').firestore.document
     ('Users/{userId}/following/{followedUid}').onCreate((data, context) => {
 
         //get blocker's and blocked's Uids for identification

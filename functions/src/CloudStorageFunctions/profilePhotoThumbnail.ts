@@ -7,7 +7,7 @@ const os = require('os')
 const fs = require('fs')
 
 
-export const profilePhotoMakeThumbnail = functions.region('asia-east2').storage.object()
+export const profilePhotoThumbnail = functions.region('asia-east2').storage.object()
 .onFinalize(async (object: { bucket: any; name: any; contentType: any; }) => {
   
   //The Storage bucket in Cloud Storage that contains the file

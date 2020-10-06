@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //When a user updates his userDoc with name or UserName then this updated info needs to be
 //reflected in all the compliments Sent Docs by this person, this will run only if name or userName was changed
-export const updateTheUserDetailsAtCompsSent = functions.region('asia-east2').firestore.document
+export const updateUserDetailsAtCompsSent = functions.region('asia-east2').firestore.document
     ('Users/{userId}').onUpdate((change, context) => {
 
         const upDatedUserData = change.after.data()

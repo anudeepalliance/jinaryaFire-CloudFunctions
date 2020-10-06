@@ -9,7 +9,7 @@ const utilityFunctions = require('frequentFunctions')
 //2.Add Poker to the pokersForInsights sub collection of the poked
 //3.A Notification payload is created and sent via FCM to the poked person
 //4.Create and add a Notification Doc of the type Insight Pokes to poked person
-export const pokeForTheInsights = functions.region('asia-east2').https.onCall((pokeForInsightData, context) => {
+export const pokeForInsights = functions.region('asia-east2').https.onCall((pokeForInsightData, context) => {
 
     //check if request came from an authenticated user
     if (!context.auth) {

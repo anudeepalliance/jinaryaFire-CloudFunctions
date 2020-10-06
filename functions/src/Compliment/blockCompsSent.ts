@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //When a user blocks another user then set the compliments Sent receivedBlocked field to true
 //So the blocker or blocked dont see the compliments exchanged between them
-export const blockTheCompsSent = functions.region('asia-east2').firestore.document
+export const blockCompsSent = functions.region('asia-east2').firestore.document
     ('Users/{userId}/blocked/{blockedUid}').onCreate((data, context) => {
 
         //get blocker's and blocked's Uids for identification

@@ -30,11 +30,11 @@ exports.sendUserFeedback = sendUserFeedback.sendFeedback
 // exports.reportContent = reportContent.reportTheContent
 
 import addNewFollower = require('./FollowFunctions/addNewFollower')
-exports.addNewFollower = addNewFollower.addTheNewFollower
+exports.addNewFollower = addNewFollower.addNewFollower
 
 
 import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
-exports.removeUserAsFollower = removeUserAsFollower.removeUserAsTheFollower
+exports.removeUserAsFollower = removeUserAsFollower.removeUserAsFollower
 
 
 import stopBlockedFromFollowingAndAddToHisBlockedBy = require('./FollowFunctions/stopBlockedFromFollowingAndAddToHisBlockedBy')
@@ -45,10 +45,10 @@ exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeUnBloc
 
 
 import updateUserInfoAtFollowedPeople = require('./FollowFunctions/updateUserInfoAtFollowedPeople')
-exports.updateUserInfoAtFollowedPeople = updateUserInfoAtFollowedPeople.updateUserInfoAtTheFollowedPeople
+exports.updateUserInfoAtFollowedPeople = updateUserInfoAtFollowedPeople.updateUserInfoAtFollowedPeople
 
 import updateUserInfoToFollowers = require('./FollowFunctions/updateUserInfoToFollowers')
-exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToTheFollowers
+exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToFollowers
 
 //curently not in use, this function creates a thumbnail version of the profile image uploaded CS
 //but does not retrieve the URL of the uploaded thumbnail Image, hence this done at the client for now
@@ -57,31 +57,31 @@ exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToTh
 
 
 import addNewCompliment = require('./Compliment/addNewCompliment')
-exports.addNewCompliment = addNewCompliment.addTheNewCompliment
+exports.addNewCompliment = addNewCompliment.addNewCompliment
 
 import updateUserInfoAtComplimentLikes = require('./Compliment/updateUserInfoAtComplimentLikes')
-exports.updateUserInfoAtComplimentLikes = updateUserInfoAtComplimentLikes.updateUserInfoAtTheComplimentLikes
+exports.updateUserInfoAtComplimentLikes = updateUserInfoAtComplimentLikes.updateUserInfoAtComplimentLikes
 
 import updateUserInfoAtComplimentsSentNumbers = require('./Compliment/updateUserInfoAtComplimentsSentNumbers')
-exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSentNumbers.updateUserInfoAtTheComplimentsSentNumbers
+exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSentNumbers.updateUserInfoAtComplimentsSentNumbers
 
 import decrementCompSentNoAndDeleteCompImage = require('./Compliment/decrementCompSentNoAndDeleteCompImage')
-exports.decrementCompSentNoAndDeleteCompImage = decrementCompSentNoAndDeleteCompImage.decrementTheCompSentNoAndDeleteCompImage
+exports.decrementCompSentNoAndDeleteCompImage = decrementCompSentNoAndDeleteCompImage.decrementCompSentNoAndDeleteCompImage
 
 import notificationDocsLimit = require('./Maintenance/notificationDocsLimit')
 exports.notificationDocsLimit = notificationDocsLimit.deleteThe101thNotificationDoc
 
 import pokeForInsights = require('./Insights/pokeForInsights')
-exports.pokeForInsights = pokeForInsights.pokeForTheInsights
+exports.pokeForInsights = pokeForInsights.pokeForInsights
 
 import sendNotificationToPokers = require('./Insights/sendNotificationToPokers')
-exports.sendNotificationToPokers = sendNotificationToPokers.sendNotificationToThePokers
+exports.sendNotificationToPokers = sendNotificationToPokers.sendNotificationToPokers
 
 import blockCompsReceived = require('./Compliment/blockCompsReceived')
-exports.blockCompsReceived = blockCompsReceived.blockTheCompsReceived
+exports.blockCompsReceived = blockCompsReceived.blockCompsReceived
 
 import blockCompsSent = require('./Compliment/blockCompsSent')
-exports.blockCompsSent = blockCompsSent.blockTheCompsSent
+exports.blockCompsSent = blockCompsSent.blockCompsSent
 
 import unBlockCompsReceived = require('./Compliment/unBlockCompsReceived')
 exports.unBlockCompsReceived = unBlockCompsReceived.unBlockTheCompsReceived
@@ -90,13 +90,13 @@ import unBlockCompsSent = require('./Compliment/unBlockCompsSent')
 exports.unBlockCompsSent = unBlockCompsSent.unBlockTheCompsSent
 
 import markFollowedPersonCompsReceivedToTrue = require('./Compliment/markFollowedPersonCompsReceivedToTrue')
-exports.markFollowedPersonCompsReceivedToTrue = markFollowedPersonCompsReceivedToTrue.markTheFollowedPersonCompsReceivedToTrue
+exports.markFollowedPersonCompsReceivedToTrue = markFollowedPersonCompsReceivedToTrue.markFollowedPersonCompsReceivedToTrue
 
 import markUnFollowedCompsReceivedToFalse = require('./Compliment/markUnFollowedCompsReceivedToFalse')
-exports.markUnFollowedCompsReceivedToFalse = markUnFollowedCompsReceivedToFalse.markTheUnFollowedCompsReceivedToFalse
+exports.markUnFollowedCompsReceivedToFalse = markUnFollowedCompsReceivedToFalse.markUnFollowedCompsReceivedToFalse
 
 import updateUserDetailsAtCompsSent = require('./Compliment/updateUserDetailsAtCompsSent')
-exports.updateUserDetailsAtCompsSent = updateUserDetailsAtCompsSent.updateTheUserDetailsAtCompsSent
+exports.updateUserDetailsAtCompsSent = updateUserDetailsAtCompsSent.updateUserDetailsAtCompsSent
 
 import sendCompLikeNotificationToReceiver = require('./Compliment/sendCompLikeNotificationToReceiver')
 exports.sendCompLikeNotificationToReceiver = sendCompLikeNotificationToReceiver.sendCompLikeNotificationToReceiver
@@ -105,10 +105,10 @@ import sendCompLikeNotificationToSender = require('./Compliment/sendCompLikeNoti
 exports.sendCompLikeNotificationToSender = sendCompLikeNotificationToSender.sendCompLikeNotificationToSender
 
 import incrementNoOfFollowers = require('./FollowFunctions/incrementNoOfFollowers')
-exports.incrementNoOfFollowers = incrementNoOfFollowers.incrementTheNoOfFollowers
+exports.incrementNoOfFollowers = incrementNoOfFollowers.incrementNoOfFollowers
 
 import decrementNoOfFollowers = require('./FollowFunctions/decrementNoOfFollowers')
-exports.decrementNoOfFollowers = decrementNoOfFollowers.decrementTheNoOfFollowers
+exports.decrementNoOfFollowers = decrementNoOfFollowers.decrementNoOfFollowers
 
 import sendInsightLikeNotificationToOwner = require('./Insights/sendInsightLikeNotificationToOwner')
 exports.sendInsightLikeNotificationToOwner = sendInsightLikeNotificationToOwner.sendInsightLikeNotificationToOwner

@@ -27,12 +27,13 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
   const db = admin.firestore()
   const noOfFollowing: number = populateWhatsNewData.noOfFollowing
   const noOfInterestedPeopleToQuery = 10
-  const documentLimit = 2
+  const documentLimitPerInterestedPerson = 2
   const whatsNewObjects: any[] = []
   const interestedPeople: any[] = []
   let latestCompReceivedTimeInRecord = 0
   let latestInsightAddedInRecord = 0
   const maxNumberOfPokeForInsightDocs = 10
+  const maxNumberOfWhatsNewObjects = 20
 
   //check if request came from an authenticated user
   if (!context.auth) {
@@ -135,7 +136,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
               // .where('senderUid', '<', userId)
               // .orderBy('senderUid')
               .orderBy('receivedTime', 'desc')
-              .limit(documentLimit)
+              .limit(documentLimitPerInterestedPerson)
           }
           
           //if comp exists then the the receivedTime value is assigned and get comps more recent than the receivedTime in the exisiting coll
@@ -147,7 +148,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
               // .orderBy('senderUid')
               .where('receivedTime', '>', latestCompReceivedTimeInRecord)
               .orderBy('receivedTime', 'desc')
-              .limit(documentLimit)
+              .limit(documentLimitPerInterestedPerson)
           }
 
           //Now just query the comps and convert them into a custom object and add it to the WhatsNewObjects Array
@@ -159,7 +160,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
                 primaryProfileUid: document.data()?.receiverUid,
                 primaryProfileUserName: document.data()?.receiverUserName,
                 primaryProfileName: document.data()?.receiverName,
-                content: document.data()?.complimentReceivedContent,
+                content: document.data()?.complimentContent,
                 contentQuestion: null,
                 hasImage: document.data()?.hasImage,
                 secondaryProfileUid: document.data()?.senderUid,
@@ -212,7 +213,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
             console.log(`insights for ${person.userName} does not exist n record`)
             insightAddedRef = await db.collection('Users').doc(person.uid).collection('insights')
               .orderBy('addedAt', 'desc')
-              .limit(documentLimit)
+              .limit(documentLimitPerInterestedPerson)
           }
           //if insight exists then the the addedTime value is assigned and get insights more recent than the addedTime in the exisiting coll
           else {
@@ -220,7 +221,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
             insightAddedRef = await db.collection('Users').doc(person.uid).collection('insights')
               .where('addedAt', '>', latestInsightAddedInRecord)
               .orderBy('addedAt', 'desc')
-              .limit(documentLimit)
+              .limit(documentLimitPerInterestedPerson)
           }
 
           //Now just query the insights and convert them into a custom object and add it to the WhatsNewObjects Array
@@ -265,7 +266,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
 
     console.log(`no of whats new items is ${noOfWhatsNewObjects}`)
     //check if whatsNewObjects are less than 80 and there more followedPeople to get data from
-    if (noOfWhatsNewObjects < 80 && interestedPeople.length < noOfFollowing) {
+    if (noOfWhatsNewObjects < maxNumberOfWhatsNewObjects && interestedPeople.length < noOfFollowing) {
       console.log(`whatsNewItems is less than 80 and there are more followingPeople left to query`)
       //Get the interest meter of the last person in the Array and query the next 50 people & their data
       const lastInterestedPerson = interestedPeople[interestedPeople.length - 1]
@@ -321,7 +322,7 @@ export const populateWhatsNew = functions.region('asia-east2').https.onCall((pop
           const personUserName = person.userName
           const personName = person.name
 
-          //check if this user hasnt already been poked by the user
+          //check if this person hasnt already been poked by the user
           await db.collection('Users').doc(personUid)
             .collection('pokersForInsights').doc(userId)
             .get().then((userAsPokerDoc: DocumentSnapshot) => {

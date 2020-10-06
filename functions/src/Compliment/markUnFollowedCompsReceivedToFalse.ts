@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //When a user UnFollows another user then set the compsReceived from the UnFollowed person
 //following status field to false so that comp receiver has the updated comp received doc
-export const markTheUnFollowedCompsReceivedToFalse = functions.region('asia-east2').firestore.document
+export const markUnFollowedCompsReceivedToFalse = functions.region('asia-east2').firestore.document
     ('Users/{userId}/following/{followedUid}').onDelete((data, context) => {
 
         //get blocker's and blocked's Uids for identification
