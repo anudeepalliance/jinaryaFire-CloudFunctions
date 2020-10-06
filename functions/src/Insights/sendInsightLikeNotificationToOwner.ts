@@ -25,9 +25,14 @@ export const sendInsightLikeNotificationToOwner = functions.region('asia-east2')
             console.log('liker is same as owner')
             return Promise
         } else {
+            return sendNotification()
+
+        }
+
+        async function sendNotification() {
             //get the likerProfilePhotoUrl
-            return admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
-                .doc(likerUid).get().then((likerUserProfileDoc: DocumentSnapshot) => {
+            await admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
+                .doc(likerUid).get().then(async(likerUserProfileDoc: DocumentSnapshot) => {
                     //the likerProfilePhotoUrl
                     const likerProfileImageUrl = likerUserProfileDoc.data()!.photoUrl
 
@@ -75,23 +80,17 @@ export const sendInsightLikeNotificationToOwner = functions.region('asia-east2')
                     }
 
                     //get the senderNotification Token of the receiver
-                    return admin.firestore().collection('Users').doc(ownerUid).collection('notificationToken')
-                        .doc('theNotificationToken').get().then((notificationTokenDoc: DocumentSnapshot) => {
-                            const senderNotificationToken = notificationTokenDoc.get('notificationToken')
-                            //initiate an empty promises Array
-                            const promises = []
+                    await admin.firestore().collection('Users').doc(ownerUid).collection('notificationToken')
+                        .doc('theNotificationToken').get().then(async(notificationTokenDoc: DocumentSnapshot) => {
+                            const senderNotificationToken = await notificationTokenDoc.get('notificationToken')
                             //send a notification to the sender
-                            const p = admin.messaging().sendToDevice(senderNotificationToken, notificationPayload)
-                            promises.push(p)
+                            await admin.messaging().sendToDevice(senderNotificationToken, notificationPayload)
                             //add a notificationDoc to the sender
-                            const p1 = admin.firestore().collection('Users').doc(ownerUid).collection('Notifications').doc(nofiticationDocId).set(notificationObject)
-                            promises.push(p1)
-                            //run all the promises
-                            return Promise.all(promises)
-
+                            await admin.firestore().collection('Users').doc(ownerUid).collection('Notifications').doc(nofiticationDocId).set(notificationObject)
                         })
 
                 })
         }
+
     })
 

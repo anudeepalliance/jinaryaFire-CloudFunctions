@@ -24,11 +24,18 @@ export const sendCompLikeNotificationToReceiver = functions.region('asia-east2')
             console.log('liker is same as receiver')
             return Promise
         } else {
-            //get the likerProfilePhotoUrl
-            return admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
-                .doc(likerUid).get().then((likerUserProfileDoc: DocumentSnapshot) => {
+
+            return sendTheNotification()
+        }
+            
+        async function sendTheNotification() {
+
+            //get the liker userProfile doc for profilePhotoUrl
+            await admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
+                .doc(likerUid).get().then(async (likerUserProfileDoc: DocumentSnapshot) => {
+
                     //the likerProfilePhotoUrl
-                    const likerProfileImageUrl = likerUserProfileDoc.data()!.photoUrl
+                    const likerProfileImageUrl = likerUserProfileDoc.data()?.photoUrl
 
                     //Create the Notification Payload content
                     const notificationPayload = {
@@ -72,23 +79,21 @@ export const sendCompLikeNotificationToReceiver = functions.region('asia-east2')
                         notificationId: nofiticationDocId
                     }
 
-                    //get the receiverNotification Token of the receiver
-                    return admin.firestore().collection('Users').doc(receiverUid).collection('notificationToken')
-                        .doc('theNotificationToken').get().then((notificationTokenDoc: DocumentSnapshot) => {
-                            const receiverNotificationToken = notificationTokenDoc.get('notificationToken')
-                            //initiate an empty promises Array
-                            const promises = []
+                    //Get the notification token of the compReceiver
+                    await admin.firestore().collection('Users').doc(receiverUid).collection('notificationToken')
+                        .doc('theNotificationToken').get().then(async (notificationTokenDoc: DocumentSnapshot) => {
+
+                            const receiverNotificationToken = await notificationTokenDoc.data()?.notificationToken
                             //send a notification to the receiver
-                            const p = admin.messaging().sendToDevice(receiverNotificationToken, notificationPayload)
-                            promises.push(p)
+                            await admin.messaging().sendToDevice(receiverNotificationToken, notificationPayload)
                             //add a notificationDoc to the receiver
-                            const p1 = admin.firestore().collection('Users').doc(receiverUid).collection('Notifications').doc(nofiticationDocId).set(notificationObject)
-                            promises.push(p1)
-                            //run all the promises
-                            return Promise.all(promises)
+                            await admin.firestore().collection('Users').doc(receiverUid).collection('Notifications').doc(nofiticationDocId).set(notificationObject)
 
                         })
 
                 })
+
         }
+
+
     })
