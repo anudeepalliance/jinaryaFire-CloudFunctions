@@ -34,13 +34,15 @@ export const sendCompLikeNotificationToSender = functions.region('asia-east2').f
                         console.log('liker is same as sender')
                         return Promise
                     } else {
-                        return sendTheNotification(senderUid)
+                        const complimentContent = complimentDoc.data()?.complimentContent
+                        return sendTheNotification(senderUid, complimentContent)
 
                     }
                 })
         }
 
-        async function sendTheNotification(theSenderUid : String) {
+        async function sendTheNotification(theSenderUid : String, theComplimentContent : String) {
+
             //get the likerProfilePhotoUrl
             await admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
                 .doc(likerUid).get().then(async (likerUserProfileDoc: DocumentSnapshot) => {
@@ -50,8 +52,8 @@ export const sendCompLikeNotificationToSender = functions.region('asia-east2').f
                     //Create the Notification Payload content
                     const notificationPayload = {
                         notification: {
-                            title: 'Your compliment received a Like',
-                            body: `${likerUserName}`,
+                            title: `${likerUserName} liked your compliment`,
+                            body: theComplimentContent,
                             //Add an additional intent filter in manifest file for android for the activity with the name 
                             //same as the clickAction here or Off Screen Notification click action wont work
                             clickAction: ".compliments.likedComplimentSent.LikeReceivedComplimentSentActivity",
@@ -70,7 +72,7 @@ export const sendCompLikeNotificationToSender = functions.region('asia-east2').f
                     const nofiticationDocId = utilityFunctions.randomId()
 
                     const notificationObject = {
-                        message: null,
+                        message: theComplimentContent,
                         receivedTime: Date.now(),
                         senderUserName: likerUserName,
                         senderUid: likerUid,

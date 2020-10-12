@@ -24,11 +24,18 @@ export const sendCompLikeNotificationToReceiver = functions.region('asia-east2')
             console.log('liker is same as receiver')
             return Promise
         } else {
+            return getTheComplimentContentAndSendCompliment()
+        }
 
-            return sendTheNotification()
+        async function getTheComplimentContentAndSendCompliment() {
+            await admin.firestore().collection('Users').doc(receiverUid).collection('complimentsReceived')
+                .doc(complimentId).get().then(async(complimentDoc: DocumentSnapshot) => {
+                    const complimentContent = complimentDoc.data()?.complimentContent
+                    await sendTheNotification(complimentContent)
+                })
         }
             
-        async function sendTheNotification() {
+        async function sendTheNotification(complimentContent: String) {
 
             //get the liker userProfile doc for profilePhotoUrl
             await admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
@@ -40,8 +47,8 @@ export const sendCompLikeNotificationToReceiver = functions.region('asia-east2')
                     //Create the Notification Payload content
                     const notificationPayload = {
                         notification: {
-                            title: 'Your compliment received a Like',
-                            body: `${likerUserName}`,
+                            title: `${likerUserName} has liked your compliment`,
+                            body: complimentContent,
                             //Add an additional intent filter in manifest file for android for the activity with the name 
                             //same as the clickAction here or Off Screen Notification click action wont work
                             clickAction: ".compliments.complimentReceived.NewComplimentReceivedActivity",
@@ -61,7 +68,7 @@ export const sendCompLikeNotificationToReceiver = functions.region('asia-east2')
                     const nofiticationDocId = utilityFunctions.randomId()
 
                     const notificationObject = {
-                        message: null,
+                        message: complimentContent,
                         receivedTime: Date.now(),
                         senderUserName: likerUserName,
                         senderUid: likerUid,
