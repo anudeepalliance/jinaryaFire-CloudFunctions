@@ -309,7 +309,7 @@ service cloud.firestore {
     allow create: if request.auth.uid != null;
   }
 
-  //allow all logged in users to create feedback documents but dont allow them to view the feedback sent
+  //allow all logged in users to create feedback documents but dont allow them to view the feedback sent.
   match /UserFeedback/{Feedback=**} {
     allow create: if request.auth.uid != null;
   }
