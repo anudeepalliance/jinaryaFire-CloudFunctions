@@ -7,7 +7,7 @@ const utilityFunctions = require('frequentFunctions')
 //1. Check if there are some pending pokers in the pokersForInsights Sub Collection
 //2. If yes then get their Notification Tokens, them send them all FCM notifications and Notification Docs
 //3. Then delete the pokers from the sub collection so they are not notified unnecesarily for future insights
-export const sendNotificationToPokers = functions.region('asia-east2').firestore.document
+export const sendNotificationToPokers = functions.region('asia-south1').firestore.document
     ('Users/{pokedUid}/insights/{insightId}').onCreate((insightData, context) => {
 
         //get pokedUid
@@ -78,8 +78,16 @@ export const sendNotificationToPokers = functions.region('asia-east2').firestore
                                 //get this poker's notificationToken, send a notification and then delete the poker
                                 await db.collection('Users').doc(pokerUid).collection('notificationToken')
                                     .doc('theNotificationToken').get().then(async (notificationTokenDoc: DocumentSnapshot) => {
-                                        //send a notification to this poker with his notificationToken
-                                        await admin.messaging().sendToDevice(notificationTokenDoc.data()?.notificationToken, notificationPayload)
+                                        
+                                        const notificationToken = notificationTokenDoc.data()?.notificationToken
+                                        //Check if the notificationToken is not null and not "deviceLoggedOut" then attempt to send as it will fail without it anyways
+                                        if (notificationToken && String(notificationToken) !== "deviceLoggedOut") {
+                                            //send a notification to this poker with his notificationToken
+                                            await admin.messaging().sendToDevice(notificationToken, notificationPayload)
+                                        } else {
+                                            console.log('receiver is not Signed In or his notificationToken does not exist')
+                                        }
+                                        
                                         //delete the poker
                                         const pokerDocPath = poker.ref.path
                                         await db.doc(pokerDocPath).delete()

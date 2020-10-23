@@ -6,7 +6,7 @@ const admin = require('firebase-admin')
 //to see if the totalNoOfItems is > 99, if so then delete all the read items in the WhatsNewCollection and decrement
 //the totalNoOfItems field, The function will get to a point where all items are unRead in WhatsNewColl so it wont
 //delete and update the value, this will avoid the infinite loop of this function
-export const whatsNewCollectionMaintenance = functions.region('asia-east2').firestore.document
+export const whatsNewCollectionMaintenance = functions.region('asia-south1').firestore.document
     ('Users/{userId}/whatsNewRecords/totalNoOfWhatsNewItems').onUpdate(async (change, context) => {
 
         const updatedData = change.after.data()

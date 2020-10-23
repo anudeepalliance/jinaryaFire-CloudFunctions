@@ -5,7 +5,7 @@ const utilityFunctions = require('frequentFunctions')
 
 //When a n insight received a like then send a notification to the owner of the insight 
 //unless the liker is different from the insight owner
-export const sendInsightLikeNotificationToOwner = functions.region('asia-east2').firestore.document
+export const sendInsightLikeNotificationToOwner = functions.region('asia-south1').firestore.document
     ('Users/{userId}/insights/{insightId}/insightLikes/{likerUid}')
     .onCreate((data, context) => {
 
@@ -83,8 +83,14 @@ export const sendInsightLikeNotificationToOwner = functions.region('asia-east2')
                     await admin.firestore().collection('Users').doc(ownerUid).collection('notificationToken')
                         .doc('theNotificationToken').get().then(async(notificationTokenDoc: DocumentSnapshot) => {
                             const senderNotificationToken = await notificationTokenDoc.get('notificationToken')
-                            //send a notification to the sender
-                            await admin.messaging().sendToDevice(senderNotificationToken, notificationPayload)
+
+                            //Check if the notificationToken is not null and not "deviceLoggedOut" then attempt to send as it will fail without it anyways
+                            if (senderNotificationToken && String(senderNotificationToken) !== "deviceLoggedOut") {
+                                //Send the notification to the sender
+                                await admin.messaging().sendToDevice(senderNotificationToken, notificationPayload)
+                            } else {
+                                console.log('receiver is not Signed In or his notificationToken does not exist')
+                            }
                             //add a notificationDoc to the sender
                             await admin.firestore().collection('Users').doc(ownerUid).collection('Notifications').doc(nofiticationDocId).set(notificationObject)
                         })

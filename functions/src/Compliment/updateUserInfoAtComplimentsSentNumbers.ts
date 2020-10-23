@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the complimentSentNumbers coll of all users who have sent this person a compliment
-export const updateUserInfoAtComplimentsSentNumbers = functions.region('asia-east2').firestore.document
+export const updateUserInfoAtComplimentsSentNumbers = functions.region('asia-south1').firestore.document
     ('Users/{userId}').onUpdate((change, context) => {
 
         const upDatedUserData = change.after.data()
@@ -33,7 +33,7 @@ export const updateUserInfoAtComplimentsSentNumbers = functions.region('asia-eas
                 await userComplimentsSentNumbersDocs.get().then(async (userDocs: DocumentSnapshot[]) => {
                     userDocs.forEach(async userDoc => {
                         const userDocPath = userDoc.ref.path
-                        await admin.firestire().doc(userDocPath).update({
+                        await admin.firestore().doc(userDocPath).update({
                             name: newName,
                             nameLowerCase: newNameLowerCase,
                             userName: newUserName,

@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
 
 // export function sendFeedback() 
-  export const sendFeedback = functions.region('asia-east2').https.onCall((userFeedbackData, context) => {
+  export const sendUserFeedback = functions.region('asia-east2').https.onCall((userFeedbackData, context) => {
     if (!context.auth) {
       throw new functions.https.HttpsError(
         'unauthenticated', 

@@ -2,8 +2,8 @@
 const admin = require('firebase-admin')
 
 //this service account file is available in the server folder of this project, this was created at GCC
-//which gives admin access to the Firebase Project. This file is highly confidential and not uploaded to Git
-const serviceAccount = require('../server/jinaryafire-firebase-adminsdk-db1fd-7d77661d4e.json')
+//which gives admin access to the Firebase Project. This file is highly confidential and should not be uploaded to Git
+const serviceAccount = require('../server/jinaryafire-5e9e10abe9c3.json')
 
 //Initialize the App with the service account
 admin.initializeApp({
@@ -14,18 +14,18 @@ admin.initializeApp({
 
 
 //All the functions are imported from this line, visit the functions file for details on what these functions do
-export { newUserSignUp } from './for Development/userCreated'
+export { newUserCreated } from './for Development/newUserCreated'
 export { userDeleted } from './for Development/userDeleted'
 
+//Moved this to be done at the client itself, no need for a CF
+// import sendUserFeedback = require('./ReportAndFeedback/sendUserFeedback')
+// exports.sendUserFeedback = sendUserFeedback.sendUserFeedback
 
-import sendUserFeedback = require('./ReportAndFeedback/sendUserFeedback')
-exports.sendUserFeedback = sendUserFeedback.sendFeedback
-
-
+//User will directly upload reports to FS without the need for the CF
 // import reportPerson = require('./ReportAndFeedback/reportPerson')
 // exports.reportPerson = reportPerson.reportThePerson
 
-
+//User will directly upload reports to FS without the need for the CF
 // import reportContent = require('./ReportAndFeedback/reportContent')
 // exports.reportContent = reportContent.reportTheContent
 
@@ -69,7 +69,7 @@ import decrementCompSentNoAndDeleteCompImage = require('./Compliment/decrementCo
 exports.decrementCompSentNoAndDeleteCompImage = decrementCompSentNoAndDeleteCompImage.decrementCompSentNoAndDeleteCompImage
 
 import notificationDocsLimit = require('./Maintenance/notificationDocsLimit')
-exports.notificationDocsLimit = notificationDocsLimit.deleteThe101thNotificationDoc
+exports.notificationDocsLimit = notificationDocsLimit.notificationDocsLimit
 
 import pokeForInsights = require('./Insights/pokeForInsights')
 exports.pokeForInsights = pokeForInsights.pokeForInsights

@@ -7,7 +7,7 @@ const utilityFunctions = require('frequentFunctions')
 //1.it is added to the compliments received sub collection of the receiver via callable Cf as the sender does not have permission to write that sub collection
 //2.A Notification payload is created and sent via FCM to the client
 //3. A Notification Object is created and added to the Notifications Sub Collection of the Client
-export const addNewCompliment = functions.region('asia-east2').https.onCall((complimentData, context) => {
+export const addNewCompliment = functions.region('asia-south1').https.onCall((complimentData, context) => {
 
   const db = admin.firestore()
 
@@ -124,10 +124,12 @@ export const addNewCompliment = functions.region('asia-east2').https.onCall((com
         await db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('Notifications')
           .doc(complimentId).set(notificationObject)
 
-        //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
-        if (receiverNotificationToken) {
+        //Check if the notificationToken is not null and not "deviceLoggedOut" then attempt to send as it will fail without it anyways
+        if (receiverNotificationToken && String(receiverNotificationToken) !== "deviceLoggedOut") {
           //Send the notification to the user
           await admin.messaging().sendToDevice(receiverNotificationToken, notificationPayload)
+        } else {
+          console.log('receiver is not Signed In or his notificationToken does not exist')
         }
         //User gained a new compliment so increase the noOfCompliment
         await db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('ProfileInfo')

@@ -50,12 +50,20 @@ service cloud.firestore {
     }
 
     function noOfLikesIsGreaterOrLessThanByOne() {
-      return request.resource.data.noOfLikes == resource.data.noOfLikes + 1 || 
+      return 
+      request.resource.data.noOfLikes == resource.data.noOfLikes + 1 || 
       request.resource.data.noOfLikes == resource.data.noOfLikes - 1;
     }
 
+    function noOfLikesIsGreaterOrLessThanByOneOrUnchanged() {
+      return 
+      noOfLikesIsGreaterOrLessThanByOne() || 
+      request.resource.data.noOfLikes == resource.data.noOfLikes;
+    }
+
     function noOfViewsIsGreaterOrLessThanByOne() {
-      return request.resource.data.noOfViews == resource.data.noOfViews + 1 || 
+      return 
+      request.resource.data.noOfViews == resource.data.noOfViews + 1 || 
       request.resource.data.noOfViews == resource.data.noOfViews - 1;
     }
       
@@ -146,7 +154,7 @@ service cloud.firestore {
 
     //custom function to check if client is trying to update anything other 
     //than likes or views field of the complimentSent doc
-    function isUpdatingOnlyLikesOrViewsCounter() {
+    function isWatcherUpdatingOnlyLikesOrViewsCounter() {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes']) &&
       noOfLikesIsGreaterOrLessThanByOne() ||
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfViews']) &&
@@ -180,6 +188,13 @@ service cloud.firestore {
         noOfLikesIsGreaterOrLessThanByOne();
     }
 
+    //Check if the mandatoryInsight owner is updating ownerLiked field, answer option selected
+    function isMandatoryInsightOwnerUpdatingOwnerLikedOrNoOfLikesOrAnswerOptionField() {
+      return request.auth.uid == uid && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerLiked', 'noOfLikes','answerOption']) &&
+        noOfLikesIsGreaterOrLessThanByOneOrUnchanged();
+    }
+
         //The rules for insights sub coll
     match /insights/{randomInsightId} {
       //allow read for insight owners and the followers
@@ -190,21 +205,37 @@ service cloud.firestore {
       allow create: if request.auth.uid == uid
 
       //allow update only if user or watcher is trying to update the likes or viewCounter fields
-      allow update: if isUpdatingOnlyLikesOrViewsCounter() || isInsightOwnerUpdatingOwnerLikedOrNoOfLikesField();
+      allow update: if isWatcherUpdatingOnlyLikesOrViewsCounter() || isInsightOwnerUpdatingOwnerLikedOrNoOfLikesField();
 
       //allow delete insight by owner of the insight
       allow delete: if request.auth.uid == uid;
     }
 
-        //The rules for insight likes sub coll
-        match /insights/{randomInsightId}/insightLikes/{likerUid} {
-        //allow read, create for owners and the followers
-        allow read, create: if request.auth.uid == uid
-         || isFollower()
+    //The rules for mandatoryInsights sub coll
+    match /mandatoryInsights/{randomInsightId} {
+      //allow read for insight owners and the followers
+      allow read: if request.auth.uid == uid
+      || isFollower()
+
+      //allow create for owners only
+      allow create: if request.auth.uid == uid
+
+      //allow update only if user or watcher is trying to update the likes or viewCounter fields
+      allow update: if isWatcherUpdatingOnlyLikesOrViewsCounter() || isMandatoryInsightOwnerUpdatingOwnerLikedOrNoOfLikesOrAnswerOptionField();
+
+      //allow delete insight by owner of the insight
+      allow delete: if false;
+    }
+
+    //The rules for insight likes sub coll
+    match /insights/{randomInsightId}/insightLikes/{likerUid} {
+    //allow read, create for owners and the followers
+      allow read, create: if request.auth.uid == uid
+        || isFollower()
 
         //allow delete to only the likers so users can unlike their own likes and cannot unlike for other users
         allow delete: if request.auth.uid == likerUid;
-        }
+    }
 
     //The rules for complimentsReceivedLike Docs
     match /complimentsReceived/{randomComplimentId} {
@@ -218,7 +249,7 @@ service cloud.firestore {
       allow create: if false
 
       //allow update only if trying to update the likes or viewCounter fields
-      allow update: if isUpdatingOnlyLikesOrViewsCounter() ||
+      allow update: if isWatcherUpdatingOnlyLikesOrViewsCounter() ||
         isComplimentReceiverUpdatingWasReadOrComplimentBlockedOrFollowingStatusOrReceivedLikedField() ||
         isComplimentSenderUpdatingReceiverBlockedStatusOrSenderNameOrSenderUserNameOrSenderLikedField();
 
@@ -266,24 +297,20 @@ service cloud.firestore {
         allow read : if request.auth.uid in resource.data.followers || resource.data.following
       }
 
-      match/ComplimentIdeas/{ideaId} {
+      //All users can read ComplimentIdeas
+      match/UserFeedback/{ContentIdeas=**} {
         //everyone can read compliment ideas, only admins will create & write to this via console
-        allow read: if true;
-      }
-
-      match/InsightIdeas/{ideaId} {
-        //everyone can read insight ideas, only admins will create & write to this via console
-        allow read: if true;
+        allow read: if request.auth.uid != null;
       }
 
   
-  //allow logged in users to create reports on other users or any content
-  //reading and deleting the reports are not allowed
-  match /ReportPerson/{reportId} {
+  //allow logged in users to create reports on other users
+  match/UserFeedback/{Reports=**} {
     allow create: if request.auth.uid != null;
   }
 
-    match /ReportContent/{reportId} {
+  //allow all logged in users to create feedback documents but dont allow them to view the feedback sent
+  match /UserFeedback/{Feedback=**} {
     allow create: if request.auth.uid != null;
   }
 

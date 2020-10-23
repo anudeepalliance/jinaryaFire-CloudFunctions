@@ -22,7 +22,7 @@ const admin = require('firebase-admin')
 // insights and add poke whatsNewDocs for those users
 //NOTE: do not consider addition of poke_for_insights whatsNewDoc to the whatsNewDoc
 //records for incrementing at this function or decrementing at client
-export const populateWhatsNew = functions.region('asia-east2').https.onCall((populateWhatsNewData, context) => {
+export const populateWhatsNew = functions.region('asia-south1').https.onCall((populateWhatsNewData, context) => {
 
   const db = admin.firestore()
   const noOfFollowing: number = populateWhatsNewData.noOfFollowing

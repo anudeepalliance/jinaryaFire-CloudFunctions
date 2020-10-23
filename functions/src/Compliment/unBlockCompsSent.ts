@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //When a user unBlocks another user then set the compliments Sent receivedBlocked field to false
 //So the unBlocker or unBlocked can see the compliments exchanged between them
-export const unBlockTheCompsSent = functions.region('asia-east2').firestore.document
+export const unBlockTheCompsSent = functions.region('asia-south1').firestore.document
     ('Users/{userId}/blocked/{blockedUid}').onDelete((data, context) => {
 
         //get blocker's and blocked's Uids for identification

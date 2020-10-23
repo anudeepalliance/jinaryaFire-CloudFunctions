@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 //When client Unblocks a person, Firestore calls a background function to 
 //1. Remove blocker(himself) from the blocked person's following sub collection
 //2. Set the interest Meter of the unBlocker to 1 at unBlocked's compsSentNoDoc of the unBlocker
-export const removeUnBlockeeFromBlockedBy = functions.region('asia-east2').firestore.document
+export const removeUnBlockeeFromBlockedBy = functions.region('asia-south1').firestore.document
     ('Users/{unBlockerUid}/blocked/{unBlockedUid}').onDelete(async (unBlockedData, context) => {
 
         const unBlockerUid = context.params.unBlockerUid

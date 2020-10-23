@@ -5,7 +5,7 @@ const utilityFunctions = require('frequentFunctions')
 
 //When a person likes a compliment, then send a notification to the comp sender if the liker is not the sender
 //and add a notificationDoc to their notifications Sub Coll
-export const sendCompLikeNotificationToSender = functions.region('asia-east2').firestore.document
+export const sendCompLikeNotificationToSender = functions.region('asia-south1').firestore.document
     ('Users/{userId}/complimentsReceived/{complimentId}/complimentLikes/{likerUid}')
     .onCreate((data, context) => {
 
@@ -94,8 +94,13 @@ export const sendCompLikeNotificationToSender = functions.region('asia-east2').f
                     await admin.firestore().collection('Users').doc(theSenderUid).collection('notificationToken')
                         .doc('theNotificationToken').get().then(async (notificationTokenDoc: DocumentSnapshot) => {
                             const senderNotificationToken = await notificationTokenDoc.get('notificationToken')
-                            //send a notification to the sender
-                            await admin.messaging().sendToDevice(senderNotificationToken, notificationPayload)
+                            //Check if the notificationToken is not null and not "deviceLoggedOut" then attempt to send as it will fail without it anyways
+                            if (senderNotificationToken && String(senderNotificationToken) !== "deviceLoggedOut") {
+                                //send a notification to the sender
+                                await admin.messaging().sendToDevice(senderNotificationToken, notificationPayload)
+                            } else {
+                                console.log('receiver is not Signed In or his notificationToken does not exist')
+                              }
                             //add a notificationDoc to the sender
                             await admin.firestore().collection('Users').doc(theSenderUid)
                                 .collection('Notifications').doc(nofiticationDocId).set(notificationObject)

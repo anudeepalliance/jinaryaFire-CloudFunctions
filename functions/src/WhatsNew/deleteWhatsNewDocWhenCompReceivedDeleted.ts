@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //when a user deletes a complimentReceived then delete all the 
 //whatsNewDoc versions of that deleted complimentReceived
-export const deleteWhatsNewDocWhenCompReceivedDeleted = functions.region('asia-east2').firestore.document
+export const deleteWhatsNewDocWhenCompReceivedDeleted = functions.region('asia-south1').firestore.document
   ('Users/{userId}/complimentsReceived/{complimentId}').onDelete((data, context) => {
 
     //get the id of the compliment that was deleted

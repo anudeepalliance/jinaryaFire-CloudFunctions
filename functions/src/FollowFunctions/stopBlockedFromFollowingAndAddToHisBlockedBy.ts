@@ -6,7 +6,7 @@ const admin = require('firebase-admin')
 //2. Stop the Blocked from following the Blocker
 //3. decrement the noOfFollowing of the blocked
 //4. set the interestMeter at blocked's compsSentNosDoc of the blocker to 0
-export const stopBlockedFromFollowingAndAddToHisBlockedBy = functions.region('asia-east2').firestore.document
+export const stopBlockedFromFollowingAndAddToHisBlockedBy = functions.region('asia-south1').firestore.document
   ('Users/{blockerUid}/blocked/{blockedUid}').onCreate(async (blockedData, context) => {
 
     const db = admin.firestore()

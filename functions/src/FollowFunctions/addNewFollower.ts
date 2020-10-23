@@ -7,7 +7,7 @@ const utilityFunctions = require('frequentFunctions')
 //1.add follower to the followed's followers sub collection
 //2.an FCM notification to sent to the followed
 //3.A Notification doc is added to Notification Sub Collection of the Followed
-export const addNewFollower = functions.region('asia-east2').firestore.document
+export const addNewFollower = functions.region('asia-south1').firestore.document
   ('Users/{followerUserId}/following/{followedUserId}').onCreate((data, context) => {
 
     const db = admin.firestore()
@@ -125,10 +125,13 @@ export const addNewFollower = functions.region('asia-east2').firestore.document
                         await db.collection('Users').doc(followedUid).collection('followers').doc(followerUid).set(followerData)
                         //Add the notification doc to the user's notification sub collection
                         await db.collection('Users').doc(followedUid).collection('Notifications').doc(followerUid).set(notificationObject)
-                        //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
-                        //if ( followeeNotificationToken ) {
-                        //Send the notification to the user
+                        //Check if the notificationToken is not null and not "deviceLoggedOut" then attempt to send as it will fail without it anyways
+                        if (followedNotificationToken && String(followedNotificationToken) !== "deviceLoggedOut") {
+                          //Send the notification to the user
                         await admin.messaging().sendToDevice(followedNotificationToken, notificationPayload)
+                        } else {
+                          console.log('receiver is not Signed In or his notificationToken does not exist')
+                        }
                         //save the async function as a promise
                         await markFollowedPersonWhatsNewItemsFollowingStatusToTrueAndIncrementNoOfUnReadItems()
 

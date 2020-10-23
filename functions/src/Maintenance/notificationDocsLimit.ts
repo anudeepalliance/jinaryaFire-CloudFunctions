@@ -5,13 +5,13 @@ const admin = require('firebase-admin')
 //When a new notification Doc is added to the Notificatons Sub Coll
 //Check for the notificationNumbers Doc, if it is greater than 99 then delete the oldest notificationDoc
 //else just increment the noOfNotifications received by 1
-export const deleteThe101thNotificationDoc = functions.region('asia-east2').firestore.document
+export const notificationDocsLimit = functions.region('asia-south1').firestore.document
     ('Users/{userId}/Notifications/{notificationDoc}').onCreate((data, context) => {
 
         //If it is a new user then a default noOfNotificationsReceivedDoc with value 0
         //will be created, if so then just return else run the function
         if (data.data().noOfNotificationsReceived === 0) {
-            return
+            return Promise
         } else {
             //It is not a new user so run the function as usual
             const db = admin.firestore()

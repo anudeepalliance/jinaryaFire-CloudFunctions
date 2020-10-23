@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the complimentlikes coll of all the compliments that he has liked
-export const updateUserInfoAtComplimentLikes = functions.region('asia-east2').firestore.document
+export const updateUserInfoAtComplimentLikes = functions.region('asia-south1').firestore.document
     ('Users/{userId}').onUpdate((change, context) => {
 
         const upDatedUserData = change.after.data()

@@ -4,7 +4,7 @@ const admin = require('firebase-admin')
 
 //when a user deletes an insightAdded then delete all the 
 //whatsNewDoc versions of that deleted insight
-export const deleteWhatsNewDocWhenInsightAddedDeleted = functions.region('asia-east2').firestore.document
+export const deleteWhatsNewDocWhenInsightAddedDeleted = functions.region('asia-south1').firestore.document
   ('Users/{userId}/insights/{insightId}').onDelete((data, context) => {
 
     //get the id of the compliment that was deleted

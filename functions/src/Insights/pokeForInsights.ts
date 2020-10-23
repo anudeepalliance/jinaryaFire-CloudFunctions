@@ -9,7 +9,7 @@ const utilityFunctions = require('frequentFunctions')
 //2.Add Poker to the pokersForInsights sub collection of the poked
 //3.A Notification payload is created and sent via FCM to the poked person
 //4.Create and add a Notification Doc of the type Insight Pokes to poked person
-export const pokeForInsights = functions.region('asia-east2').https.onCall((pokeForInsightData, context) => {
+export const pokeForInsights = functions.region('asia-south1').https.onCall((pokeForInsightData, context) => {
 
     //create a firestore reference variable
     const db = admin.firestore()
@@ -104,10 +104,12 @@ export const pokeForInsights = functions.region('asia-east2').https.onCall((poke
                                         await db.collection('Users').doc(pokeForInsightData.pokedUid).collection('Notifications')
                                             .doc(pokeForInsightData.pokerUid).set(notificationObject)
 
-                                        //Check if the notificationToken is not null only then attempt to send as it will fail without it anyways
-                                        if (pokedNotificationToken) {
+                                        //Check if the notificationToken is not null and not "deviceLoggedOut" then attempt to send as it will fail without it anyways
+                                        if (pokedNotificationToken && String(pokedNotificationToken) !== "deviceLoggedOut") {
                                             //Send the notification to the user
                                             await admin.messaging().sendToDevice(pokedNotificationToken, notificationPayload)
+                                        } else {
+                                            console.log('receiver is not Signed In or his notificationToken does not exist')
                                         }
 
                                     })

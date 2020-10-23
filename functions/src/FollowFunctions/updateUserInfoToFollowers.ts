@@ -5,7 +5,7 @@ const admin = require('firebase-admin')
 //When a user updates his userDoc like name or UserName then this updated info needs to be
 //reflected in the user's followers' following doc of all the other users that are a follower of this user 
 //which includes the insightsAdded variable as well if updated
-export const updateUserInfoToFollowers = functions.region('asia-east2').firestore.document
+export const updateUserInfoToFollowers = functions.region('asia-south1').firestore.document
     ('Users/{userId}').onUpdate((change, context) => {
 
         const upDatedUserData = change.after.data()
