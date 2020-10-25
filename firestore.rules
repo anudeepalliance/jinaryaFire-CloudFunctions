@@ -55,11 +55,12 @@ service cloud.firestore {
       request.resource.data.noOfLikes == resource.data.noOfLikes - 1;
     }
 
-    function noOfLikesIsGreaterOrLessThanByOneOrUnchanged() {
-      return 
-      noOfLikesIsGreaterOrLessThanByOne() || 
-      request.resource.data.noOfLikes == resource.data.noOfLikes;
-    }
+    // function noOfLikesIsGreaterOrLessThanByOneOrUnchanged() {
+    //   return 
+    //   request.resource.data.noOfLikes == resource.data.noOfLikes + 1 || 
+    //   request.resource.data.noOfLikes == resource.data.noOfLikes - 1 || 
+    //   request.resource.data.noOfLikes == resource.data.noOfLikes;
+    // }
 
     function noOfViewsIsGreaterOrLessThanByOne() {
       return 
@@ -189,11 +190,11 @@ service cloud.firestore {
     }
 
     //Check if the mandatoryInsight owner is updating ownerLiked field, answer option selected
-    function isMandatoryInsightOwnerUpdatingOwnerLikedOrNoOfLikesOrAnswerOptionField() {
-      return request.auth.uid == uid && 
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerLiked', 'noOfLikes','answerOption']) &&
-        noOfLikesIsGreaterOrLessThanByOneOrUnchanged();
-    }
+    // function isMandatoryInsightOwnerUpdatingOwnerLikedOrNoOfLikesOrAnswerOptionField() {
+    //   return request.auth.uid == uid && 
+    //     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerLiked', 'noOfLikes','answerOption']) &&
+    //     noOfLikesIsGreaterOrLessThanByOneOrUnchanged();
+    // }
 
         //The rules for insights sub coll
     match /insights/{randomInsightId} {
@@ -220,8 +221,9 @@ service cloud.firestore {
       //allow create for owners only
       allow create: if request.auth.uid == uid
 
-      //allow update only if user or watcher is trying to update the likes or viewCounter fields
-      allow update: if isWatcherUpdatingOnlyLikesOrViewsCounter() || isMandatoryInsightOwnerUpdatingOwnerLikedOrNoOfLikesOrAnswerOptionField();
+      //allow update only if watcher is trying to update the likes or viewCounter fields
+      //allow user to completely update the insight
+      allow update: if isWatcherUpdatingOnlyLikesOrViewsCounter() || request.auth.uid == uid;
 
       //allow delete insight by owner of the insight
       allow delete: if false;
