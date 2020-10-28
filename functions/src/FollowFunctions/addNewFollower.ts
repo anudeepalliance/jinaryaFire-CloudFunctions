@@ -63,8 +63,6 @@ export const addNewFollower = functions.region('asia-south1').firestore.document
                       followedYouAt: Date.now(),
                       //is the followed following back the follower,
                       followingBack: followedFollowingBack,
-                      //not adding noOfComplimentsSent as that is added by a different CF
-                      bio: followerUserProfileDoc.data()!.bio
                     }
 
                     const followerThumbnailImageUrl = followerUserProfileDoc.data()!.photoUrl
@@ -92,7 +90,6 @@ export const addNewFollower = functions.region('asia-south1').firestore.document
                             PERSON_UID_INTENT_EXTRA: followerUid,
                             PERSON_NAME_INTENT_EXTRA: followerData.name,
                             PERSON_USERNAME_INTENT_EXTRA: followerData.userName,
-                            PERSON_BIO_INTENT_EXTRA: followerData.bio,
                             //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
                             //be created at the client else, this will fail
                             CHANNEL_ID: "Follow Update ID"
@@ -102,7 +99,7 @@ export const addNewFollower = functions.region('asia-south1').firestore.document
                         const nofiticationDocId = utilityFunctions.randomId()
 
                         const notificationObject = {
-                          message: `${followerData.bio}`,
+                          message: null,
                           receivedTime: Date.now(),
                           senderUserName: followerData.userName,
                           senderUid: followerData.uid,
@@ -114,7 +111,6 @@ export const addNewFollower = functions.region('asia-south1').firestore.document
                           intentExtrasUid: followerData.uid,
                           intentExtrasName: followerData.name,
                           intentExtrasUserName: followerData.userName,
-                          intentExtrasBio: followerData.bio,
                           //This is needed for client to access this doc and update the wasClicked field
                           contentId: followerUid,
                           notificationId: nofiticationDocId

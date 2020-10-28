@@ -136,11 +136,12 @@ service cloud.firestore {
         allow delete: if request.auth.uid == uid;
       }
 
-     match /pokersForInsights/{randomId} {
-        //User is authorised to read
-        //to his pokersForInsights sub-collection but not create
-        //create and delete will be done by CF only
-        allow read: if request.auth.uid == uid;
+     match /pokersForInsights/{pokerUid} {
+        //poked and poker are allowed to read his pokers
+        allow read: if request.auth.uid == uid || request.auth.uid == pokerUid;
+        //only follower and poker are allowed to create a poker docs
+        allow create: if request.auth.uid == pokerUid && isFollower()
+        //delete will be done by CF only
      }
 
 
