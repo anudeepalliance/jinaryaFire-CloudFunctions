@@ -1,8 +1,58 @@
 rules_version = '2';
 service firebase.storage {
+
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if request.auth!=null;
+
+    match /Users/{userId} {
+        //allow users to write to their own profile
+        //photos folder, others can just read to it
+        match /profilePhotos/{profilePhotoFile} {
+					//only owners of the folder can create Images
+        	allow create: if isItContentOwnerAndResourceIsAnImageWhichIsLessThan2Mb()
+          //ensure the name of the photo file is as specified in the App
+          //either it is profilePhoto or the thumbnail
+          && (profilePhotoFile == "profilePhoto" ||  profilePhotoFile == "thumb_100x100_profilePhoto")
+          //allow user to delete his own profilePhotos
+          allow delete: if request.auth.uid == userId
+          //allow anyone to view the profilePhotos of the user
+          allow read: if request.auth.uid != null
+          //ensure the name of the photo file is as specified in the App
+          //either it is profilePhoto or the thumbnail
+          && (profilePhotoFile == "profilePhoto" ||  profilePhotoFile == "thumb_100x100_profilePhoto")
+        }
+    
+        //allow insight owners to create and delete 
+        //their own insight Images
+        match /insights/{insight_photo_id} {
+          allow create: if isItContentOwnerAndResourceIsAnImageWhichIsLessThan2Mb()
+          //names of the files are dynamic so cannot add rules for file names
+          allow delete: if request.auth.uid == userId
+          //allow registered users to view the insightImages of the user
+          //photo files are appended with insight Ids so the user will need the id
+          //of the insight to query the associated image, since insight is fully secured
+          //to be accessed by owners and followers only via FS rules, the associated photos are secured too
+          allow read: if request.auth.uid != null
+        }
+        
+        //rules for the compliment images folder
+        match /complimentsSent/{comp_photo_id} {
+          allow create: if isItContentOwnerAndResourceIsAnImageWhichIsLessThan2Mb()
+          //allow registered users to view the compImages of the user
+          //photo files are appended with comp Ids so the user will need the id
+          //of the comp to query the associated image, since comp is fully secured
+          //to be accessed by sender and receiver only via FS rules, the associated photos are secured too
+          allow read: if request.auth.uid != null
+        }
+
+      // True if the user is signed in or the requested data is 'public'
+      function isItContentOwnerAndResourceIsAnImageWhichIsLessThan2Mb() {
+        return request.auth.uid == userId &&
+        request.resource.size < 2 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/.*')
+      }
+
     }
+
   }
+
 }

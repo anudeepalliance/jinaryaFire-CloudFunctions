@@ -6,6 +6,7 @@ const admin = require('firebase-admin')
 //1. Reduce the no of compliments sent at sender's complimentsSentNos sub Collection
 //2. Decrement the noOfCompsSent at sender's userProfile Document
 //3. Delete the compsSent Image at the sender's complimentsSent CS Folder
+//NoOfComps received by the receiver remains the same despite the delete
 export const decrementCompSentNoAndDeleteCompImage = functions.region('asia-south1').firestore.document
   ('Users/{userId}/complimentsReceived/{complimentId}').onDelete((snap, context) => {
 

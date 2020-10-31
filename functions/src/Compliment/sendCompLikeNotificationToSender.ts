@@ -6,8 +6,7 @@ const utilityFunctions = require('frequentFunctions')
 //When a person likes a compliment, then send a notification to the comp sender if the liker is not the sender
 //and add a notificationDoc to their notifications Sub Coll
 export const sendCompLikeNotificationToSender = functions.region('asia-south1').firestore.document
-    ('Users/{userId}/complimentsReceived/{complimentId}/complimentLikes/{likerUid}')
-    .onCreate((data, context) => {
+    ('Users/{userId}/complimentsReceived/{complimentId}/complimentLikes/{likerUid}').onCreate((data, context) => {
 
         //get the receiverUid
         const receiverUid = context.params.userId
@@ -34,14 +33,14 @@ export const sendCompLikeNotificationToSender = functions.region('asia-south1').
                         console.log('liker is same as sender')
                         return Promise
                     } else {
-                        const complimentContent = complimentDoc.data()?.complimentContent
-                        return sendTheNotification(senderUid, complimentContent)
+                        const complimentReceiverUserName = complimentDoc.data()?.receiverUserName
+                        return sendTheNotification(senderUid, complimentReceiverUserName)
 
                     }
                 })
         }
 
-        async function sendTheNotification(theSenderUid : String, theComplimentContent : String) {
+        async function sendTheNotification(theSenderUid : String, complimentReceiverUserName : String) {
 
             //get the likerProfilePhotoUrl
             await admin.firestore().collection('Users').doc(likerUid).collection('ProfileInfo')
@@ -53,7 +52,7 @@ export const sendCompLikeNotificationToSender = functions.region('asia-south1').
                     const notificationPayload = {
                         notification: {
                             title: `${likerUserName} liked your compliment`,
-                            body: theComplimentContent,
+                            body: `You sent this compliment to ${complimentReceiverUserName}`,
                             //Add an additional intent filter in manifest file for android for the activity with the name 
                             //same as the clickAction here or Off Screen Notification click action wont work
                             clickAction: ".compliments.likedComplimentSent.LikeReceivedComplimentSentActivity",
@@ -72,7 +71,7 @@ export const sendCompLikeNotificationToSender = functions.region('asia-south1').
                     const nofiticationDocId = utilityFunctions.randomId()
 
                     const notificationObject = {
-                        message: theComplimentContent,
+                        message: `You sent this compliment to ${complimentReceiverUserName}`,
                         receivedTime: Date.now(),
                         senderUserName: likerUserName,
                         senderUid: likerUid,

@@ -51,7 +51,7 @@ export const addNewCompliment = functions.region('asia-south1').https.onCall((co
       receiverUserName: complimentData.receiverUserName,
       receiverName: complimentData.receiverName,
       complimentRead: false,
-      receivedTime: Date.now(),
+      receivedTime: complimentData.receivedTime,
       noOfLikes: 0,
       noOfViews: 0,
       //compliment is just being added so neither of them would have liked this content
@@ -99,7 +99,7 @@ export const addNewCompliment = functions.region('asia-south1').https.onCall((co
 
         const notificationObject = {
           message: `${complimentData.complimentContent}`,
-          receivedTime: Date.now(),
+          receivedTime: complimentData.receivedTime,
           senderUserName: complimentData.senderUserName,
           senderUid: complimentData.senderUid,
           //this will be false by default, will turn true at client when clicked
