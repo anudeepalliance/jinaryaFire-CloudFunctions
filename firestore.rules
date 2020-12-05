@@ -133,7 +133,7 @@ service cloud.firestore {
         allow read: if request.auth.uid == uid;
         allow update: if request.auth.uid == uid && isUpdatingOnlyWasClickedField();
         allow create: if request.auth.uid == uid && isCreatingOnlyNoOfNotificationsReceivedDoc();
-        allow delete: if request.auth.uid == uid;
+        allow delete: if request.auth.uid == uid && isNotDeletingNoOfNotificationsReceivedDoc();
       }
 
      match /pokersForInsights/{pokerUid} {
@@ -147,6 +147,10 @@ service cloud.firestore {
 
     function isCreatingOnlyNoOfNotificationsReceivedDoc() {
       return request.resource.data.keys().hasOnly(['noOfNotificationsReceived'])
+    }
+
+    function isNotDeletingNoOfNotificationsReceivedDoc() {
+      return !resource.data.keys().hasOnly(['noOfNotificationsReceived'])
     }
 
 

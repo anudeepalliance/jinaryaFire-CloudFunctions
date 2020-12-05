@@ -6,7 +6,7 @@ const utilityFunctions = require('frequentFunctions')
 //When a compliment is sent by the user then the following are done
 //1.it is added to the compliments received sub collection of the receiver via callable Cf as the sender does not have permission to write that sub collection
 //2.A Notification payload is created and sent via FCM to the client
-//3. A Notification Object is created and added to the Notifications Sub Collection of the Client
+//3. A Notification Object is created and added to the Notifications Sub Collection of the Client.
 export const addNewCompliment = functions.region('asia-south1').https.onCall((complimentData, context) => {
 
   const db = admin.firestore()

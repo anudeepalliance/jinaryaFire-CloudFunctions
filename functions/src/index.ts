@@ -68,8 +68,11 @@ exports.updateUserInfoAtComplimentsSentNumbers = updateUserInfoAtComplimentsSent
 import decrementCompSentNoAndDeleteCompImage = require('./Compliment/decrementCompSentNoAndDeleteCompImage')
 exports.decrementCompSentNoAndDeleteCompImage = decrementCompSentNoAndDeleteCompImage.decrementCompSentNoAndDeleteCompImage
 
-import notificationDocsLimit = require('./Maintenance/notificationDocsLimit')
+import notificationDocsLimit = require('./Notifications/notificationDocsLimit')
 exports.notificationDocsLimit = notificationDocsLimit.notificationDocsLimit
+
+import decrementNoOfNotificationsReceived = require('./Notifications/decrementNoOfNotificationsReceived')
+exports.decrementNoOfNotificationsReceived = decrementNoOfNotificationsReceived.decrementNoOfNotificationsReceived
 
 import pokeForInsights = require('./Insights/pokeForInsights')
 exports.pokeForInsights = pokeForInsights.pokeForInsights
