@@ -19,7 +19,7 @@
     "child-process-promise": "^2.2.1",
     "express": "^4.17.1",
     "firebase-admin": "^9.2.0",
-    "firebase-functions": "^3.12.0",
+    "firebase-functions": "^3.13.0",
     "frequentFunctions": "file:lib/Utils/frequentFunctions",
     "fs-extra": "^9.0.0",
     "globalVariables": "file:lib/Utils/globalVariables",

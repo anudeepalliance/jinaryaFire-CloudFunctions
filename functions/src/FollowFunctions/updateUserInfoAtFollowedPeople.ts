@@ -28,6 +28,8 @@ export const updateUserInfoAtFollowedPeople = functions.region('asia-south1').fi
 
             const updaterFollowingColl = admin.firestore().collection('Users').doc(updatersUserId).collection('following')
 
+            return updateUserDetails()
+
             async function updateUserDetails() {
                 await updaterFollowingColl.get().then(async (followedUserDocs: DocumentSnapshot[]) => {
 
@@ -41,7 +43,5 @@ export const updateUserInfoAtFollowedPeople = functions.region('asia-south1').fi
                     })
                 })
             }
-
-            return updateUserDetails()
         }
     })

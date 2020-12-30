@@ -32,26 +32,28 @@ service cloud.firestore {
     }
 
     match /whatsNew/{whatsNewDocId} {
-      allow update: if isUpdatingOnlyNoOfLikesUserLikedHasReadIsFollowingInWhatsNewDoc();
+      allow update: if request.auth.uid == uid && isUpdatingOnlyNoOfLikesUserLikedInWhatsNewDoc() || 
+      isUpdatingIsFollowingOrHasReadField();
       //users are allows to read their WhatsNew Documents
       allow read: if request.auth.uid == uid;
       //allow user to delete a whatsNewDoc only if the content type is poke for insights
-      allow delete: if request.auth.uid == uid && resource.data.contentType == 'POKE_FOR_INSIGHTS'; 
+      allow delete: if request.auth.uid == uid; 
     }
 
     //In whatsNewSubColl check if user is updating only 
-    //noOfLikes, userLiked, hasRead, isFollowing fields
-    function isUpdatingOnlyNoOfLikesUserLikedHasReadIsFollowingInWhatsNewDoc() {
-      return request.auth.uid == uid 
-      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfLikes', 'userLiked','hasRead', 'hasRead','isFollowing']) 
-      && noOfLikesIsGreaterOrLessThanByOne();
-      // || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasRead'])
-      // || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isFollowing']);
+    //noOfLikes, userLiked fields
+    function isUpdatingOnlyNoOfLikesUserLikedInWhatsNewDoc() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(['noOfLikes', 'userLiked'])
+    }
+
+    //In whatsNewSubColl check if user is updating only 
+    //hasRead, isFollowing fields
+    function isUpdatingIsFollowingOrHasReadField() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(['hasRead','isFollowing']);
     }
 
     function noOfLikesIsGreaterOrLessThanByOne() {
-      return 
-      request.resource.data.noOfLikes == resource.data.noOfLikes + 1 || 
+      return request.resource.data.noOfLikes == resource.data.noOfLikes + 1 || 
       request.resource.data.noOfLikes == resource.data.noOfLikes - 1;
     }
 
@@ -244,10 +246,18 @@ service cloud.firestore {
         allow delete: if request.auth.uid == likerUid;
     }
 
-    //The rules for complimentsReceivedLike Docs
-    match /complimentsReceived/{randomComplimentId} {
-      //allow read for compliment receivers, the followers and compliment senders
-      //senders view the comp based on collection group rules written at the bottom of this file
+    //The rules for complimentSender person doc
+    match /complimentSenders/{senderUid} {
+      //allow read for compliment receivers
+      allow read: if request.auth.uid == uid;
+
+      //only admin will create, delete & update these docs
+      allow write: if false
+    }
+
+    //The rules for complimentsReceived Docs
+    match /complimentSenders/{senderUid}/compliments/{randomComplimentId} {
+      //allow read for compliment receivers
       allow read: if request.auth.uid == uid;
 
       //allow create for the followers
@@ -266,7 +276,7 @@ service cloud.firestore {
     }
 
    //The rules for complimentsReceivedLikes sub coll
-   match /complimentsReceived/{randomComplimentId}/complimentLikes/{likerUid} {
+   match  /complimentSenders/{senderUid}/compliments/{randomComplimentId}/complimentLikes/{likerUid} {
       //allow any logged in user to read the likers and add themselves as likers
       //users need the complimentId to read and add themselves as likers to that compliment
       //and since compliment rules are secure this rule will not be insecure as the compliment ID is secure
@@ -289,7 +299,7 @@ service cloud.firestore {
       //Using a collectionGroup query for retreving compliments sent
       //so some path wild card is added since according to firestore rules,
       //The collectioncomplimentsReceived can exist anywhere in the DB
-			match /{somepath=**}/complimentsReceived/{randomComplimentId} {
+			match /{somepath=**}/compliments/{randomComplimentId} {
         //Allow read permission to compliment receivers, followers of the receiver
         //and the sender of the compliment 
         //sender is already a follower but separate rule is added just in case the sender unfollows a person later

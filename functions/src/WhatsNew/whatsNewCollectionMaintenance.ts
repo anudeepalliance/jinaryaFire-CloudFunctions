@@ -14,7 +14,7 @@ export const whatsNewCollectionMaintenance = functions.region('asia-south1').fir
         const userId = context.params.userId
         const userDocRef = db.collection('Users').doc(userId)
         const currentTotalNoOfItems = updatedData?.totalNoOfWhatsNewItems
-        const maxDocsInWhatsNewThreshold = 4
+        const maxDocsInWhatsNewThreshold = 30
         //this is a global variable so no need add this is an input parameter in the 
         //deleteAndDecrementTheData(excessDocs) function
         let noOfWhatsNewDocsDeleted = 0
@@ -25,14 +25,18 @@ export const whatsNewCollectionMaintenance = functions.region('asia-south1').fir
             return deleteAndDecrementTheData(excessDocs)
 
         } else {
-            console.log(`no of whatsNewItems is equal to or less than 99`)
+            console.log(`no of whatsNewItems is equal to or less than ${maxDocsInWhatsNewThreshold}`)
             return
         }
 
         async function deleteAndDecrementTheData(excessDocs : number) {
             await deleteExcessReadWhatsNewItems(excessDocs)
             await deleteAllUnFollowedWhatsNewItems()
-            await decrementTheTotalNoItems()
+            //update the totalNoOfWhatsNewItems field only if items were actually deleted
+            if ( noOfWhatsNewDocsDeleted > 0 ) {
+                await decrementTheTotalNoItems()
+            }
+        
         }
 
 

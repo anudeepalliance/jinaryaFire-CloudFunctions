@@ -14,8 +14,8 @@ admin.initializeApp({
 
 
 //All the functions are imported from this line, visit the functions file for details on what these functions do
-export { newUserCreated } from './for Development/newUserCreated'
-export { userDeleted } from './for Development/userDeleted'
+export { newUserCreated } from './forDevelopment/newUserCreated'
+export { userDeleted } from './forDevelopment/userDeleted'
 
 //Moved this to be done at the client itself, no need for a CF
 // import sendUserFeedback = require('./ReportAndFeedback/sendUserFeedback')
@@ -37,8 +37,8 @@ import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
 exports.removeUserAsFollower = removeUserAsFollower.removeUserAsFollower
 
 
-import stopBlockedFromFollowingAndAddToHisBlockedBy = require('./FollowFunctions/stopBlockedFromFollowingAndAddToHisBlockedBy')
-exports.stopBlockedFromFollowingAndAddToHisBlockedBy = stopBlockedFromFollowingAndAddToHisBlockedBy.stopBlockedFromFollowingAndAddToHisBlockedBy
+import personBlocked = require('./FollowFunctions/personBlocked')
+exports.personBlocked = personBlocked.personBlocked
 
 import removeUnBlockeeFromBlockedBy = require('./FollowFunctions/removeUnBlockeeFromBlockedBy')
 exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeUnBlockeeFromBlockedBy
@@ -127,3 +127,9 @@ exports.deleteWhatsNewDocWhenCompReceivedDeleted = deleteWhatsNewDocWhenCompRece
 
 import deleteWhatsNewDocWhenInsightAddedDeleted = require('./WhatsNew/deleteWhatsNewDocWhenInsightAddedDeleted')
 exports.deleteWhatsNewDocWhenInsightAddedDeleted = deleteWhatsNewDocWhenInsightAddedDeleted.deleteWhatsNewDocWhenInsightAddedDeleted
+
+
+//for Development functions
+
+import logDataSentByClient = require('./forDevelopment/logDataSentByClient')
+exports.logDataSentByClient = logDataSentByClient.logDataSentByClient

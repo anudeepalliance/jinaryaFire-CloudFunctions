@@ -34,9 +34,42 @@ export const addNewCompliment = functions.region('asia-south1').https.onCall((co
           )
         } else {
           //sender is not blocked so continue with the function
-          return addCompliment()
+          return isThisTheFirstCompliment()
         }
       })
+  }
+  
+
+  async function isThisTheFirstCompliment() {
+
+    if ( complimentData.complimentSentPreviously === false ) {
+
+      console.log(`no compliments were sent previosuly`)
+      const randomId = utilityFunctions.randomId()
+
+      const complimentSender = {
+        uid: `${complimentData.senderUid}`,
+        randomSenderId: randomId,
+        userBlocked: false,
+        personBlocked: false
+      }
+
+      //this is the first compliment sent by the sender
+      //so create the compliment sender doc first
+      await db.collection('Users').doc(complimentData.receiverUid).collection('complimentSenders')
+      .doc(complimentData.senderUid).set(complimentSender)
+
+      //then just add the compliment
+      return addCompliment()
+
+    } else {
+
+      console.log(`compliments were sent previosuly`)
+
+      //just add the compliment
+      return addCompliment()
+    }
+
   }
 
   async function addCompliment() {
@@ -61,9 +94,6 @@ export const addNewCompliment = functions.region('asia-south1').https.onCall((co
       //added this variable as the same object is used as compReceived and compSent Object
       senderLiked: false,
       complimentId: complimentId,
-      followingStatus: complimentData.followingStatus,
-      senderBlocked: false,
-      receiverBlocked: false,
       hasImage: complimentData.hasImage,
       //the below field value needs to be same as the CO defined in the client
       contentCategory: "compliment"
@@ -118,9 +148,14 @@ export const addNewCompliment = functions.region('asia-south1').https.onCall((co
         }
 
 
-        //The compliment Object is added to the compsReceived Sub Coll of the receiver
-        await db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('complimentsReceived')
-          .doc(complimentId).set(complimentReceivedObject)
+        //The compliment Object is added to the complimentSenders/compliments Sub Coll of the receiver
+        await db.collection('Users')
+          .doc(complimentReceivedObject.receiverUid)
+          .collection('complimentSenders')
+          .doc(complimentReceivedObject.senderUid)
+          .collection('compliments')
+          .doc(complimentReceivedObject.complimentId)
+          .set(complimentReceivedObject)
 
         //Add the notification doc to the user's notification sub collection
         await db.collection('Users').doc(complimentReceivedObject.receiverUid).collection('Notifications')
