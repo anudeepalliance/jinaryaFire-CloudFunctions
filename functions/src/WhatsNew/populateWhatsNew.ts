@@ -131,10 +131,12 @@ export const populateWhatsNew = functions.region('asia-south1').https.onCall((po
           //if comp does not exist then the value be 0 so just get recent comps
           if (latestCompReceivedTimeInRecord === 0) {
             console.log(`compliments for ${person.userName} does not exist in record`)
-            compsReceivedRef = db.collection('Users').doc(person.uid).collection('complimentsReceived')
-              // .where('senderUid', '>', userId)
-              // .where('senderUid', '<', userId)
-              // .orderBy('senderUid')
+            compsReceivedRef = db.collectionGroup('compliments')
+              .where('receiverUid', '==', person.uid)
+              //disabled due to firestore limitation where in equality filters like '>' and '!=' have to be applied to the same field only, its used if
+              //records exisit in the current csub collection 
+              // .where('senderUid', '!=', userId)
+              // .orderBy('senderUid', 'desc')
               .orderBy('receivedTime', 'desc')
               .limit(documentLimitPerInterestedPerson)
           }
@@ -142,11 +144,12 @@ export const populateWhatsNew = functions.region('asia-south1').https.onCall((po
           //if comp exists then the the receivedTime value is assigned and get comps more recent than the receivedTime in the exisiting coll
           else {
             console.log(`compliments for ${person.userName} exists in record`)
-            compsReceivedRef = await db.collection('Users').doc(person.uid).collection('complimentsReceived')
-              // .where('senderUid', '>', userId)
-              // .where('senderUid', '<', userId)
-              // .orderBy('senderUid')
+            compsReceivedRef = db.collectionGroup('compliments')
+              .where('receiverUid', '==', person.uid)
               .where('receivedTime', '>', latestCompReceivedTimeInRecord)
+              //disabled due to firestore limitation where in equality filters like '>' and '!=' have to be applied to the same field only
+              // .where('senderUid', '!=', userId)
+              // .orderBy('senderUid', 'desc')
               .orderBy('receivedTime', 'desc')
               .limit(documentLimitPerInterestedPerson)
           }

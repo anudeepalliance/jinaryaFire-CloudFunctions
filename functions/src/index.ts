@@ -40,8 +40,8 @@ exports.removeUserAsFollower = removeUserAsFollower.removeUserAsFollower
 import personBlocked = require('./FollowFunctions/personBlocked')
 exports.personBlocked = personBlocked.personBlocked
 
-import removeUnBlockeeFromBlockedBy = require('./FollowFunctions/removeUnBlockeeFromBlockedBy')
-exports.removeUnBlockeeFromBlockedBy = removeUnBlockeeFromBlockedBy.removeUnBlockeeFromBlockedBy
+import personUnBlocked = require('./FollowFunctions/personUnBlocked')
+exports.personUnBlocked = personUnBlocked.personUnBlocked
 
 
 import updateUserInfoAtFollowedPeople = require('./FollowFunctions/updateUserInfoAtFollowedPeople')
@@ -79,24 +79,6 @@ exports.pokeForInsights = pokeForInsights.pokeForInsights
 
 import sendNotificationToPokers = require('./Insights/sendNotificationToPokers')
 exports.sendNotificationToPokers = sendNotificationToPokers.sendNotificationToPokers
-
-import blockCompsReceived = require('./Compliment/blockCompsReceived')
-exports.blockCompsReceived = blockCompsReceived.blockCompsReceived
-
-import blockCompsSent = require('./Compliment/blockCompsSent')
-exports.blockCompsSent = blockCompsSent.blockCompsSent
-
-import unBlockCompsReceived = require('./Compliment/unBlockCompsReceived')
-exports.unBlockCompsReceived = unBlockCompsReceived.unBlockTheCompsReceived
-
-import unBlockCompsSent = require('./Compliment/unBlockCompsSent')
-exports.unBlockCompsSent = unBlockCompsSent.unBlockTheCompsSent
-
-import markFollowedPersonCompsReceivedToTrue = require('./Compliment/markFollowedPersonCompsReceivedToTrue')
-exports.markFollowedPersonCompsReceivedToTrue = markFollowedPersonCompsReceivedToTrue.markFollowedPersonCompsReceivedToTrue
-
-import markUnFollowedCompsReceivedToFalse = require('./Compliment/markUnFollowedCompsReceivedToFalse')
-exports.markUnFollowedCompsReceivedToFalse = markUnFollowedCompsReceivedToFalse.markUnFollowedCompsReceivedToFalse
 
 import updateUserDetailsAtCompsSent = require('./Compliment/updateUserDetailsAtCompsSent')
 exports.updateUserDetailsAtCompsSent = updateUserDetailsAtCompsSent.updateUserDetailsAtCompsSent

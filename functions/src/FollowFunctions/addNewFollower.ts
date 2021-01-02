@@ -27,7 +27,8 @@ export const addNewFollower = functions.region('asia-south1').firestore.document
       // Check if follower is blocked by the followed, if yes then throw an error
       await db.collection('Users').doc(followedUid).collection('blocked')
         .doc(followerUid).get().then(async (blockedFollower: DocumentSnapshot) => {
-          if (blockedFollower.exists) {
+          //check if blockedFollower person exists and also check if currently blocked status is true
+          if (blockedFollower.exists && blockedFollower.data()?.currentlyBlocked === true ) {
             //print a message to console that follower was not added
             console.log('cannot add follower, follower is blocked by followed')
             //remove the followed from follower's following sub coll

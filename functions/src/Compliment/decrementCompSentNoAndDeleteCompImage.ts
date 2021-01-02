@@ -11,7 +11,7 @@ const admin = require('firebase-admin')
 //5. Decrement the noOfCompsSent at sender's/following/receiverUid/document
 //NoOfComps received by the receiver remains the same despite the delete
 export const decrementCompSentNoAndDeleteCompImage = functions.region('asia-south1').firestore.document
-  ('Users/{userId}/complimentsReceived/{complimentId}').onDelete((snap, context) => {
+  ('Users/{userId}/complimentSenders/{complimentSenderUid}/compliments/{complimentId}').onDelete((snap, context) => {
 
     //get the data of the deleted compliment document
     const deletedCompliment = snap.data()

@@ -6,7 +6,7 @@ const utilityFunctions = require('frequentFunctions')
 //When a person likes a compliment, then send a notification to the comp receiver if the liker is not the receiver
 //and add a notificationDoc to their notifications Sub Coll
 export const sendCompLikeNotificationToReceiver = functions.region('asia-south1').firestore.document
-    ('Users/{userId}/complimentsReceived/{complimentId}/complimentLikes/{likerUid}')
+    ('Users/{userId}/complimentSenders/{complimentSenderUid}/compliments/{complimentId}/complimentLikes/{likerUid}')
     .onCreate((data, context) => {
 
         //get the compId

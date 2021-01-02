@@ -25,7 +25,7 @@ export const pokeForInsights = functions.region('asia-south1').firestore.documen
             //Check if the poker is blocked by the poked, if yes then throw an error
             await db.collection('Users').doc(pokedUid).collection('blocked')
                 .doc(pokerUid).get().then(async (pokerBlockedDoc: DocumentSnapshot) => {
-                    if (pokerBlockedDoc.exists) {
+                    if (pokerBlockedDoc.exists && pokerBlockedDoc.data()?.currentlyBlocked === true) {
                         throw new functions.https.HttpsError(
                             'unauthenticated',
                             'Poker is blocked by the poker'

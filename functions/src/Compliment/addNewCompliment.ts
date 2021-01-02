@@ -25,7 +25,7 @@ export const addNewCompliment = functions.region('asia-south1').https.onCall((co
     //For safety check if the comp sender is blocked by the received
     await db.collection('Users').doc(complimentData.receiverUid).collection('blocked')
       .doc(complimentData.senderUid).get().then((doc: DocumentSnapshot) => {
-        if (doc.exists) {
+        if (doc.exists && doc.data()?.currentlyBlocked === true) {
           //the error text that is sent back to the client and needs to contain the "blocked" text as the client will delete
           //the receiver from the local "my following table" to avoid attempting to send compliment to this person again
           throw new functions.https.HttpsError(

@@ -107,13 +107,15 @@ service cloud.firestore {
         //Only the owner can create and read
         //can update if updating the noOfComplimentsSent
         allow read, create: if request.auth.uid == uid;
-        allow update: if request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['noOfComplimentsSent', 'interestMeter']);
+        allow update: if request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasAny(['noOfComplimentsSent', 'interestMeter']);
       }
       
       match /blocked/{blockedPersonUid} {
-        //Only the user is authorised to read, delete 
-        //and add to his blocked sub-collection
-        allow read,create, delete: if request.auth.uid == uid;
+        //Only the user is authorised to read
+        allow read: if request.auth.uid == uid;
+        //Creation, updation and deletion is done by admin since
+        //we are enforcing 48hrs rule for blocking and unBlocking
+        allow write: if false;
       }
       
       match /blockedBy/{blockedByPersonUid} {
