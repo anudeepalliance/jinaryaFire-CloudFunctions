@@ -81,6 +81,8 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
 
     await deleteAllUnReadComplimentsReceivedByBlocked()
 
+    await deleteFollowRequestsBetweenTheTwo()
+
   }
 
   async function addBlockedToBlockedSubCollOfBlocker() {
@@ -224,6 +226,17 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
         await complimentRef.delete()
       })
     })
+
+  }
+
+  async function deleteFollowRequestsBetweenTheTwo() {
+    //delete follow request from blocked to the blocker
+    await db.collection('Users').doc(blockerUid).collection('followRequests')
+    .doc(blockedUid).delete()
+
+    //delete follow request from blocker to the blocked
+    await db.collection('Users').doc(blockedUid).collection('followRequests')
+    .doc(blockerUid).delete()
 
   }
 

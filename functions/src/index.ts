@@ -3,8 +3,7 @@ const admin = require('firebase-admin')
 
 //this service account file is available in the server folder of this project, this was created at GCC
 //which gives admin access to the Firebase Project. This file is highly confidential and should not be uploaded to Git
-const serviceAccount = require('../server/jinaryafire-5e9e10abe9c3.json')
-
+const serviceAccount = require('../server/jinaryafire-firebase-adminsdk-db1fd-459c7721a7.json')
 //Initialize the App with the service account
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -32,17 +31,20 @@ export { userDeleted } from './forDevelopment/userDeleted'
 import addNewFollower = require('./FollowFunctions/addNewFollower')
 exports.addNewFollower = addNewFollower.addNewFollower
 
+import acceptFollowRequest = require('./FollowFunctions/acceptFollowRequest')
+exports.acceptFollowRequest = acceptFollowRequest.acceptFollowRequest
+
+import cancelFollowRequest = require('./FollowFunctions/cancelFollowRequest')
+exports.cancelFollowRequest = cancelFollowRequest.cancelFollowRequest
 
 import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
 exports.removeUserAsFollower = removeUserAsFollower.removeUserAsFollower
-
 
 import personBlocked = require('./FollowFunctions/personBlocked')
 exports.personBlocked = personBlocked.personBlocked
 
 import personUnBlocked = require('./FollowFunctions/personUnBlocked')
 exports.personUnBlocked = personUnBlocked.personUnBlocked
-
 
 import updateUserInfoAtFollowedPeople = require('./FollowFunctions/updateUserInfoAtFollowedPeople')
 exports.updateUserInfoAtFollowedPeople = updateUserInfoAtFollowedPeople.updateUserInfoAtFollowedPeople
@@ -52,9 +54,8 @@ exports.updateUserInfoToFollowers = updateUserInfoToFollowers.updateUserInfoToFo
 
 //curently not in use, this function creates a thumbnail version of the profile image uploaded CS
 //but does not retrieve the URL of the uploaded thumbnail Image, hence this done at the client for now
-// import profilePhotoThumbnail = require('./CloudStorageFunctions/profilePhotoThumbnail')
-// exports.profilePhotoThumbnail = profilePhotoThumbnail.profilePhotoMakeThumbnail
-
+import profilePhotoThumbnail = require('./CloudStorageFunctions/profilePhotoThumbnail')
+exports.profilePhotoThumbnail = profilePhotoThumbnail.profilePhotoThumbnail
 
 import addNewCompliment = require('./Compliment/addNewCompliment')
 exports.addNewCompliment = addNewCompliment.addNewCompliment

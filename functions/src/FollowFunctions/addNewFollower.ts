@@ -3,178 +3,110 @@ import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 const utilityFunctions = require('frequentFunctions')
 
-//When client followes a user, a firestore .onCreate() background function is triggered to
-//1.add follower to the followed's followers sub collection
-//2.an FCM notification to sent to the followed
-//3.A Notification doc is added to Notification Sub Collection of the Followed
-export const addNewFollower = functions.region('asia-south1').firestore.document
-  ('Users/{followerUserId}/following/{followedUserId}').onCreate((data, context) => {
+//When client followes a user, a firestore .onCreate() background function is triggered to 
+//1.Check if the follower is blocked by the followed
+//2.If yes then thrown an error
+//3.If not then check if followed is autoAccepting Followers
+//4.If Yes then add the follower doc to the followed's followes sub coll
+//and add Followed to Following sub coll of follower
+//5.If Not then create and add follow request in the followed's follow requests sub coll
+export const addNewFollower = functions.region('asia-south1').https.onCall((followedPersonData, context) => {
 
-    const db = admin.firestore()
-    //get follower and followee Uids for identification
-    const followedUid = context.params.followedUserId
-    //for identification and notification payload data (Intent Extras for client)
-    const followerUid = context.params.followerUserId
-    //get reference to the follower's whatsNewSubColl
-    const followerWhatsNewColl = db.collection('Users').doc(followerUid).collection('whatsNew')
-    //get reference to the follower's noOfFollowedPersonUnReadWhatsNewItems
-    const noOfFollowedPersonUnReadWhatsNewItemsDoc = db.collection('Users').doc(followerUid).collection('whatsNewRecords').doc('noOfFollowedPersonUnReadWhatsNewItems')
+  //check if request came from an authenticated user
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'only authenticated users can block'
+    )
+  }
 
-    return addFollower()
+  const db = admin.firestore()
+  //get follower and followee Uids for identification
+  const followedUid = followedPersonData.uid
+  const followedName = followedPersonData.name
+  const followedUserName = followedPersonData.userName
+  //for identification and notification payload data (Intent Extras for client)
+  const followerUid = context.auth.uid
 
-    async function addFollower() {
+  return addFollowerOrMakeFollowRequest()
 
-      // Check if follower is blocked by the followed, if yes then throw an error
-      await db.collection('Users').doc(followedUid).collection('blocked')
-        .doc(followerUid).get().then(async (blockedFollower: DocumentSnapshot) => {
-          //check if blockedFollower person exists and also check if currently blocked status is true
-          if (blockedFollower.exists && blockedFollower.data()?.currentlyBlocked === true ) {
-            //print a message to console that follower was not added
-            console.log('cannot add follower, follower is blocked by followed')
-            //remove the followed from follower's following sub coll
-            await db.collection('Users').doc(followerUid)
-              .collection('following').doc(followedUid).delete()
+  async function addFollowerOrMakeFollowRequest() {
 
-          } else {
-            //Follower is not blocked by followed so carry on with the logic
 
-            //Find out if Followed is following the Follower already
-            await db.collection('Users').doc(followedUid).collection('following')
-              .doc(followerUid).get().then(async (followerPerson: DocumentSnapshot) => {
+    //get the autoAcceptFollowers variable of the followed
+    await db.collection('Users').doc(followedUid).collection('autoAcceptFollowers')
+      .doc(followedUid).get().then(async (autoAcceptFollowers: DocumentSnapshot) => {
 
-                let followedFollowingBack = false
+        //continue with the follow logic since followed is auto accepting followers
+        if (autoAcceptFollowers.exists && autoAcceptFollowers.data()?.autoAcceptFollowers === true) {
 
-                //if doc exists mean followed is following the follower so set the variable to true
-                if (followerPerson.exists) {
-                  followedFollowingBack = true
-                }
+          console.log(`user is auto accepting followers, add the follower`)
 
-                //Get Follower user details that needs to be duplicated to the Followed's follower Sub Coll
-                //And also added to the notification Payload data
-                await db.collection('Users').doc(followerUid).collection('ProfileInfo')
-                  .doc(followerUid).get().then(async (followerUserProfileDoc: DocumentSnapshot) => {
 
+          // Check if follower is blocked by the followed, if yes then throw an error
+          await db.collection('Users').doc(followedUid).collection('blocked')
+            .doc(followerUid).get().then(async (blockedFollower: DocumentSnapshot) => {
+              //check if blockedFollower person exists and also check if currently blocked status is true
+              if (blockedFollower.exists && blockedFollower.data()?.currentlyBlocked === true) {
+                //print a message to console that follower was not added
+                throw new functions.https.HttpsError(
+                  'unauthenticated',
+                  'cannot add follower, follower is blocked by followed'
+                )
+              }
+
+              //Find out if Followed is following the Follower already
+              await db.collection('Users').doc(followedUid).collection('following')
+                .doc(followerUid).get().then(async (followerPerson: DocumentSnapshot) => {
+
+                  //Get Follower user details that needs to be duplicated to the Followed's follower Sub Coll
+                  //And also added to the notification Payload data
+                  await db.collection('Users').doc(followerUid).get().then(async (followerUserDoc: DocumentSnapshot) => {
 
                     //The FollowerPerson object which will be pushed to the followers sub collection of followed
                     const followerData = {
-                      name: followerUserProfileDoc.data()!.name,
-                      nameLowerCase: followerUserProfileDoc.data()!.name.toLowerCase().toString(),
-                      userName: followerUserProfileDoc.data()!.userName,
+                      name: followerUserDoc.data()!.name,
+                      nameLowerCase: followerUserDoc.data()!.name.toLowerCase().toString(),
+                      userName: followerUserDoc.data()!.userName,
                       uid: followerUid,
                       followedYouAt: Date.now(),
                       //is the followed following back the follower,
-                      followingBack: followedFollowingBack,
+                      followingBack: followerPerson.exists,
                     }
 
-                    const followerThumbnailImageUrl = followerUserProfileDoc.data()!.photoUrl
+                    const followedPerson = {
+                      followedUid: followedUid,
+                      name: followedName,
+                      userName: followedUserName,
+                      noOfComplimentsSent: 0,
+                      interestMeter: Date.now(),
+                      randomId: utilityFunctions.randomId(),
+                      followerUid: followerUid
+                    }
 
-                    //get the notification token of the followed to identify & send notification to his device
-                    await db.collection('Users').doc(followedUid).collection('notificationToken')
-                      .doc('theNotificationToken').get().then(async (notificationTokenDoc: DocumentSnapshot) => {
-
-                        //the fields to be same as the ones at Fs
-                        const followedNotificationToken = notificationTokenDoc.data()?.notificationToken
-
-                        //Create the Notification Payload content
-                        const notificationPayload = {
-                          notification: {
-                            title: 'You have a new Follower',
-                            body: `${followerData.userName}`,
-                            //Add an additional intent filter in manifest file for android for the activity with the name 
-                            //same as the clickAction here or Off Screen Notification click action wont work
-                            clickAction: ".People.PersonProfileActivity",
-                            image: `${followerThumbnailImageUrl}`
-                          },
-                          data: {
-                            ACTIVITY_NAME: "PERSON_PROFILE_ACTIVITY",
-                            //The below field name to be same as the one used in the client
-                            PERSON_UID_INTENT_EXTRA: followerUid,
-                            PERSON_NAME_INTENT_EXTRA: followerData.name,
-                            PERSON_USERNAME_INTENT_EXTRA: followerData.userName,
-                            //If the app is in the foreground then this channel will be used to trigger a notification and this channel has to
-                            //be created at the client else, this will fail
-                            CHANNEL_ID: "Follow Update ID"
-                          }
-                        }
-
-                        const nofiticationDocId = utilityFunctions.randomId()
-
-                        const notificationObject = {
-                          message: null,
-                          receivedTime: Date.now(),
-                          senderUserName: followerData.userName,
-                          senderUid: followerData.uid,
-                          //this will be false by default, will turn true at client when clicked
-                          wasClicked: false,
-                          //this type has be same as in the client
-                          notificationChannelId: "Follow Update ID",
-                          intentToActivity: "PERSON_PROFILE_ACTIVITY",
-                          intentExtrasUid: followerData.uid,
-                          intentExtrasName: followerData.name,
-                          intentExtrasUserName: followerData.userName,
-                          //This is needed for client to access this doc and update the wasClicked field
-                          contentId: followerUid,
-                          notificationId: nofiticationDocId
-                        }
-
-
-                        //Add the follower to the followee sub-collection
-                        await db.collection('Users').doc(followedUid).collection('followers').doc(followerUid).set(followerData)
-                        //Add the notification doc to the user's notification sub collection
-                        await db.collection('Users').doc(followedUid).collection('Notifications').doc(followerUid).set(notificationObject)
-                        //Check if the notificationToken is not null and not "deviceLoggedOut" then attempt to send as it will fail without it anyways
-                        if (followedNotificationToken && String(followedNotificationToken) !== "deviceLoggedOut") {
-                          //Send the notification to the user
-                        await admin.messaging().sendToDevice(followedNotificationToken, notificationPayload)
-                        } else {
-                          console.log('receiver is not Signed In or his notificationToken does not exist')
-                        }
-                        //save the async function as a promise
-                        await markFollowedPersonWhatsNewItemsFollowingStatusToTrueAndIncrementNoOfUnReadItems()
-
-                      })
+                    //Add the follower to the followee sub-collection
+                    await db.collection('Users').doc(followedUid).collection('followers').doc(followerUid).set(followerData)
+                    //Add the followed to the following sub-collection of the follower
+                    await db.collection('Users').doc(followerUid).collection('following').doc(followedUid).set(followedPerson)
 
                   })
 
-              })
-
-          }
-
-        })
-
-    }
-
-    //find the followed person's whatsNew items and mark the following status as true, 
-    //then increment the noOfFollowedPersonUnReadWhatsNewItems
-    //by one if that whatsItem's hasRead field is false as this is a doc that user should read now
-    async function markFollowedPersonWhatsNewItemsFollowingStatusToTrueAndIncrementNoOfUnReadItems() {
-      await followerWhatsNewColl
-        .where('primaryProfileUid', '==', followedUid)
-        .get().then(
-          async (followedWhatsNewItems: DocumentSnapshot[]) => {
-            //check if there are followedPerson's whatsNew items
-            if (followedWhatsNewItems.length !== null) {
-              //loop through each item
-              followedWhatsNewItems.forEach(async followedWhatsNewItem => {
-
-                //update the following status to true
-                await followerWhatsNewColl.doc(followedWhatsNewItem.data()?.id).update({
-                  isFollowing: true
                 })
 
-                //if the whatsNewItem hasRead is false then increment the noOfFollowedPersonUnReadWhatsNewItems
-                if (followedWhatsNewItem.data()?.hasRead === false) {
-                  await noOfFollowedPersonUnReadWhatsNewItemsDoc.update({
-                    noOfFollowedPersonUnReadWhatsNewItems: admin.firestore.FieldValue.increment(1)
-                  })
-                }
+            })
+        }         
+        //followed not auto accepting followers, create a follow request and add it to firestore
+        else {
+          console.log(`user is not auto accepting followers, make a follow request`)
+          const followRequest = {
+            followerUid: followerUid
+          }
+          //Add the followRequestedUid to the followRequests sub-collection of the followed
+          await db.collection('Users').doc(followedUid).collection('followRequests').doc(followerUid).set(followRequest)
 
-              })
-            } else {
-              //print a message to console that no Followed Person whatsNewItems
-              console.log('no Followed Person whatsNewItems available')
-            }
-          })
-    }
+        }
 
-  })
+      })
+  }
+
+})

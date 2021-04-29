@@ -1,95 +1,43 @@
 {
   "indexes": [
     {
-      "collectionGroup": "complimentsReceived",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        {
-          "fieldPath": "complimentId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "senderUid",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "complimentsReceived",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        {
-          "fieldPath": "receiverBlocked",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "receiverUid",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "senderBlocked",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "senderUid",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "receivedTime",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "complimentsReceived",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        {
-          "fieldPath": "receiverBlocked",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "senderBlocked",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "senderUid",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "receivedTime",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "complimentsReceived",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        {
-          "fieldPath": "receiverUid",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "senderUid",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "complimentsReceived",
+      "collectionGroup": "blocked",
       "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "currentlyBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "blockedOrUnBlockedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "BlockRelationships",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "NX1n5QlbWzUQgVMgc2MFo0GlPVp2.currentlyBlocked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "NX1n5QlbWzUQgVMgc2MFo0GlPVp2.blockedOrUnBlockedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "compliments",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
           "fieldPath": "complimentRead",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "receiverBlocked",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "senderBlocked",
+          "fieldPath": "receiverUid",
           "order": "ASCENDING"
         },
         {
@@ -99,38 +47,70 @@
       ]
     },
     {
-      "collectionGroup": "complimentsReceived",
-      "queryScope": "COLLECTION",
+      "collectionGroup": "compliments",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
-          "fieldPath": "receiverBlocked",
+          "fieldPath": "receiverUid",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "senderBlocked",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "complimentId",
-          "order": "ASCENDING"
+          "fieldPath": "receivedTime",
+          "order": "DESCENDING"
         }
       ]
     },
     {
-      "collectionGroup": "complimentsReceived",
+      "collectionGroup": "compliments",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "receiverUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "receivedTime",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "compliments",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "receiverUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "senderUid",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "receivedTime",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "complimentSenders",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "receiverBlocked",
+          "fieldPath": "personBlocked",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "senderBlocked",
+          "fieldPath": "userBlocked",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "complimentId",
-          "order": "DESCENDING"
+          "fieldPath": "randomSenderId",
+          "order": "ASCENDING"
         }
       ]
     },
@@ -159,6 +139,20 @@
         {
           "fieldPath": "interestMeter",
           "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "wasClicked",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "receivedTime",
+          "order": "ASCENDING"
         }
       ]
     },
@@ -223,6 +217,20 @@
         {
           "fieldPath": "timeStamp",
           "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "whatsNew",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "hasRead",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
         }
       ]
     },

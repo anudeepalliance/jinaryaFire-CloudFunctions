@@ -20,25 +20,29 @@ export const profilePhotoThumbnail = functions.region('asia-east2').storage.obje
   // const metageneration = object.metageneration
   
   const folderPath = cloudStorageRawImageFilePath.toString()
-  const photoOwnerUid = 
-    folderPath.substring(folderPath.indexOf("/") + 1, folderPath.lastIndexOf("/"))
-
+  let contentType : String = ""
+  
+  if ( folderPath.includes('profilePhotos') ) {
+    contentType = "profilePhoto"
+  } else if ( folderPath.includes('insights') ) {
+    contentType = "insights"
+  } else {
+    contentType = "compliments"
+  }
   //Exit if this is triggered on a file that is not an image
-  if (!rawImageContentType.startsWith('image/')) {
+  if ( !rawImageContentType.startsWith('image/') ) {
     console.log('This is not an image.')
     return false
   }
 
-  //Get the file name
-
+  //Get the file name and if it starts with thumb then exit the function since that image was
+  //uploaded by this function itself
   const fileName = path.basename(cloudStorageRawImageFilePath)
   //Exit if the image is already a thumbnail
   if (fileName.startsWith('thumb')) {
     console.log('Already a Thumbnail.')
     return false
   }
-  
-
   
   //Initiate an admin access to the storage bucket
   const bucket = admin.storage().bucket(cloudStorageFileBucket)
@@ -57,14 +61,14 @@ export const profilePhotoThumbnail = functions.region('asia-east2').storage.obje
   //which is in the temporary directoy
   await bucket.file(cloudStorageRawImageFilePath).download({destination: tempFilePath})
   console.log('Image downloaded locally to', tempFilePath)
-  console.log(`the uid of the photo Owner is ${photoOwnerUid}`)
+  console.log(`the content type is ${contentType}`)
 
   //Generate a thumbnail using ImageMagick with its path as the temporary filePath
   await spawn('convert', [tempFilePath, '-thumbnail', '100x100>', tempFilePath])
   console.log('Thumbnail created at', tempFilePath)
-  //Add a prefix called 'thumb_' to thumbnail file name, the final name has to be the same as the 
+  //Add a prefix called 'thumb_' to thumbnail file name, the final name has to be the same as the `
   //one in the client as the client looks for the file with the Filename
-  const thumbFileName = `thumb_100x100_${fileName}`
+  const thumbFileName = `thumb_100x100_resized_${fileName}`
   
   //Get a reference to a FilePath that this thumbnail file needs to be uploaded to,
   const thumbFilePath = path.join(
@@ -80,14 +84,16 @@ export const profilePhotoThumbnail = functions.region('asia-east2').storage.obje
     // })
 
   // // Upload the thumbnail to the thumbFilePath created above
-  const uploadTask = await bucket.upload(tempFilePath, {
+  // const uploadTask = 
+  await bucket.upload(tempFilePath, {
     destination: thumbFilePath, metadata: metadata,
   })
 
-  const downloadUrl = uploadTask[0].metadata.mediaLink
-  admin.firestore().collection('Users').doc(photoOwnerUid).update({
-    thumbnailUrl : downloadUrl.toString()
-  })
+  //get the download Url of this thumbnail photo
+  // const downloadUrl = uploadTask[0].metadata.mediaLink
+  // admin.firestore().collection('Users').doc(photoOwnerUid).update({
+  //   thumbnailUrl : downloadUrl.toString()
+  // })
 
   // get a string url reference to the thumbnail Image
   // const thumbnailPath = `profilePhotos/${photoOwnerUid}/thumb_100x100_profilePhoto`

@@ -130,6 +130,13 @@ service cloud.firestore {
         allow read, create, update: if request.auth.uid == uid;
         allow delete : if false;
       }
+
+      match /autoAcceptFollowers/{uid} {
+        //Only the user is authorised to read and write
+        //to his followers sub-collection
+        allow read, create, update: if request.auth.uid == uid;
+        allow delete : if false;
+      }
       
       match /Notifications/{randomId} {
         //User is authorised to create and read

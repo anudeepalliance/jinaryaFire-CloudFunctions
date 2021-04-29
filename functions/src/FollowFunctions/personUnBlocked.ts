@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin')
 
-//When client Unblocks a person, Firestore calls a background function to 
+//When client Unblocks a person
 //1. Remove unBlocked from the blocked sub Coll of the unBlocker
 //2. Remove unBlocker(himself) from the unBlocked person's BlockedBy Sub Coll
 //3. Set the interest Meter of the unBlocker to 1 at unBlocked's compsSentNoDoc
