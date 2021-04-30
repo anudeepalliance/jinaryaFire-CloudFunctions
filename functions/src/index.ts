@@ -37,8 +37,11 @@ exports.acceptFollowRequest = acceptFollowRequest.acceptFollowRequest
 import cancelFollowRequest = require('./FollowFunctions/cancelFollowRequest')
 exports.cancelFollowRequest = cancelFollowRequest.cancelFollowRequest
 
-import removeUserAsFollower = require('./FollowFunctions/removeUserAsFollower')
-exports.removeUserAsFollower = removeUserAsFollower.removeUserAsFollower
+import removeUnFollowerAsFollower = require('./FollowFunctions/removeUnFollowerAsFollower')
+exports.removeUnFollowerAsFollower = removeUnFollowerAsFollower.removeUnFollowerAsFollower
+
+import removeAsFollower = require('./FollowFunctions/removeAsFollower')
+exports.removeAsFollower = removeAsFollower.removeAsFollower
 
 import personBlocked = require('./FollowFunctions/personBlocked')
 exports.personBlocked = personBlocked.personBlocked
