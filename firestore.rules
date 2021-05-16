@@ -330,15 +330,27 @@ service cloud.firestore {
       }
 
   
-  //allow logged in users to create reports on other users
-  match/UserFeedback/{Reports=**} {
+  //allow logged in users to create reports on others content
+  match/UserFeedback/Reports/{ReportContent=**} {
     allow create: if request.auth.uid != null;
+  }
+
+  //allow logged in users to create reports on other users
+  match/UserFeedback/Reports/{ReportPerson=**} {
+    allow create: if request.auth.uid != null;
+  }
+
+  //allow all logged in users to create deactivate account requests in their own document
+  match /UserFeedback/Reports/DeactivateAccountRequests/{uid} {
+    allow write: if request.auth.uid == uid;
   }
 
   //allow all logged in users to create feedback documents but dont allow them to view the feedback sent.
   match /UserFeedback/{Feedback=**} {
     allow create: if request.auth.uid != null;
   }
+
+
 
 
   //End of rules

@@ -57,7 +57,7 @@ export const addNewCompliment = functions.region('asia-south1').https.onCall((co
       //this is the first compliment sent by the sender
       //so create the compliment sender doc first
       await db.collection('Users').doc(complimentData.receiverUid).collection('complimentSenders')
-      .doc(complimentData.senderUid).set(complimentSender)
+        .doc(complimentData.senderUid).set(complimentSender)
 
       //then just add the compliment
       return addCompliment()

@@ -49,6 +49,12 @@ exports.personBlocked = personBlocked.personBlocked
 import personUnBlocked = require('./FollowFunctions/personUnBlocked')
 exports.personUnBlocked = personUnBlocked.personUnBlocked
 
+import deactivateUser = require('./ReportAndFeedback/deactivateUser')
+exports.deactivateUser = deactivateUser.deactivateUser
+
+import reactivateUser = require('./ReportAndFeedback/reactivateUser')
+exports.reactivateUser = reactivateUser.reactivateUser
+
 import updateUserInfoAtFollowedPeople = require('./FollowFunctions/updateUserInfoAtFollowedPeople')
 exports.updateUserInfoAtFollowedPeople = updateUserInfoAtFollowedPeople.updateUserInfoAtFollowedPeople
 
