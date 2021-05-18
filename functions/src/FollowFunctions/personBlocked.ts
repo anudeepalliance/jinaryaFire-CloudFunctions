@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions'
 import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
+const utilityFunctions = require('frequentFunctions')
 
 //When client blocks a person, Firestore triggers a background function to 
 //1. add blocked to the blocked sub coll of the blocker
@@ -67,8 +68,6 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
 
     await setInterestMeterAtCompsSentNoToZeroAtBlocker()
 
-    await addBlockerToBlockedBySubColl()
-
     await stopBlockedFromFollowingTheBlocker()
 
     await setInterestMeterAtCompSentNosToZeroAtBlocked()
@@ -88,11 +87,13 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
   async function addBlockedToBlockedSubCollOfBlocker() {
     //create a blocked person object from the function data and add the person to the blocked Sub Coll\
     const blockedPersonDoc = {
-      uid: blockedPersonData.uid,
+      blockedId : utilityFunctions.randomId(),
+      blockedUid: blockedPersonData.uid,
       name: blockedPersonData.name,
       userName: blockedPersonData.userName,
       blockedOrUnBlockedAt: Date.now(),
-      currentlyBlocked: true
+      currentlyBlocked: true,
+      blockerUid: blockerUid
     }
 
     //add the blocked person to the blocked sub Coll of the blocker
@@ -132,18 +133,6 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
     }
   }
 
-  async function addBlockerToBlockedBySubColl() {
-    const blockedByUidDoc = {
-      uid: blockerUid
-    }
-    //Add Blocker to Blocked by Sub Collection of the Blocked
-    //User need not know whom all he has been blocked by hence just the Uid is added for
-    //Checking purposes in perope recycler views
-    await db.collection('Users').doc(blockedUid).collection('blockedBy').doc(blockerUid).set(
-      blockedByUidDoc
-    )
-
-  }
 
   async function stopBlockedFromFollowingTheBlocker() {
     //Check if the blocked person is following the blocker

@@ -55,6 +55,9 @@ exports.deactivateUser = deactivateUser.deactivateUser
 import reactivateUser = require('./ReportAndFeedback/reactivateUser')
 exports.reactivateUser = reactivateUser.reactivateUser
 
+import deleteDeactivatedUsers = require('./ReportAndFeedback/deleteDeactivatedUsers')
+exports.deleteDeactivatedUsers = deleteDeactivatedUsers.deleteDeactivatedUsers
+
 import updateUserInfoAtFollowedPeople = require('./FollowFunctions/updateUserInfoAtFollowedPeople')
 exports.updateUserInfoAtFollowedPeople = updateUserInfoAtFollowedPeople.updateUserInfoAtFollowedPeople
 
@@ -99,11 +102,11 @@ exports.sendCompLikeNotificationToReceiver = sendCompLikeNotificationToReceiver.
 import sendCompLikeNotificationToSender = require('./Compliment/sendCompLikeNotificationToSender')
 exports.sendCompLikeNotificationToSender = sendCompLikeNotificationToSender.sendCompLikeNotificationToSender
 
-import incrementNoOfFollowers = require('./FollowFunctions/incrementNoOfFollowers')
-exports.incrementNoOfFollowers = incrementNoOfFollowers.incrementNoOfFollowers
+// import incrementNoOfFollowers = require('./FollowFunctions/incrementNoOfFollowers')
+// exports.incrementNoOfFollowers = incrementNoOfFollowers.incrementNoOfFollowers
 
-import decrementNoOfFollowers = require('./FollowFunctions/decrementNoOfFollowers')
-exports.decrementNoOfFollowers = decrementNoOfFollowers.decrementNoOfFollowers
+// import decrementNoOfFollowers = require('./FollowFunctions/decrementNoOfFollowers')
+// exports.decrementNoOfFollowers = decrementNoOfFollowers.decrementNoOfFollowers
 
 import sendInsightLikeNotificationToOwner = require('./Insights/sendInsightLikeNotificationToOwner')
 exports.sendInsightLikeNotificationToOwner = sendInsightLikeNotificationToOwner.sendInsightLikeNotificationToOwner

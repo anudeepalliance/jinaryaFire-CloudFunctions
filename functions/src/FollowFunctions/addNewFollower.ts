@@ -65,13 +65,12 @@ export const addNewFollower = functions.region('asia-south1').https.onCall((foll
 
                     //The FollowerPerson object which will be pushed to the followers sub collection of followed
                     const followerData = {
+                      followerUid: followerUid,
                       name: followerUserDoc.data()!.name,
-                      nameLowerCase: followerUserDoc.data()!.name.toLowerCase().toString(),
                       userName: followerUserDoc.data()!.userName,
-                      uid: followerUid,
                       followedYouAt: Date.now(),
-                      //is the followed following back the follower,
                       followingBack: followerPerson.exists,
+                      followedUid: followedUid,  
                     }
 
                     const followedPerson = {
@@ -99,8 +98,11 @@ export const addNewFollower = functions.region('asia-south1').https.onCall((foll
         else {
           console.log(`user is not auto accepting followers, make a follow request`)
           const followRequest = {
+            followRequestedUid: followedUid,
             followerUid: followerUid
           }
+        
+           
           //Add the followRequestedUid to the followRequests sub-collection of the followed
           await db.collection('Users').doc(followedUid).collection('followRequests').doc(followerUid).set(followRequest)
 

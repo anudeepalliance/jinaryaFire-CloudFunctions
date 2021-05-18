@@ -10,13 +10,13 @@ export const deactivateUser = functions.region('asia-south1').firestore.document
         //get the uid of the user who made this request
         const deactivateRequestUid = context.params.deactivateRequestedUid
         const db = admin.firestore()
-        const usersColl = db.collection('Users').doc(deactivateRequestUid)
+        const userDocAtUsersColl = db.collection('Users').doc(deactivateRequestUid)
 
         return deactiveTheUser()
 
         async function deactiveTheUser() {
             //get the user doc
-            await usersColl.get().then(async (userDoc: DocumentSnapshot) => {
+            await userDocAtUsersColl.get().then(async (userDoc: DocumentSnapshot) => {
                 //create a deactivate user from the user retrieved
                 const deactivateUserObject = {
                     uid: userDoc.data()?.uid,
@@ -30,7 +30,7 @@ export const deactivateUser = functions.region('asia-south1').firestore.document
                     .doc(deactivateUserObject.uid)
                     .set(deactivateUserObject)
                 //delete the user doc from the Users Collection
-                await usersColl.delete()
+                await userDocAtUsersColl.delete()
             })
         }
 

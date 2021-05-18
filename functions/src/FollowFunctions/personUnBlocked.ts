@@ -51,8 +51,6 @@ export const personUnBlocked = functions.region('asia-south1').https.onCall((unB
 
         await updateBlockedAtAndCurrentlyBlockedStatus()
 
-        await removeUnBlockedFromBlockedBySubColl()
-
         await setInterestMeterAtCompsSentNoLocatedAtUnBlockerToOne()
 
         await setInterestMeterAtCompsSentNoLocatedAtUnBlockedToOne()
@@ -70,11 +68,6 @@ export const personUnBlocked = functions.region('asia-south1').https.onCall((unB
             blockedOrUnBlockedAt : Date.now(),
             currentlyBlocked : false
           })
-    }
-
-    async function removeUnBlockedFromBlockedBySubColl() {
-        //Remove Unblocker from unBlocked person's BlockedBy Sub Coll
-        await db.collection('Users').doc(unBlockedUid).collection('blockedBy').doc(unBlockerUid).delete()
     }
 
     async function setInterestMeterAtCompsSentNoLocatedAtUnBlockerToOne() {
