@@ -23,8 +23,6 @@ export const addNewFollower = functions.region('asia-south1').https.onCall((foll
   const db = admin.firestore()
   //get follower and followee Uids for identification
   const followedUid = followedPersonData.uid
-  const followedName = followedPersonData.name
-  const followedUserName = followedPersonData.userName
   //for identification and notification payload data (Intent Extras for client)
   const followerUid = context.auth.uid
 
@@ -66,8 +64,6 @@ export const addNewFollower = functions.region('asia-south1').https.onCall((foll
                     //The FollowerPerson object which will be pushed to the followers sub collection of followed
                     const followerData = {
                       followerUid: followerUid,
-                      name: followerUserDoc.data()!.name,
-                      userName: followerUserDoc.data()!.userName,
                       followedYouAt: Date.now(),
                       followingBack: followerPerson.exists,
                       followedUid: followedUid,  
@@ -75,17 +71,15 @@ export const addNewFollower = functions.region('asia-south1').https.onCall((foll
 
                     const followedPerson = {
                       followedUid: followedUid,
-                      name: followedName,
-                      userName: followedUserName,
                       noOfComplimentsSent: 0,
                       interestMeter: Date.now(),
                       randomId: utilityFunctions.randomId(),
                       followerUid: followerUid
                     }
 
-                    //Add the follower to the followee sub-collection
+                    //Add the follower to the followers sub-collection of followed
                     await db.collection('Users').doc(followedUid).collection('followers').doc(followerUid).set(followerData)
-                    //Add the followed to the following sub-collection of the follower
+                    //Add the followed to the followed sub-collection of follower
                     await db.collection('Users').doc(followerUid).collection('following').doc(followedUid).set(followedPerson)
 
                   })

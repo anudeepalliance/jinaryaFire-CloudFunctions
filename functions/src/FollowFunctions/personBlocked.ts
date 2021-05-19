@@ -66,19 +66,19 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
 
     await stopBlockerFromFollowingTheBlocked()
 
-    await setInterestMeterAtCompsSentNoToZeroAtBlocker()
+    // await setInterestMeterAtCompsSentNoToZeroAtBlocker()
 
     await stopBlockedFromFollowingTheBlocker()
 
-    await setInterestMeterAtCompSentNosToZeroAtBlocked()
+    // await setInterestMeterAtCompSentNosToZeroAtBlocked()
 
-    await setPersonBlockedAtCompSenderPersonToTrue()
+    // await setPersonBlockedAtCompSenderPersonToTrue()
 
-    await setUserBlockedAtCompSenderPersonToTrue()
+    // await setUserBlockedAtCompSenderPersonToTrue()
 
     // await deleteAllUnReadComplimentsSentByBlocker()
 
-    await deleteAllUnReadComplimentsReceivedByBlocked()
+    // await deleteAllUnReadComplimentsReceivedByBlocked()
 
     await deleteFollowRequestsBetweenTheTwo()
 
@@ -89,17 +89,13 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
     const blockedPersonDoc = {
       blockedId : utilityFunctions.randomId(),
       blockedUid: blockedPersonData.uid,
-      name: blockedPersonData.name,
-      userName: blockedPersonData.userName,
       blockedOrUnBlockedAt: Date.now(),
       currentlyBlocked: true,
       blockerUid: blockerUid
     }
 
     //add the blocked person to the blocked sub Coll of the blocker
-    await db.collection('Users').doc(blockerUid).collection('blocked').doc(blockedUid).set(
-      blockedPersonDoc
-    )
+    await db.collection('Users').doc(blockerUid).collection('blocked').doc(blockedUid).set(blockedPersonDoc)
 
   }
 
@@ -110,28 +106,28 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
       //stop following the blocked
       await db.collection('Users').doc(blockerUid).collection('following').doc(blockedUid).delete()
       //decrement noOfFollowing People
-      await db.collection('Users').doc(blockerUid).collection('ProfileInfo').doc(blockerUid).update({
-        noOfFollowing: admin.firestore.FieldValue.increment(-1)
-      })
+      // await db.collection('Users').doc(blockerUid).collection('ProfileInfo').doc(blockerUid).update({
+      //   noOfFollowing: admin.firestore.FieldValue.increment(-1)
+      // })
       //removed the blocker as follower to the blocked ( it exists since he was following the blocked )
       await db.collection('Users').doc(blockedUid).collection('followers').doc(blockerUid).delete()
       //decrement the noOfFollowers at blocked
-      await db.collection('Users').doc(blockedUid).collection('ProfileInfo').doc(blockedUid).update({
-        noOfFollowers: admin.firestore.FieldValue.increment(-1)
-      })
+      // await db.collection('Users').doc(blockedUid).collection('ProfileInfo').doc(blockedUid).update({
+      //   noOfFollowers: admin.firestore.FieldValue.increment(-1)
+      // })
     }
   }
 
-  async function setInterestMeterAtCompsSentNoToZeroAtBlocker() {
-    const compsSentNosDocOfBlockedDocRef = db.collection('Users').doc(blockerUid).collection('complimentsSentNumbers').doc(blockedUid)
-    const compsSentNosDocOfBlocked = await compsSentNosDocOfBlockedDocRef.get()
-    if (compsSentNosDocOfBlocked.exists) {
-      //set the interestMeter to 0 at blocked's compsSentNosDoc of the blocker
-      await compsSentNosDocOfBlockedDocRef.update({
-        interestMeter: 0
-      })
-    }
-  }
+  // async function setInterestMeterAtCompsSentNoToZeroAtBlocker() {
+  //   const compsSentNosDocOfBlockedDocRef = db.collection('Users').doc(blockerUid).collection('complimentsSentNumbers').doc(blockedUid)
+  //   const compsSentNosDocOfBlocked = await compsSentNosDocOfBlockedDocRef.get()
+  //   if (compsSentNosDocOfBlocked.exists) {
+  //     //set the interestMeter to 0 at blocked's compsSentNosDoc of the blocker
+  //     await compsSentNosDocOfBlockedDocRef.update({
+  //       interestMeter: 0
+  //     })
+  //   }
+  // }
 
 
   async function stopBlockedFromFollowingTheBlocker() {
@@ -155,38 +151,38 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
     }
   }
 
-  async function setInterestMeterAtCompSentNosToZeroAtBlocked() {
-    const compsSentNosDocOfBlockerDocRef = db.collection('Users').doc(blockedUid).collection('complimentsSentNumbers').doc(blockerUid)
-    const compsSentNosDocOfBlocker = await compsSentNosDocOfBlockerDocRef.get()
-    if (compsSentNosDocOfBlocker.exists) {
-      //set the interestMeter to 0 at blocked's compsSentNosDoc of the blocker
-      await compsSentNosDocOfBlockerDocRef.update({
-        interestMeter: 0
-      })
-    }
-  }
+  // async function setInterestMeterAtCompSentNosToZeroAtBlocked() {
+  //   const compsSentNosDocOfBlockerDocRef = db.collection('Users').doc(blockedUid).collection('complimentsSentNumbers').doc(blockerUid)
+  //   const compsSentNosDocOfBlocker = await compsSentNosDocOfBlockerDocRef.get()
+  //   if (compsSentNosDocOfBlocker.exists) {
+  //     //set the interestMeter to 0 at blocked's compsSentNosDoc of the blocker
+  //     await compsSentNosDocOfBlockerDocRef.update({
+  //       interestMeter: 0
+  //     })
+  //   }
+  // }
 
-  async function setPersonBlockedAtCompSenderPersonToTrue() {
-    const complimentSenderAtBlockerDocRef = db.collection('Users').doc(blockerUid).collection('complimentSenders').doc(blockedUid)
-    //set the personBlocked status of blocked's complimentSender person located at blocker's compsSenders subColl to true
-    const complimentSenderAtBlockerDoc = await complimentSenderAtBlockerDocRef.get()
-    if ( complimentSenderAtBlockerDoc.exists ) {
-      await complimentSenderAtBlockerDocRef.update({
-        personBlocked: true
-      })
-    }
-  }
+  // async function setPersonBlockedAtCompSenderPersonToTrue() {
+  //   const complimentSenderAtBlockerDocRef = db.collection('Users').doc(blockerUid).collection('complimentSenders').doc(blockedUid)
+  //   //set the personBlocked status of blocked's complimentSender person located at blocker's compsSenders subColl to true
+  //   const complimentSenderAtBlockerDoc = await complimentSenderAtBlockerDocRef.get()
+  //   if ( complimentSenderAtBlockerDoc.exists ) {
+  //     await complimentSenderAtBlockerDocRef.update({
+  //       personBlocked: true
+  //     })
+  //   }
+  // }
 
-  async function setUserBlockedAtCompSenderPersonToTrue() {
-    const complimentSenderAtBlockedDocRef = db.collection('Users').doc(blockedUid).collection('complimentSenders').doc(blockerUid)
-    //set the userBlocked status at blocker's complimentSender person located at blocked's compsSenders subColl to true
-    const complimentSenderAtBlockedDoc = await complimentSenderAtBlockedDocRef.get()
-    if (complimentSenderAtBlockedDoc.exists) {
-      await complimentSenderAtBlockedDocRef.update({
-        userBlocked: true
-      })
-    }
-  }
+  // async function setUserBlockedAtCompSenderPersonToTrue() {
+  //   const complimentSenderAtBlockedDocRef = db.collection('Users').doc(blockedUid).collection('complimentSenders').doc(blockerUid)
+  //   //set the userBlocked status at blocker's complimentSender person located at blocked's compsSenders subColl to true
+  //   const complimentSenderAtBlockedDoc = await complimentSenderAtBlockedDocRef.get()
+  //   if (complimentSenderAtBlockedDoc.exists) {
+  //     await complimentSenderAtBlockedDocRef.update({
+  //       userBlocked: true
+  //     })
+  //   }
+  // }
 
   //disabled this since its alright to see unRead compsReceived from blocker, this will avoid exploitation by blocker,
   //and sticks to whatsApp logic where unRead msgs can still be seen by blocked person
@@ -204,19 +200,19 @@ export const personBlocked = functions.region('asia-south1').https.onCall((block
 
   // }
 
-  async function deleteAllUnReadComplimentsReceivedByBlocked() {
-    //delete unRead comps sent by Blocked to Blocker
-    const unReadCompsReceivedByBlocked = db.collection('Users').doc(blockerUid).collection('complimentSenders').doc(blockedUid)
-    .collection('compliments').where('complimentRead', '==', false)
+  // async function deleteAllUnReadComplimentsReceivedByBlocked() {
+  //   //delete unRead comps sent by Blocked to Blocker
+  //   const unReadCompsReceivedByBlocked = db.collection('Users').doc(blockerUid).collection('complimentSenders').doc(blockedUid)
+  //   .collection('compliments').where('complimentRead', '==', false)
 
-    await unReadCompsReceivedByBlocked.get().then(async (unReadCompsReceived: DocumentSnapshot[]) => {
-      unReadCompsReceived.forEach(async unReadCompReceived => {
-        const complimentRef = unReadCompReceived.ref
-        await complimentRef.delete()
-      })
-    })
+  //   await unReadCompsReceivedByBlocked.get().then(async (unReadCompsReceived: DocumentSnapshot[]) => {
+  //     unReadCompsReceived.forEach(async unReadCompReceived => {
+  //       const complimentRef = unReadCompReceived.ref
+  //       await complimentRef.delete()
+  //     })
+  //   })
 
-  }
+  // }
 
   async function deleteFollowRequestsBetweenTheTwo() {
     //delete follow request from blocked to the blocker
