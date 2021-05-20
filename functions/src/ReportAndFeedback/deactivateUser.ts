@@ -23,12 +23,14 @@ export const deactivateUser = functions.region('asia-south1').firestore.document
                     userName: userDoc.data()?.userName,
                     name: userDoc.data()?.name
                 }
+                
                 //insert the user to the deactivatedUsers Collection
                 await db.collection('UserFeedback')
                     .doc('Reports')
                     .collection('DeactivatedUsers')
                     .doc(deactivateUserObject.uid)
                     .set(deactivateUserObject)
+                    
                 //delete the user doc from the Users Collection
                 await userDocAtUsersColl.delete()
             })
