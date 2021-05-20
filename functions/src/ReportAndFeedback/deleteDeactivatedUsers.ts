@@ -6,7 +6,7 @@ const admin = require('firebase-admin')
 export const deleteDeactivatedUsers = functions.region('asia-south1')
     .pubsub.schedule('every 43200 minutes').onRun((context) => {
 
-        //thirty days in millis
+        //thirty days in millis.
         // const thirtyDaysInMillis = 86400000
         const thirtyDaysInMillis = 5000
         //get the 30day window
