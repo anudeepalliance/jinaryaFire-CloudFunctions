@@ -3,7 +3,7 @@ import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 const admin = require('firebase-admin')
 
 //When a user has made a deactivate request more than 30 days ago then delete all the user data permanently
-export const deleteDeactivatedUsers = functions.region('asia-south1')
+export const deleteDeactivatedUsers = functions.runWith({maxInstances: 1}).region('asia-south1')
     .pubsub.schedule('every 43200 minutes').onRun((context) => {
 
         //thirty days in millis.
