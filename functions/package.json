@@ -23,7 +23,7 @@
     "frequentFunctions": "file:lib/Utils/frequentFunctions",
     "fs-extra": "^9.1.0",
     "globalVariables": "file:lib/Utils/globalVariables",
-    "sharp": "^0.27.2"
+    "sharp": "^0.30.5"
   },
   "devDependencies": {
     "tslint": "^5.20.1",
